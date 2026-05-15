@@ -11,18 +11,19 @@ documentation gathered during any CREST project work.
 
 | Folder | Purpose |
 | ------ | ------- |
-| `[docs/vendor/](docs/vendor/)` | Vendor-supplied documentation, data sheets, manuals, and reference material |
-| `[docs/internal/](docs/internal/)` | Internal notes, decisions, and meeting records |
+| [docs/](docs/) | Documentation index for the docs area and subfolders |
+| [docs/vendor/](docs/vendor/) | Vendor-supplied documentation, data sheets, manuals, and reference material |
+| [docs/internal/](docs/internal/) | Internal notes, decisions, and meeting records |
 
 ### Generic Repository Tooling
 
 | File/Folder | Purpose |
 | ----------- | ------- |
-| `[.githooks/](.githooks/)` | Git hook scripts used for pre-commit and pre-push validation |
-| `[scripts/](scripts/)` | Utility scripts used by hooks (e.g., VS Code settings sorting) |
-| `[.markdownlint.yaml](.markdownlint.yaml)` | Shared markdownlint rule configuration used by the pre-commit hook |
-| `[.gitattributes](.gitattributes)` | Cross-platform line-ending and binary file handling policy |
-| `[Makefile](Makefile)` | Optional convenience shortcuts for hook setup, settings sort, and docs lint |
+| [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
+| [scripts/](scripts/) | Utility scripts used by hooks (e.g., VS Code settings sorting) |
+| [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |
+| [.gitattributes](.gitattributes) | Cross-platform line-ending and binary file handling policy |
+| [Makefile](Makefile) | Optional convenience shortcuts for hook setup, settings sort, and docs lint |
 
 ### Tooling Commands (Optional)
 
@@ -35,7 +36,7 @@ make lint-docs
 make lint-docs-fix
 ```
 
-If `make` is not available, run the scripts directly from `scripts/`.
+If `make` is not available, run the scripts directly from [scripts/](scripts/).
 
 ## Access
 
