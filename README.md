@@ -1,4 +1,4 @@
-# wip-crst — Crest
+# Crest
 
 This repository captures vendor documentation and internal notes related to the Crest project.
 
