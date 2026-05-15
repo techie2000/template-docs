@@ -1,0 +1,111 @@
+{
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "chat.agent.maxRequests": 35,
+  "chat.math.enabled": true,
+  "chat.mcp.autostart": "onlyNew",
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": true,
+    "cursor-global": true,
+    "cursor-workspace": true,
+    "windsurf": true
+  },
+  "chat.tools.terminal.autoApprove": {
+    "make": true,
+    "mkdir": true
+  },
+  "chat.useAgentSkills": true,
+  "chat.useCustomizationsInParentRepositories": true,
+  "chat.viewSessions.orientation": "stacked",
+  "chatCustomizationsEvaluations.customDiagnostics": null,
+  "code-eol.highlightExtraWhitespace": true,
+  "code-eol.highlightNonDefault": true,
+  "cSpell.allowCompoundWords": false,
+  "cSpell.autocorrect": false,
+  "cSpell.caseSensitive": true,
+  "cSpell.customDictionaries": {
+    "crest-words": {
+      "addWords": true,
+      "description": "Project-specific accepted words",
+      "name": "crest-words",
+      "path": "${workspaceFolder}/.vscode/crest-words.txt",
+      "scope": "workspace"
+    },
+    "generic-project-words": {
+      "addWords": true,
+      "description": "Project-specific accepted words",
+      "name": "generic-project-words",
+      "path": "${workspaceFolder}/.vscode/generic-project-words.txt",
+      "scope": "workspace"
+    }
+  },
+  "cSpell.enabled": true,
+  "cSpell.enabledFileTypes": {
+    "markdown": true
+  },
+  "cSpell.ignoreRegExpList": null,
+  "cSpell.language": "en,en-GB",
+  "csv.enabled": true,
+  "diffEditor.diffAlgorithm": "advanced",
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.autoClosingBrackets": "languageDefined",
+  "editor.inlineSuggest.edits.showCollapsed": true,
+  "editor.renderControlCharacters": false,
+  "editor.renderWhitespace": "all",
+  "editor.showFoldingControls": "always",
+  "favorites.saveSeparated": true,
+  "files.exclude": {
+    "**/backups/**": true,
+    "**/worktrees/**": true
+  },
+  "files.watcherExclude": {
+    "**/backups/**": true,
+    "**/worktrees/**": true
+  },
+  "git.autofetch": true,
+  "github.copilot.chat.anthropic.cacheBreakpoints.lastTwoMessages": true,
+  "github.copilot.chat.anthropic.tools.websearch.enabled": true,
+  "github.copilot.chat.anthropic.tools.websearch.userLocation": {},
+  "github.copilot.chat.cli.remote.enabled": true,
+  "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.copilotMemory.enabled": true,
+  "github.copilot.chat.githubMcpServer.enabled": true,
+  "github.copilot.chat.localIndex.enabled": true,
+  "github.copilot.chat.responsesApi.toolSearchTool.enabled": true,
+  "github.copilot.chat.reviewSelection.instructions": "Please review the following code for potential issues and improvements.",
+  "github.copilot.chat.skillTool.enabled": true,
+  "github.copilot.chat.switchAgent.enabled": true,
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "imageCarousel.explorerContextMenu.enabled": true,
+  "inlineChat.notebookAgent": true,
+  "logViewer.chunkSizeKb": 64,
+  "logViewer.followTailMode": "auto",
+  "logViewer.logLevel": "error",
+  "logViewer.options": {
+    "encoding": "utf8",
+    "fileCheckInterval": 500,
+    "fileListInterval": 2000,
+    "ignorePattern": "(node_modules|.git)"
+  },
+  "logViewer.showStatusBarItemOnChange": true,
+  "makefile.configureOnOpen": true,
+  "markdown-mermaid.controls.show": "always",
+  "notebook.showFoldingControls": "always",
+  "search.exclude": {
+    "**/backups/**": true,
+    "**/worktrees/**": true
+  },
+  "terminal.integrated.localEchoEnabled": "auto",
+  "terminal.integrated.suggest.enabled": true,
+  "terminal.integrated.suggest.providers": {
+    "lsp": true
+  },
+  "terminal.integrated.suggest.quickSuggestions": {
+    "arguments": "on",
+    "commands": "on"
+  },
+  "terminal.integrated.windowsUseConptyDll": true,
+  "workbench.browser.enableChatTools": true,
+  "workbench.colorTheme": "Copilot Theme"
+}
