@@ -38,3 +38,4 @@ make lint-docs
 3. Add screenshots/diagrams under [images/](images/).
 4. Update [.vscode/extensions.json](.vscode/extensions.json) recommendations if needed.
 5. Add project-specific words to `*-words.txt` files in [.vscode/](.vscode/).
+6. Register each new word list under `cSpell.customDictionaries` in [.vscode/settings.json](.vscode/settings.json).
