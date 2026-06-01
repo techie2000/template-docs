@@ -26,7 +26,9 @@ function ConvertTo-SortedJsonNode {
         foreach ($item in $Node) {
             $items += ,(ConvertTo-SortedJsonNode -Node $item)
         }
-        return $items
+        # Preserve array shape. Without unary comma, PowerShell unrolls arrays:
+        # [] -> $null and [x] -> x, which breaks JSON schema-typed arrays.
+        return ,$items
     }
 
     return $Node

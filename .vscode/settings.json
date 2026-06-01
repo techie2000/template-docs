@@ -18,7 +18,7 @@
   "chat.useAgentSkills": true,
   "chat.useCustomizationsInParentRepositories": true,
   "chat.viewSessions.orientation": "stacked",
-  "chatCustomizationsEvaluations.customDiagnostics": null,
+  "chatCustomizationsEvaluations.customDiagnostics": [],
   "code-eol.highlightExtraWhitespace": true,
   "code-eol.highlightNonDefault": true,
   "cSpell.allowCompoundWords": false,
@@ -44,7 +44,7 @@
   "cSpell.enabledFileTypes": {
     "markdown": true
   },
-  "cSpell.ignoreRegExpList": null,
+  "cSpell.ignoreRegExpList": [],
   "cSpell.language": "en,en-GB",
   "csv.enabled": true,
   "diffEditor.diffAlgorithm": "advanced",
@@ -73,9 +73,11 @@
   "github.copilot.chat.githubMcpServer.enabled": true,
   "github.copilot.chat.localIndex.enabled": true,
   "github.copilot.chat.responsesApi.toolSearchTool.enabled": true,
-  "github.copilot.chat.reviewSelection.instructions": {
-    "text": "Please review the following code for potential issues and improvements."
-  },
+  "github.copilot.chat.reviewSelection.instructions": [
+    {
+      "text": "Please review the following code for potential issues and improvements."
+    }
+  ],
   "github.copilot.chat.skillTool.enabled": true,
   "github.copilot.chat.switchAgent.enabled": true,
   "github.copilot.nextEditSuggestions.enabled": true,
