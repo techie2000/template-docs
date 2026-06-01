@@ -73,7 +73,9 @@
   "github.copilot.chat.githubMcpServer.enabled": true,
   "github.copilot.chat.localIndex.enabled": true,
   "github.copilot.chat.responsesApi.toolSearchTool.enabled": true,
-  "github.copilot.chat.reviewSelection.instructions": "Please review the following code for potential issues and improvements.",
+  "github.copilot.chat.reviewSelection.instructions": {
+    "text": "Please review the following code for potential issues and improvements."
+  },
   "github.copilot.chat.skillTool.enabled": true,
   "github.copilot.chat.switchAgent.enabled": true,
   "github.copilot.nextEditSuggestions.enabled": true,
