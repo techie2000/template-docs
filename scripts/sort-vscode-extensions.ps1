@@ -26,6 +26,12 @@ function ConvertTo-SortedJsonNode {
         foreach ($item in $Node) {
             $items += ,(ConvertTo-SortedJsonNode -Node $item)
         }
+
+        # For extension ID lists (string arrays), normalize order alphabetically.
+        if ($items.Count -gt 0 -and ($items | Where-Object { $_ -isnot [string] } | Measure-Object).Count -eq 0) {
+            $items = @($items | Sort-Object)
+        }
+
         # Preserve array shape for empty and single-item arrays.
         return ,$items
     }
