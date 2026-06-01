@@ -95,6 +95,20 @@ When creating or editing markdown files, use the `markdownlint` rules defined in
 
 #### Mermaid Best Practices
 
+##### Mermaid Label Line Break Rule (REQUIRED)
+
+When writing multi-line Mermaid node labels:
+
+- Use `<br/>` inside quoted labels.
+- Do **not** use escaped newline tokens like `\n` in labels.
+
+Required pre-check before finalizing diagram markdown:
+
+1. Search changed diagram markdown for literal `\n` text.
+2. Replace any `\n` label content with `<br/>`.
+
+This prevents visible `\n` artifacts in rendered diagrams in GitHub and VS Code previews.
+
 ```markdown
 ## Example Architecture Diagram
 
