@@ -25,13 +25,6 @@
   "cSpell.autocorrect": false,
   "cSpell.caseSensitive": true,
   "cSpell.customDictionaries": {
-    "crest-words": {
-      "addWords": true,
-      "description": "Project-specific accepted words",
-      "name": "crest-words",
-      "path": "${workspaceFolder}/.vscode/crest-words.txt",
-      "scope": "workspace"
-    },
     "generic-project-words": {
       "addWords": true,
       "description": "Project-specific accepted words",

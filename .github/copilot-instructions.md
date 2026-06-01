@@ -1,4 +1,4 @@
-# GitHub Copilot Configuration for Crest
+# GitHub Copilot Configuration for Work Template Docs
 
 This repository uses GitHub Copilot custom instructions, agents, and prompts to maintain code quality and consistency.
 The configuration has been tailored specifically for this repository.
