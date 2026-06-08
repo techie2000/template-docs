@@ -20,14 +20,14 @@ else
 init: install-hooks settings-sort
 
 install-hooks:
->./scripts/install-hooks.sh
+>bash ./scripts/install-hooks.sh
 
 settings-sort:
->./scripts/settings-sort.sh
+>bash ./scripts/settings-sort.sh
 
 lint-docs:
->./scripts/lint-docs.sh
+>bash ./scripts/lint-docs.sh
 
 lint-docs-fix:
->./scripts/lint-docs.sh --fix
+>bash ./scripts/lint-docs.sh --fix
 endif

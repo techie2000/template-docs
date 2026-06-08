@@ -6,8 +6,11 @@ applyTo: '**/*.ps1,**/*.psm1'
 
 When writing or modifying PowerShell functions or cmdlets in this repository:
 
-- Use only [approved PowerShell verbs](https://learn.microsoft.com/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands) for function names.
-- Do not introduce new functions with unapproved verbs such as `Ask`, `Do`, `Handle`, or `Process` unless they are part of an external interface that cannot be changed.
+- Use only [approved PowerShell verbs](https://learn.microsoft.com/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands)
+  for function names.
+- Do not introduce new functions with unapproved verbs such as `Ask`, `Do`,
+  `Handle`, or `Process` unless they are part of an external interface that
+  cannot be changed.
 - Prefer standard verb-noun naming, such as:
   - `Get-...`
   - `Set-...`

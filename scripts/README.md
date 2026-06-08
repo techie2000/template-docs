@@ -31,15 +31,19 @@ Bash:
 
 ```bash
 make init
-./scripts/install-hooks.sh
-./scripts/settings-sort.sh
-./scripts/lint-docs.sh
-./scripts/lint-docs.sh --fix
+bash ./scripts/install-hooks.sh
+bash ./scripts/settings-sort.sh
+bash ./scripts/lint-docs.sh
+bash ./scripts/lint-docs.sh --fix
 ```
 
 For repos created from this template, run `make init` once after cloning.
 Git local config (`.git/config`) is not version-controlled, so hook setup must
 be applied per clone.
+
+Invoke `.sh` helpers through `bash` rather than relying on the executable bit.
+That keeps script execution reliable in agent-driven and cross-platform checkouts
+where file mode metadata may not be preserved.
 
 ## Notes
 
