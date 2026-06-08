@@ -10,6 +10,7 @@ This folder contains helper scripts for local repository tooling.
 | `install-hooks.sh` | Bash | Configures `core.hooksPath` to `.githooks` and applies executable bits when available. |
 | `lint-docs.ps1` | PowerShell | Runs markdownlint-cli2 using `.markdownlint.yaml`; supports optional fix mode. |
 | `lint-docs.sh` | Bash | Runs markdownlint-cli2 using `.markdownlint.yaml`; supports optional fix mode. |
+| `PSScriptAnalyzerSettings.psd1` | PowerShell | Shared PSScriptAnalyzer settings used to enforce approved PowerShell verbs. |
 | `settings-sort.ps1` | PowerShell | Wrapper for `sort-vscode-settings.ps1`; supports `-CheckOnly`. |
 | `settings-sort.sh` | Bash | Wrapper that delegates to `sort-vscode-settings.ps1` via `pwsh`. |
 | `sort-vscode-settings.ps1` | PowerShell | Canonical JSON key sorter for `.vscode/settings.json`; used by git hooks. |
@@ -43,4 +44,5 @@ be applied per clone.
 ## Notes
 
 - `sort-vscode-settings.ps1` is intentionally PowerShell-only because git hooks call it directly.
+- `PSScriptAnalyzerSettings.psd1` is used by the GitHub Actions PowerShell lint workflow to enforce `PSUseApprovedVerbs`.
 - The `.ps1`/`.sh` helper pairs are maintained for cross-platform script parity.
