@@ -1,6 +1,9 @@
-claude
+Claude
+Clearstream
+DTCC
 gantt
 github
 ISIN
+pycache
 setext
 toplevel
