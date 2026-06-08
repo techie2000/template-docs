@@ -10,6 +10,11 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.bak
+!.tmp/
+
+# Repository-local transient outputs
+.tmp/*
+!.tmp/.gitkeep
 
 # Python cache files
 __pycache__/

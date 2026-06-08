@@ -23,6 +23,7 @@ and operational references for the software or service being documented.
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
+| [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 
 ## Quick Start
 
@@ -45,6 +46,7 @@ When adding or editing PowerShell in repositories created from this template:
 - Use only approved PowerShell verbs for function names.
 - Treat `PSScriptAnalyzer` rule `PSUseApprovedVerbs` as a required check for new or edited PowerShell code.
 - Review `.github/instructions/powershell-approved-verbs.instructions.md` for the repository instruction used by Copilot.
+- The repository includes `scripts/PSScriptAnalyzerSettings.psd1` and `.github/workflows/powershell-lint.yml` to validate PowerShell scripts in GitHub Actions.
 
 ## Repository Customization Checklist
 
@@ -54,4 +56,4 @@ When adding or editing PowerShell in repositories created from this template:
 4. Update [.vscode/extensions.json](.vscode/extensions.json) recommendations if needed.
 5. Add project-specific words to `*-words.txt` files in [.vscode/](.vscode/).
 6. Register each new word list under `cSpell.customDictionaries` in [.vscode/settings.json](.vscode/settings.json).
-7. If you add PowerShell automation, include `PSScriptAnalyzer` validation for approved verbs in your local/CI checks.
+7. If you add PowerShell automation, keep `scripts/PSScriptAnalyzerSettings.psd1` aligned with your linting policy and ensure the GitHub Actions workflow still covers your PowerShell files.
