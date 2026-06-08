@@ -22,6 +22,7 @@ and operational references for the software or service being documented.
 | [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
+| [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
 
 ## Quick Start
 
@@ -37,6 +38,14 @@ Git does not allow a repository template to enforce local `.git/config` values
 automatically, so this bootstrap step must be run once per cloned/generated
 repository.
 
+## PowerShell Guidance
+
+When adding or editing PowerShell in repositories created from this template:
+
+- Use only approved PowerShell verbs for function names.
+- Treat `PSScriptAnalyzer` rule `PSUseApprovedVerbs` as a required check for new or edited PowerShell code.
+- Review `.github/instructions/powershell-approved-verbs.instructions.md` for the repository instruction used by Copilot.
+
 ## Repository Customization Checklist
 
 1. Replace this README with project-specific context.
@@ -45,3 +54,4 @@ repository.
 4. Update [.vscode/extensions.json](.vscode/extensions.json) recommendations if needed.
 5. Add project-specific words to `*-words.txt` files in [.vscode/](.vscode/).
 6. Register each new word list under `cSpell.customDictionaries` in [.vscode/settings.json](.vscode/settings.json).
+7. If you add PowerShell automation, include `PSScriptAnalyzer` validation for approved verbs in your local/CI checks.
