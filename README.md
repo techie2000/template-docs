@@ -22,6 +22,7 @@ and operational references for the software or service being documented.
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 | [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |
+| .markdownlintignore | Ignore rules for transient markdown artifacts such as .tmp/ output |
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
 
@@ -38,6 +39,11 @@ hooks (`core.hooksPath=.githooks`) and normalizes VS Code workspace files.
 Git does not allow a repository template to enforce local `.git/config` values
 automatically, so this bootstrap step must be run once per cloned/generated
 repository.
+
+Temporary Files and Diagnostic Output
+Transient logs, timing files, build output, and other diagnostic artifacts should be written under .tmp/ at the repository root rather than the repo root itself.
+
+The template also includes .markdownlintignore with .tmp/** so temporary markdown files created in .tmp/ do not fail repository markdown linting. This keeps diagnostics out of normal documentation validation while still allowing committed docs to remain fully linted.
 
 ## PowerShell Guidance
 
