@@ -1,4 +1,6 @@
+claude
 gantt
 github
+ISIN
 setext
 toplevel
