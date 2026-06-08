@@ -12,6 +12,11 @@
     "windsurf": true
   },
   "chat.tools.terminal.autoApprove": {
+    ".vscode/settings.json": true,
+    "git add": true,
+    "git commit": true,
+    "git push": true,
+    "git restore": true,
     "make": true,
     "mkdir": true
   },
