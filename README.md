@@ -10,8 +10,8 @@ and operational references for the software or service being documented.
 | Folder | Purpose |
 | ------ | ------- |
 | [docs/](docs/) | Documentation index for the docs area and subfolders |
-| [docs/vendor/](docs/vendor/) | Vendor-supplied documentation, manuals, and reference material |
 | [docs/internal/](docs/internal/) | Internal notes, decisions, and meeting records |
+| [docs/vendor/](docs/vendor/) | Vendor-supplied documentation, manuals, and reference material |
 | [images/](images/) | Supporting screenshots and diagrams |
 
 ## Tooling
@@ -19,11 +19,11 @@ and operational references for the software or service being documented.
 | File/Folder | Purpose |
 | ----------- | ------- |
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
+| [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
+| [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 | [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
-| [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
-| [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 
 ## Quick Start
 
