@@ -1,8 +1,10 @@
 .RECIPEPREFIX := >
 
-.PHONY: install-hooks settings-sort lint-docs lint-docs-fix
+.PHONY: init install-hooks settings-sort lint-docs lint-docs-fix
 
 ifeq ($(OS),Windows_NT)
+init: install-hooks settings-sort
+
 install-hooks:
 >pwsh ./scripts/install-hooks.ps1
 
@@ -15,6 +17,8 @@ lint-docs:
 lint-docs-fix:
 >pwsh ./scripts/lint-docs.ps1 -Fix
 else
+init: install-hooks settings-sort
+
 install-hooks:
 >./scripts/install-hooks.sh
 

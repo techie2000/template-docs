@@ -19,6 +19,7 @@ This folder contains helper scripts for local repository tooling.
 PowerShell:
 
 ```powershell
+make init
 pwsh ./scripts/install-hooks.ps1
 pwsh ./scripts/settings-sort.ps1
 pwsh ./scripts/lint-docs.ps1
@@ -28,11 +29,16 @@ pwsh ./scripts/lint-docs.ps1 -Fix
 Bash:
 
 ```bash
+make init
 ./scripts/install-hooks.sh
 ./scripts/settings-sort.sh
 ./scripts/lint-docs.sh
 ./scripts/lint-docs.sh --fix
 ```
+
+For repos created from this template, run `make init` once after cloning.
+Git local config (`.git/config`) is not version-controlled, so hook setup must
+be applied per clone.
 
 ## Notes
 

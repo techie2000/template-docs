@@ -26,10 +26,16 @@ and operational references for the software or service being documented.
 ## Quick Start
 
 ```bash
-make install-hooks
-make settings-sort
+make init
 make lint-docs
 ```
+
+`make init` is the recommended first-run bootstrap command. It configures Git
+hooks (`core.hooksPath=.githooks`) and normalizes VS Code workspace files.
+
+Git does not allow a repository template to enforce local `.git/config` values
+automatically, so this bootstrap step must be run once per cloned/generated
+repository.
 
 ## Repository Customization Checklist
 
