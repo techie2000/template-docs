@@ -6,6 +6,8 @@ This folder contains helper scripts for local repository tooling.
 
 | Script | Shell | Purpose |
 | ------ | ----- | ------- |
+| `bootstrap-package-name.ps1` | PowerShell | Rewrites placeholder `package.json` name to a sanitized repository directory name. |
+| `bootstrap-package-name.sh` | Bash | Rewrites placeholder `package.json` name to a sanitized repository directory name. |
 | `install-hooks.ps1` | PowerShell | Configures `core.hooksPath` to `.githooks`. |
 | `install-hooks.sh` | Bash | Configures `core.hooksPath` to `.githooks` and applies executable bits when available. |
 | `lint-docs.ps1` | PowerShell | Runs markdownlint-cli2 using `.markdownlint.yaml`; supports optional fix mode. |
@@ -23,6 +25,7 @@ PowerShell:
 make init
 pwsh ./scripts/install-hooks.ps1
 pwsh ./scripts/settings-sort.ps1
+pwsh ./scripts/bootstrap-package-name.ps1
 pwsh ./scripts/lint-docs.ps1
 pwsh ./scripts/lint-docs.ps1 -Fix
 ```
@@ -33,6 +36,7 @@ Bash:
 make init
 bash ./scripts/install-hooks.sh
 bash ./scripts/settings-sort.sh
+bash ./scripts/bootstrap-package-name.sh
 bash ./scripts/lint-docs.sh
 bash ./scripts/lint-docs.sh --fix
 ```
