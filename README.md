@@ -43,6 +43,34 @@ Git does not allow a repository template to enforce local `.git/config` values
 automatically, so this bootstrap step must be run once per cloned/generated
 repository.
 
+## Automatic Branch Deletion for Template-Based Repositories
+
+`Automatically delete head branches` is a per-repository GitHub setting. It is
+not inherited automatically by repositories created from this template.
+
+If you create a new repository from `techie2000/work-template-docs`, set
+`delete_branch_on_merge=true` immediately after creation.
+
+```bash
+OWNER="$(gh api user --jq .login)"
+TEMPLATE_OWNER="techie2000"
+TEMPLATE_REPO="work-template-docs"
+REPO="my-new-project"
+
+gh repo create "$OWNER/$REPO" --private --template "$TEMPLATE_OWNER/$TEMPLATE_REPO"
+gh api --method PATCH "/repos/$OWNER/$REPO" -f delete_branch_on_merge=true
+```
+
+```powershell
+$owner = gh api user --jq '.login'
+$templateOwner = 'techie2000'
+$templateRepo = 'work-template-docs'
+$repo = 'my-new-project'
+
+gh repo create "$owner/$repo" --private --template "$templateOwner/$templateRepo"
+gh api --method PATCH "/repos/$owner/$repo" -f delete_branch_on_merge=true
+```
+
 Temporary Files and Diagnostic Output
 Transient logs, timing files, build output, and other diagnostic artifacts
 should be written under .tmp/ at the repository root rather than the repo
@@ -58,8 +86,10 @@ committed docs to remain fully linted.
 When adding or editing PowerShell in repositories created from this template:
 
 - Use only approved PowerShell verbs for function names.
-- Treat `PSScriptAnalyzer` rule `PSUseApprovedVerbs` as a required check for new or edited PowerShell code.
-- Review `.github/instructions/powershell-approved-verbs.instructions.md` for the repository instruction used by Copilot.
+- Treat `PSScriptAnalyzer` rule `PSUseApprovedVerbs` as a required check
+ for new or edited PowerShell code.
+- Review `.github/instructions/powershell-approved-verbs.instructions.md`
+ for the repository instruction used by Copilot.
 - The repository includes `scripts/PSScriptAnalyzerSettings.psd1` and
  `.github/workflows/powershell-lint.yml` to validate PowerShell scripts in
  GitHub Actions.
