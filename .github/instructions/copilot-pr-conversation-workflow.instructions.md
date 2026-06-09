@@ -136,6 +136,10 @@ $repo = $repoInfo.name
 $result = gh api graphql -f query="$query" -F owner="$owner" -F repo="$repo" -F number=$prNumber | ConvertFrom-Json
 $threads = $result.data.repository.pullRequest.reviewThreads.nodes | Where-Object { -not $_.isResolved }
 $threads | Select-Object id,path,line,@{Name='comment';Expression={$_.comments.nodes[0].body}} | Format-Table -AutoSize
+
+# Note: reviewThreads(first:100) returns at most 100 threads per request.
+# For very large PRs, paginate with pageInfo{hasNextPage,endCursor} and after:<cursor>
+# until all unresolved threads are collected.
 ```
 
 ### 2. Fix One Thread At A Time (Prefer One Commit Per Thread)
@@ -200,6 +204,8 @@ $result = gh api graphql -f query="$query" -F owner="$owner" -F repo="$repo" -F 
 $result.data.repository.pullRequest.reviewThreads.nodes |
   Select-Object id,isResolved,path,line |
   Format-Table -AutoSize
+
+# If your PR can exceed 100 review threads, run this verification over paginated results.
 ```
 
 If any thread remains unresolved intentionally, leave a blocker reply and keep it open.
