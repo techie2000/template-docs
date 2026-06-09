@@ -22,7 +22,8 @@
     "make": true,
     "mkdir": true,
     "npm ci": true,
-    "npm pkg": true
+    "npm pkg": true,
+    "git rev-parse": true
   },
   "chat.useAgentSkills": true,
   "chat.useCustomizationsInParentRepositories": true,

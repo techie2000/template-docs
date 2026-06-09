@@ -160,14 +160,6 @@ if (
 }
 
 const customDictionaries = settings.cSpell.customDictionaries;
-const genericDictionaryName = "generic-project-words";
-if (
-  customDictionaries[genericDictionaryName] &&
-  customDictionaries[genericDictionaryName].path === "${workspaceFolder}/.vscode/generic-project-words.txt"
-) {
-  delete customDictionaries[genericDictionaryName];
-}
-
 customDictionaries[dictionaryName] = {
   addWords: true,
   description: "Project-specific accepted words",

@@ -159,14 +159,6 @@ if (-not $cSpell.ContainsKey("customDictionaries") -or -not ($cSpell["customDict
 }
 
 $customDictionaries = $cSpell["customDictionaries"]
-$genericDictionaryName = "generic-project-words"
-if ($customDictionaries.ContainsKey($genericDictionaryName)) {
-    $genericDictionary = $customDictionaries[$genericDictionaryName]
-    if ($genericDictionary -is [System.Collections.IDictionary] -and $genericDictionary["path"] -eq '${workspaceFolder}/.vscode/generic-project-words.txt') {
-        $customDictionaries.Remove($genericDictionaryName)
-    }
-}
-
 $customDictionaries[$dictionaryName] = @{
     addWords = $true
     description = "Project-specific accepted words"
