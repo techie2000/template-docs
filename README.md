@@ -60,6 +60,8 @@ another repository; it does not update the one you already made in the browser.
 
 Replace the placeholder values before running these commands.
 
+#### Bash
+
 ```bash
 OWNER="$(gh api user --jq .login)"
 TEMPLATE_OWNER="techie2000"
@@ -72,6 +74,8 @@ gh repo create "$OWNER/$REPO" --private --template "$TEMPLATE_OWNER/$TEMPLATE_RE
 # Then enables automatic branch deletion on merge for that new repository.
 gh api --method PATCH "/repos/$OWNER/$REPO" -f delete_branch_on_merge=true
 ```
+
+#### PowerShell
 
 ```powershell
 $owner = gh api user --jq '.login'
@@ -91,12 +95,16 @@ gh api --method PATCH "/repos/$owner/$repo" -f delete_branch_on_merge=true
 If you already created the repository in the browser with **Use this template**,
 run only the PATCH command against the repository that already exists.
 
+#### Bash
+
 ```bash
 OWNER="$(gh api user --jq .login)"
 REPO="replace-with-your-existing-repo-name"
 
 gh api --method PATCH "/repos/$OWNER/$REPO" -f delete_branch_on_merge=true
 ```
+
+#### PowerShell
 
 ```powershell
 $owner = gh api user --jq '.login'
