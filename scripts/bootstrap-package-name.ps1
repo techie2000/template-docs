@@ -91,7 +91,7 @@ function Get-ProjectWords {
 
     return @(
         $Value -split "[^A-Za-z0-9]+" |
-            ForEach-Object { $_.Trim().ToLowerInvariant() } |
+            ForEach-Object { $_.Trim() } |
             Where-Object { $_ -ne "" }
     )
 }
@@ -105,10 +105,12 @@ $wordSet = [System.Collections.Generic.HashSet[string]]::new([System.StringCompa
 
 foreach ($word in (Get-ProjectWords -Value $repoName)) {
     $null = $wordSet.Add($word)
+    $null = $wordSet.Add($word.ToLowerInvariant())
 }
 
 foreach ($word in (Get-ProjectWords -Value $sanitized)) {
     $null = $wordSet.Add($word)
+    $null = $wordSet.Add($word.ToLowerInvariant())
 }
 
 $null = $wordSet.Add($sanitized.ToLowerInvariant())

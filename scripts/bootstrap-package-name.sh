@@ -85,7 +85,7 @@ const [repoName, sanitizedName, settingsPath, dictionaryName, dictionaryFilePath
 function splitWords(value) {
   return value
     .split(/[^A-Za-z0-9]+/)
-    .map((word) => word.trim().toLowerCase())
+    .map((word) => word.trim())
     .filter((word) => word.length > 0);
 }
 
@@ -120,9 +120,11 @@ function sortNode(node) {
 const seededWords = new Set();
 for (const token of splitWords(repoName)) {
   seededWords.add(token);
+  seededWords.add(token.toLowerCase());
 }
 for (const token of splitWords(sanitizedName)) {
   seededWords.add(token);
+  seededWords.add(token.toLowerCase());
 }
 seededWords.add(sanitizedName.toLowerCase());
 
