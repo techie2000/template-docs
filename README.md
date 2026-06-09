@@ -36,8 +36,12 @@ make lint-docs
 
 `make init` is the recommended first-run bootstrap command. It configures Git
 hooks (`core.hooksPath=.githooks`), normalizes VS Code workspace files, and
-updates `package.json` name from template defaults to the current repository
-directory name.
+updates `package.json` metadata (`name`, `description`) from template defaults
+to repository-derived values. It also creates/updates a project-specific cSpell
+word list in `.vscode/` and registers it in
+`cSpell.customDictionaries` automatically. Documentation placeholders such as
+`{{PROJECT_NAME}}` under [docs/](docs/) are also replaced with the project
+name derived from the repository folder (with a leading `work-` prefix removed).
 
 Git does not allow a repository template to enforce local `.git/config` values
 automatically, so this bootstrap step must be run once per cloned/generated
@@ -142,8 +146,9 @@ When adding or editing PowerShell in repositories created from this template:
 2. Add or update files in [docs/vendor/](docs/vendor/) and [docs/internal/](docs/internal/).
 3. Add screenshots/diagrams under [images/](images/).
 4. Update [.vscode/extensions.json](.vscode/extensions.json) recommendations if needed.
-5. Add project-specific words to `*-words.txt` files in [.vscode/](.vscode/).
-6. Register each new word list under `cSpell.customDictionaries` in [.vscode/settings.json](.vscode/settings.json).
+5. Review the bootstrap-generated project cSpell word list in
+   [.vscode/](.vscode/) and add any extra domain terms it cannot infer.
+6. If you add additional word lists, register each under `cSpell.customDictionaries` in [.vscode/settings.json](.vscode/settings.json).
 7. If you add PowerShell automation, keep
  `scripts/PSScriptAnalyzerSettings.psd1` aligned with your linting policy and
  ensure the GitHub Actions workflow still covers your PowerShell files.

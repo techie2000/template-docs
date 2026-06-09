@@ -1,6 +1,6 @@
 # Docs Directory
 
-This folder stores documentation artifacts for the CREST repository.
+This folder stores documentation artifacts for the {{PROJECT_NAME}} repository.
 
 ## Subfolders
 
