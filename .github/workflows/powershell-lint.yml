@@ -48,3 +48,10 @@ jobs:
           $issues | ForEach-Object {
             $file = if ($_.ScriptName) { $_.ScriptName } else { '<unknown>' }
             $line = if ($_.Line) { $_.Line } else { 0 }
+            $message = $_.Message
+            $rule = $_.RuleName
+            Write-Host "::error file=$file,line=$line,title=$rule::$message"
+          }
+
+          Write-Host "PSScriptAnalyzer found $($issues.Count) issue(s)."
+          exit 1
