@@ -78,10 +78,13 @@ pwsh ./scripts/lint-docs.ps1
 ```
 
 ```bash
-./scripts/install-hooks.sh
-./scripts/settings-sort.sh
-./scripts/lint-docs.sh
+bash ./scripts/install-hooks.sh
+bash ./scripts/settings-sort.sh
+bash ./scripts/lint-docs.sh
 ```
+
+Use `bash` explicitly for `.sh` helpers so the commands still work in checkouts
+where the executable bit is unavailable or not preserved.
 
 If `make` is available, equivalent shortcuts are also provided:
 
