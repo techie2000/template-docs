@@ -27,8 +27,12 @@ if [ "$current_description" = "undefined" ] || [ "$current_description" = "null"
 fi
 
 repo_name=$(basename "$PWD")
+project_name=$(printf '%s' "$repo_name" | sed -E 's/^[Ww][Oo][Rr][Kk]-//')
+if [ -z "$project_name" ]; then
+  project_name="$repo_name"
+fi
 
-sanitized=$(printf '%s' "$repo_name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/-+/-/g; s/^[-._]+//; s/[-._]+$//')
+sanitized=$(printf '%s' "$project_name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/-+/-/g; s/^[-._]+//; s/[-._]+$//')
 if [ -z "$sanitized" ]; then
   sanitized="project-docs"
 fi
@@ -46,7 +50,7 @@ else
 fi
 
 template_description="Reusable template for documentation-first projects."
-default_description="Documentation for $repo_name."
+default_description="Documentation for $project_name."
 should_replace_description=false
 if [ "$should_replace" = "true" ] || [ -z "$current_description" ] || [ "$current_description" = "$template_description" ]; then
   should_replace_description=true
@@ -76,11 +80,11 @@ dict_name="${sanitized}-words"
 dict_file=".vscode/${dict_name}.txt"
 template_dict_file=".vscode/generic-project-words.txt"
 
-node - "$repo_name" "$sanitized" "$settings_path" "$dict_name" "$dict_file" "$template_dict_file" <<'NODE'
+node - "$repo_name" "$project_name" "$sanitized" "$settings_path" "$dict_name" "$dict_file" "$template_dict_file" <<'NODE'
 const fs = require("fs");
 const path = require("path");
 
-const [repoName, sanitizedName, settingsPath, dictionaryName, dictionaryFilePath, templateDictionaryPath] = process.argv.slice(2);
+const [repoName, projectName, sanitizedName, settingsPath, dictionaryName, dictionaryFilePath, templateDictionaryPath] = process.argv.slice(2);
 
 function splitWords(value) {
   return value
@@ -119,6 +123,10 @@ function sortNode(node) {
 
 const seededWords = new Set();
 for (const token of splitWords(repoName)) {
+  seededWords.add(token);
+  seededWords.add(token.toLowerCase());
+}
+for (const token of splitWords(projectName)) {
   seededWords.add(token);
   seededWords.add(token.toLowerCase());
 }
@@ -171,6 +179,38 @@ customDictionaries[dictionaryName] = {
 const formattedSettings = `${JSON.stringify(sortNode(settings), null, 2)}\n`;
 fs.writeFileSync(settingsPath, formattedSettings, "utf8");
 
+const docsToken = "{{PROJECT_NAME}}";
+const docsRoot = "docs";
+let docsUpdated = 0;
+
+function walkDirectory(rootPath) {
+  const entries = fs.readdirSync(rootPath, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(rootPath, entry.name);
+    if (entry.isDirectory()) {
+      walkDirectory(fullPath);
+      continue;
+    }
+
+    if (!entry.isFile() || path.extname(entry.name).toLowerCase() !== ".md") {
+      continue;
+    }
+
+    const content = fs.readFileSync(fullPath, "utf8");
+    if (!content.includes(docsToken)) {
+      continue;
+    }
+
+    fs.writeFileSync(fullPath, content.split(docsToken).join(projectName), "utf8");
+    docsUpdated += 1;
+  }
+}
+
+if (fs.existsSync(docsRoot) && fs.statSync(docsRoot).isDirectory()) {
+  walkDirectory(docsRoot);
+}
+
 console.log(`Ensured cSpell word list: ${dictionaryFilePath}`);
 console.log(`Ensured cSpell dictionary registration: ${dictionaryName}`);
+console.log(`Updated docs placeholders: ${docsUpdated}`);
 NODE

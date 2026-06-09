@@ -17,7 +17,12 @@ $currentPrivate = if ($package.ContainsKey("private")) { [string]$package["priva
 $currentDescription = if ($package.ContainsKey("description")) { [string]$package["description"] } else { "" }
 
 $repoName = Split-Path -Leaf (Get-Location)
-$sanitized = $repoName.ToLowerInvariant()
+$projectName = [regex]::Replace($repoName, "^(?i)work-", "")
+if ([string]::IsNullOrWhiteSpace($projectName)) {
+    $projectName = $repoName
+}
+
+$sanitized = $projectName.ToLowerInvariant()
 $sanitized = [regex]::Replace($sanitized, "[^a-z0-9._-]", "-")
 $sanitized = [regex]::Replace($sanitized, "-+", "-")
 $sanitized = $sanitized.Trim('-', '.', '_')
@@ -36,7 +41,7 @@ if ($shouldReplace -and $currentName -ne $sanitized) {
 }
 
 $templateDescription = "Reusable template for documentation-first projects."
-$defaultDescription = "Documentation for $repoName."
+$defaultDescription = "Documentation for $projectName."
 $shouldReplaceDescription = $shouldReplace -or [string]::IsNullOrWhiteSpace($currentDescription) -or $currentDescription -eq $templateDescription
 
 if ($shouldReplaceDescription -and $currentDescription -ne $defaultDescription) {
@@ -108,6 +113,11 @@ foreach ($word in (Get-ProjectWords -Value $repoName)) {
     $null = $wordSet.Add($word.ToLowerInvariant())
 }
 
+foreach ($word in (Get-ProjectWords -Value $projectName)) {
+    $null = $wordSet.Add($word)
+    $null = $wordSet.Add($word.ToLowerInvariant())
+}
+
 foreach ($word in (Get-ProjectWords -Value $sanitized)) {
     $null = $wordSet.Add($word)
     $null = $wordSet.Add($word.ToLowerInvariant())
@@ -172,3 +182,20 @@ if (-not $formattedSettings.EndsWith("`n")) {
 }
 [System.IO.File]::WriteAllText((Join-Path (Get-Location) $settingsPath), $formattedSettings, [System.Text.UTF8Encoding]::new($false))
 Write-Host "Ensured cSpell dictionary registration: $dictionaryName"
+
+$docsToken = "{{PROJECT_NAME}}"
+$docsPath = Join-Path (Get-Location) "docs"
+$docsUpdated = 0
+if (Test-Path -LiteralPath $docsPath -PathType Container) {
+    foreach ($docFile in (Get-ChildItem -Path $docsPath -Recurse -File -Filter "*.md")) {
+        $content = [System.IO.File]::ReadAllText($docFile.FullName)
+        if (-not $content.Contains($docsToken)) {
+            continue
+        }
+
+        $updatedContent = $content.Replace($docsToken, $projectName)
+        [System.IO.File]::WriteAllText($docFile.FullName, $updatedContent, [System.Text.UTF8Encoding]::new($false))
+        $docsUpdated += 1
+    }
+}
+Write-Host "Updated docs placeholders: $docsUpdated"

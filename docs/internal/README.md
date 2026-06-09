@@ -1,6 +1,6 @@
 # Internal Documentation
 
-This folder is reserved for internal CREST notes and team-authored documentation.
+This folder is reserved for internal {{PROJECT_NAME}} notes and team-authored documentation.
 
 ## Current Contents
 
