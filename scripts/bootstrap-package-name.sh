@@ -21,7 +21,7 @@ if [ "$current_private" = "undefined" ] || [ "$current_private" = "null" ]; then
   current_private=""
 fi
 
-current_description=$(npm pkg get description 2>/dev/null | tr -d '"' || true)
+current_description=$(npm pkg get description 2>/dev/null | tr -d '"' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' || true)
 if [ "$current_description" = "undefined" ] || [ "$current_description" = "null" ]; then
   current_description=""
 fi
