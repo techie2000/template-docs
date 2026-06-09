@@ -13,6 +13,7 @@
   },
   "chat.tools.terminal.autoApprove": {
     ".vscode/settings.json": true,
+    "gh": true,
     "git add": true,
     "git checkout": true,
     "git commit": true,
@@ -20,8 +21,7 @@
     "git restore": true,
     "make": true,
     "mkdir": true,
-    "npm init": true,
-    "npm install": true,
+    "npm ci": true,
     "npm pkg": true
   },
   "chat.useAgentSkills": true,

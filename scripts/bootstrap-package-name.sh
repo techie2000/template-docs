@@ -11,7 +11,16 @@ if ! command -v npm >/dev/null 2>&1; then
   exit 0
 fi
 
-current_name=$(npm pkg get name 2>/dev/null | tr -d '"' || true)
+current_name=$(npm pkg get name 2>/dev/null | tr -d '"[:space:]' || true)
+if [ "$current_name" = "undefined" ] || [ "$current_name" = "null" ]; then
+  current_name=""
+fi
+
+current_private=$(npm pkg get private 2>/dev/null | tr -d '"[:space:]' || true)
+if [ "$current_private" = "undefined" ] || [ "$current_private" = "null" ]; then
+  current_private=""
+fi
+
 repo_name=$(basename "$PWD")
 
 sanitized=$(printf '%s' "$repo_name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/-+/-/g; s/^[-._]+//; s/[-._]+$//')
@@ -31,4 +40,9 @@ else
   echo "Keeping package.json name: $current_name"
 fi
 
-npm pkg set "private=true" --json >/dev/null
+if [ "$should_replace" = "true" ] || [ -z "$current_private" ]; then
+  npm pkg set "private=true" --json >/dev/null
+  echo "Ensured package.json private=true"
+else
+  echo "Keeping package.json private: $current_private"
+fi

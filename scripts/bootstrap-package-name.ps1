@@ -13,6 +13,7 @@ if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
 
 $package = Get-Content -Raw "package.json" | ConvertFrom-Json -AsHashtable
 $currentName = if ($package.ContainsKey("name")) { [string]$package["name"] } else { "" }
+$currentPrivate = if ($package.ContainsKey("private")) { [string]$package["private"] } else { "" }
 
 $repoName = Split-Path -Leaf (Get-Location)
 $sanitized = $repoName.ToLowerInvariant()
@@ -33,4 +34,9 @@ if ($shouldReplace -and $currentName -ne $sanitized) {
     Write-Host "Keeping package.json name: $currentName"
 }
 
-& npm pkg set "private=true" --json | Out-Null
+if ($shouldReplace -or [string]::IsNullOrWhiteSpace($currentPrivate)) {
+    & npm pkg set "private=true" --json | Out-Null
+    Write-Host "Ensured package.json private=true"
+} else {
+    Write-Host "Keeping package.json private: $currentPrivate"
+}
