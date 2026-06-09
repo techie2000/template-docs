@@ -14,6 +14,7 @@ if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
 $package = Get-Content -Raw "package.json" | ConvertFrom-Json -AsHashtable
 $currentName = if ($package.ContainsKey("name")) { [string]$package["name"] } else { "" }
 $currentPrivate = if ($package.ContainsKey("private")) { [string]$package["private"] } else { "" }
+$currentDescription = if ($package.ContainsKey("description")) { [string]$package["description"] } else { "" }
 
 $repoName = Split-Path -Leaf (Get-Location)
 $sanitized = $repoName.ToLowerInvariant()
@@ -34,9 +35,138 @@ if ($shouldReplace -and $currentName -ne $sanitized) {
     Write-Host "Keeping package.json name: $currentName"
 }
 
+$templateDescription = "Reusable template for documentation-first projects."
+$defaultDescription = "Documentation for $repoName."
+$shouldReplaceDescription = $shouldReplace -or [string]::IsNullOrWhiteSpace($currentDescription) -or $currentDescription -eq $templateDescription
+
+if ($shouldReplaceDescription -and $currentDescription -ne $defaultDescription) {
+    & npm pkg set "description=$defaultDescription" | Out-Null
+    Write-Host "Updated package.json description: $currentDescription -> $defaultDescription"
+} else {
+    Write-Host "Keeping package.json description: $currentDescription"
+}
+
 if ($shouldReplace -or [string]::IsNullOrWhiteSpace($currentPrivate)) {
     & npm pkg set "private=true" --json | Out-Null
     Write-Host "Ensured package.json private=true"
 } else {
     Write-Host "Keeping package.json private: $currentPrivate"
 }
+
+$settingsPath = ".vscode/settings.json"
+if (-not (Test-Path -LiteralPath $settingsPath)) {
+    Write-Host "No $settingsPath found; skipping cSpell bootstrap."
+    exit 0
+}
+
+function ConvertTo-SortedJsonNode {
+    param([object]$Node)
+
+    if ($null -eq $Node) {
+        return $null
+    }
+
+    if ($Node -is [System.Collections.IDictionary]) {
+        $sorted = [ordered]@{}
+        foreach ($key in ($Node.Keys | Sort-Object)) {
+            $sorted[$key] = ConvertTo-SortedJsonNode -Node $Node[$key]
+        }
+        return $sorted
+    }
+
+    if (($Node -is [System.Collections.IEnumerable]) -and -not ($Node -is [string])) {
+        $items = @()
+        foreach ($item in $Node) {
+            $items += ,(ConvertTo-SortedJsonNode -Node $item)
+        }
+
+        return ,$items
+    }
+
+    return $Node
+}
+
+function Get-ProjectWords {
+    param([string]$Value)
+
+    return @(
+        $Value -split "[^A-Za-z0-9]+" |
+            ForEach-Object { $_.Trim().ToLowerInvariant() } |
+            Where-Object { $_ -ne "" }
+    )
+}
+
+$dictionaryName = "$sanitized-words"
+$dictionaryFileName = "$dictionaryName.txt"
+$dictionaryPath = Join-Path ".vscode" $dictionaryFileName
+$templateDictionaryPath = ".vscode/generic-project-words.txt"
+
+$wordSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+
+foreach ($word in (Get-ProjectWords -Value $repoName)) {
+    $null = $wordSet.Add($word)
+}
+
+foreach ($word in (Get-ProjectWords -Value $sanitized)) {
+    $null = $wordSet.Add($word)
+}
+
+$null = $wordSet.Add($sanitized.ToLowerInvariant())
+
+$seedPaths = @($templateDictionaryPath, $dictionaryPath)
+foreach ($seedPath in $seedPaths) {
+    if (-not (Test-Path -LiteralPath $seedPath)) {
+        continue
+    }
+
+    foreach ($line in (Get-Content -LiteralPath $seedPath)) {
+        $trimmed = $line.Trim()
+        if ($trimmed -ne "") {
+            $null = $wordSet.Add($trimmed)
+        }
+    }
+}
+
+$sortedWords = @($wordSet | Sort-Object)
+$wordListContent = ($sortedWords -join "`n")
+if (-not $wordListContent.EndsWith("`n")) {
+    $wordListContent += "`n"
+}
+[System.IO.File]::WriteAllText((Join-Path (Get-Location) $dictionaryPath), $wordListContent, [System.Text.UTF8Encoding]::new($false))
+Write-Host "Ensured cSpell word list: $dictionaryPath"
+
+$settings = Get-Content -LiteralPath $settingsPath -Raw | ConvertFrom-Json -AsHashtable
+
+if (-not $settings.ContainsKey("cSpell") -or -not ($settings["cSpell"] -is [System.Collections.IDictionary])) {
+    $settings["cSpell"] = @{}
+}
+
+$cSpell = $settings["cSpell"]
+if (-not $cSpell.ContainsKey("customDictionaries") -or -not ($cSpell["customDictionaries"] -is [System.Collections.IDictionary])) {
+    $cSpell["customDictionaries"] = @{}
+}
+
+$customDictionaries = $cSpell["customDictionaries"]
+$genericDictionaryName = "generic-project-words"
+if ($customDictionaries.ContainsKey($genericDictionaryName)) {
+    $genericDictionary = $customDictionaries[$genericDictionaryName]
+    if ($genericDictionary -is [System.Collections.IDictionary] -and $genericDictionary["path"] -eq '${workspaceFolder}/.vscode/generic-project-words.txt') {
+        $customDictionaries.Remove($genericDictionaryName)
+    }
+}
+
+$customDictionaries[$dictionaryName] = @{
+    addWords = $true
+    description = "Project-specific accepted words"
+    name = $dictionaryName
+    path = '${workspaceFolder}/.vscode/' + $dictionaryFileName
+    scope = "workspace"
+}
+
+$sortedSettings = ConvertTo-SortedJsonNode -Node $settings
+$formattedSettings = ($sortedSettings | ConvertTo-Json -Depth 100) -replace "`r?`n", "`n"
+if (-not $formattedSettings.EndsWith("`n")) {
+    $formattedSettings += "`n"
+}
+[System.IO.File]::WriteAllText((Join-Path (Get-Location) $settingsPath), $formattedSettings, [System.Text.UTF8Encoding]::new($false))
+Write-Host "Ensured cSpell dictionary registration: $dictionaryName"
