@@ -48,16 +48,28 @@ repository.
 `Automatically delete head branches` is a per-repository GitHub setting. It is
 not inherited automatically by repositories created from this template.
 
-If you create a new repository from `techie2000/work-template-docs`, set
-`delete_branch_on_merge=true` immediately after creation.
+If you create a new repository from `techie2000/work-template-docs` **using the
+GitHub CLI template flow**, set `delete_branch_on_merge=true` immediately after
+creation.
+
+If you created the repository by clicking **Use this template** in the GitHub
+web UI, do **not** run the `gh repo create` command below. That command creates
+another repository; it does not update the one you already made in the browser.
+
+### GitHub CLI template creation example
+
+Replace the placeholder values before running these commands.
 
 ```bash
 OWNER="$(gh api user --jq .login)"
 TEMPLATE_OWNER="techie2000"
 TEMPLATE_REPO="work-template-docs"
-REPO="my-new-project"
+REPO="replace-with-your-new-repo-name"
 
+# Creates a new repository from the template.
 gh repo create "$OWNER/$REPO" --private --template "$TEMPLATE_OWNER/$TEMPLATE_REPO"
+
+# Then enables automatic branch deletion on merge for that new repository.
 gh api --method PATCH "/repos/$OWNER/$REPO" -f delete_branch_on_merge=true
 ```
 
@@ -65,9 +77,31 @@ gh api --method PATCH "/repos/$OWNER/$REPO" -f delete_branch_on_merge=true
 $owner = gh api user --jq '.login'
 $templateOwner = 'techie2000'
 $templateRepo = 'work-template-docs'
-$repo = 'my-new-project'
+$repo = 'replace-with-your-new-repo-name'
 
+# Creates a new repository from the template.
 gh repo create "$owner/$repo" --private --template "$templateOwner/$templateRepo"
+
+# Then enables automatic branch deletion on merge for that new repository.
+gh api --method PATCH "/repos/$owner/$repo" -f delete_branch_on_merge=true
+```
+
+### Existing repository created in the GitHub web UI
+
+If you already created the repository in the browser with **Use this template**,
+run only the PATCH command against the repository that already exists.
+
+```bash
+OWNER="$(gh api user --jq .login)"
+REPO="replace-with-your-existing-repo-name"
+
+gh api --method PATCH "/repos/$OWNER/$REPO" -f delete_branch_on_merge=true
+```
+
+```powershell
+$owner = gh api user --jq '.login'
+$repo = 'replace-with-your-existing-repo-name'
+
 gh api --method PATCH "/repos/$owner/$repo" -f delete_branch_on_merge=true
 ```
 
