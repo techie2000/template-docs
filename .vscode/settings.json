@@ -18,12 +18,13 @@
     "git checkout": true,
     "git commit": true,
     "git push": true,
+    "git rev-parse": true,
     "git restore": true,
     "make": true,
     "mkdir": true,
     "npm ci": true,
     "npm pkg": true,
-    "git rev-parse": true
+    "ConvertFrom-Json": true
   },
   "chat.useAgentSkills": true,
   "chat.useCustomizationsInParentRepositories": true,
