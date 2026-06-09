@@ -16,6 +16,15 @@ The configuration has been tailored specifically for this repository.
 
 ## Special Instructions
 
+### PR Conversation Handling (REQUIRED)
+
+When asked to process PR conversations/review threads end-to-end, follow:
+
+- `.github/instructions/copilot-pr-conversation-workflow.instructions.md`
+
+This covers the required flow to review each thread, apply fixes, commit with traceability,
+reply in-thread with commit references, and resolve each conversation.
+
 ### Markdown Compliance Gate (REQUIRED)
 
 When an agent edits any `*.md` file, it must run this loop before commit or PR update:
