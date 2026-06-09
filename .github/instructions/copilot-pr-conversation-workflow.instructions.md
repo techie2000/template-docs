@@ -209,3 +209,45 @@ $result.data.repository.pullRequest.reviewThreads.nodes |
 ```
 
 If any thread remains unresolved intentionally, leave a blocker reply and keep it open.
+
+## Post-Merge Cleanup
+
+After the PR is merged, perform cleanup so local and remote branches stay tidy.
+
+### Required Checklist
+
+- [ ] Confirm PR state is `MERGED`
+- [ ] Ensure local working tree is clean before branch switches/deletes
+- [ ] Switch to `main`
+- [ ] Fast-forward `main` from `origin/main`
+- [ ] Delete merged feature branch locally
+- [ ] Delete merged feature branch on remote (if it still exists)
+
+### Ready-To-Run Cleanup Commands
+
+```powershell
+# Example for PR number 5
+$prNumber = 5
+
+$pr = gh pr view $prNumber --json state,headRefName,baseRefName | ConvertFrom-Json
+if ($pr.state -ne "MERGED") {
+  throw "PR #$prNumber is not merged. Cleanup skipped."
+}
+
+git status --short
+git checkout $pr.baseRefName
+git fetch --prune origin
+git pull --ff-only origin $pr.baseRefName
+
+# Delete local branch if present and different from current branch
+$currentBranch = git branch --show-current
+if ($pr.headRefName -ne $currentBranch) {
+  git branch -d $pr.headRefName
+}
+
+# Delete remote branch if present
+git push origin --delete $pr.headRefName
+```
+
+If remote branch deletion fails because the branch is already removed, treat that as
+non-blocking and continue.
