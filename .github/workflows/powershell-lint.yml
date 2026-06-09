@@ -37,8 +37,7 @@ jobs:
         shell: pwsh
         run: |
           $settingsPath = Join-Path $PWD 'scripts/PSScriptAnalyzerSettings.psd1'
-          $paths = @('.')
-          $issues = Invoke-ScriptAnalyzer -Path $paths -Recurse -Settings $settingsPath
+          $issues = Invoke-ScriptAnalyzer -Path '.' -Recurse -Settings $settingsPath
 
           if (-not $issues) {
             Write-Host 'PSScriptAnalyzer found no issues.'
