@@ -3,6 +3,7 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "chat.agent.maxRequests": 35,
+  "chat.agent.sandbox.retryWithAllowNetworkRequests": true,
   "chat.math.enabled": true,
   "chat.mcp.autostart": "onlyNew",
   "chat.mcp.discovery.enabled": {
@@ -11,6 +12,7 @@
     "cursor-workspace": true,
     "windsurf": true
   },
+  "chat.sessionSync.enabled": true,
   "chat.tools.terminal.autoApprove": {
     ".vscode/settings.json": true,
     "gh": true,
@@ -20,11 +22,29 @@
     "git push": true,
     "git rev-parse": true,
     "git restore": true,
+    "golangci-lint": true,
     "make": true,
     "mkdir": true,
     "npm ci": true,
     "npm pkg": true,
+    "npm run build": true,
+    "/^Get-ChildItem\\b/i": true,
+    "/^git (status|show\\b.*)$/": true,
     "ConvertFrom-Json": true
+  },
+  "chat.tools.urls.autoApprove": {
+    "https://code.visualstudio.com": true,
+    "https://github.com/microsoft/vscode/wiki/*": true,
+    "https://documenter.getpostman.com": true,
+    "https://github.com": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://raw.githubusercontent.com": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://pkg.go.dev": true
   },
   "chat.useAgentSkills": true,
   "chat.useCustomizationsInParentRepositories": true,
@@ -85,6 +105,52 @@
   "github.copilot.chat.skillTool.enabled": true,
   "github.copilot.chat.switchAgent.enabled": true,
   "github.copilot.nextEditSuggestions.enabled": true,
+  "gitlab.customQueries": [
+    {
+      "name": "Issues assigned to me",
+      "noItemText": "No issues assigned to you.",
+      "scope": "assigned_to_me",
+      "state": "opened",
+      "type": "issues"
+    },
+    {
+      "name": "Issues created by me",
+      "noItemText": "No issues created by you.",
+      "scope": "created_by_me",
+      "state": "opened",
+      "type": "issues"
+    },
+    {
+      "name": "Merge requests assigned to me",
+      "noItemText": "No merge requests assigned to you.",
+      "scope": "assigned_to_me",
+      "state": "opened",
+      "type": "merge_requests"
+    },
+    {
+      "name": "Merge requests I'm reviewing",
+      "noItemText": "No merge requests for you to review.",
+      "reviewer": "<current_user>",
+      "state": "opened",
+      "type": "merge_requests"
+    },
+    {
+      "name": "Merge requests created by me",
+      "noItemText": "No merge requests created by you.",
+      "scope": "created_by_me",
+      "state": "opened",
+      "type": "merge_requests"
+    },
+    {
+      "name": "All project merge requests",
+      "noItemText": "The project has no merge requests",
+      "scope": "all",
+      "state": "opened",
+      "type": "merge_requests"
+    }
+  ],
+  "gitlab.real-timeSecurityScan.enabled": true,
+  "gitlab.showPipelineUpdateNotifications": true,
   "imageCarousel.explorerContextMenu.enabled": true,
   "inlineChat.notebookAgent": true,
   "logViewer.chunkSizeKb": 64,
@@ -114,6 +180,8 @@
     "commands": "on"
   },
   "terminal.integrated.windowsUseConptyDll": true,
+  "win-ca.inject": "append",
   "workbench.browser.enableChatTools": true,
+  "workbench.browser.experimentalUserTools.enabled": true,
   "workbench.colorTheme": "Copilot Theme"
 }
