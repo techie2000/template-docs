@@ -15,22 +15,22 @@
   "chat.sessionSync.enabled": true,
   "chat.tools.terminal.autoApprove": {
     ".vscode/settings.json": true,
+    "ConvertFrom-Json": true,
+    "ConvertTo-Json": true,
+    "ForEach-Object": true,
     "gh": true,
     "git add": true,
     "git checkout": true,
     "git commit": true,
     "git push": true,
-    "git rev-parse": true,
     "git restore": true,
-    "golangci-lint": true,
     "make": true,
     "mkdir": true,
+    "New-Item": true,
     "npm ci": true,
     "npm pkg": true,
-    "npm run build": true,
-    "/^Get-ChildItem\\b/i": true,
-    "/^git (status|show\\b.*)$/": true,
-    "ConvertFrom-Json": true
+    "Out-Null": true,
+    "Set-Content": true
   },
   "chat.tools.urls.autoApprove": {
     "https://code.visualstudio.com": true,
