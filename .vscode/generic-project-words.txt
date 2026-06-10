@@ -7,3 +7,4 @@ ISIN
 pycache
 setext
 toplevel
+winget
