@@ -6,8 +6,8 @@ This folder contains helper scripts for local repository tooling.
 
 | Script | Shell | Purpose |
 | ------ | ----- | ------- |
-| `bootstrap-package-name.ps1` | PowerShell | Rewrites template `package.json` metadata from repository name and bootstraps a project cSpell word list + dictionary entry. |
-| `bootstrap-package-name.sh` | Bash | Rewrites template `package.json` metadata from repository name and bootstraps a project cSpell word list + dictionary entry. |
+| `bootstrap-package-name.ps1` | PowerShell | Rewrites template `package.json` metadata from repository name and ensures a repo-specific cSpell dictionary is added alongside the generic template dictionary. |
+| `bootstrap-package-name.sh` | Bash | Rewrites template `package.json` metadata from repository name and ensures a repo-specific cSpell dictionary is added alongside the generic template dictionary. |
 | `install-hooks.ps1` | PowerShell | Configures `core.hooksPath` to `.githooks`. |
 | `install-hooks.sh` | Bash | Configures `core.hooksPath` to `.githooks` and applies executable bits when available. |
 | `lint-docs.ps1` | PowerShell | Runs markdownlint-cli2 using `.markdownlint.yaml`; supports optional fix mode. |
