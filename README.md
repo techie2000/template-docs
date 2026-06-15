@@ -14,8 +14,8 @@ and operational references for the software or service being documented.
 | [docs/internal/](docs/internal/) | Internal notes, decisions, and meeting records |
 | [docs/vendor/](docs/vendor/) | Vendor-supplied documentation, manuals, and reference material |
 | [images/](images/) | Supporting screenshots and diagrams |
-| [src/](src/) | Runtime service logic (rule loading, matching, mailbox polling, message filing) |
-| [test/](test/) | Focused unit tests for rules and service behavior |
+| [src/](src/) | Placeholder for application/source code (add runtime logic here) |
+| [test/](test/) | Placeholder for automated tests covering `src/` behavior |
 
 ## Tooling
 

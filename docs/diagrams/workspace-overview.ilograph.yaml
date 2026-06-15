@@ -26,16 +26,16 @@ resources:
             description: Vendor-supplied documentation, manuals, and reference material.
 
       - name: src
-        subtitle: Runtime Logic
+        subtitle: Source / Runtime Logic
         color: "#17A2B8"
         description: >
-          Runtime service logic (rule loading, matching, mailbox polling,
-          message filing).
+          Placeholder for application/source code. Add the runtime/service logic for
+          your project here.
 
       - name: test
-        subtitle: Unit Tests
+        subtitle: Tests
         color: "#28A745"
-        description: Focused unit tests for rules and service behavior.
+        description: Placeholder for automated tests (unit/integration) covering `src/`.
 
       - name: scripts
         subtitle: Utility Scripts
