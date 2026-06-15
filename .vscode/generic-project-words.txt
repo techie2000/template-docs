@@ -3,6 +3,7 @@ Clearstream
 DTCC
 gantt
 github
+Ilograph
 ISIN
 pycache
 setext
