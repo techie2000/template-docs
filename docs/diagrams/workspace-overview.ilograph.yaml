@@ -1,0 +1,202 @@
+description: Quick workspace overview for template-docs. Use this in Ilograph to explore repository areas and key file relationships.
+
+resources:
+  - name: template-docs
+    subtitle: Repository Root
+    color: "#1F4E79"
+    description: >
+      Reusable documentation-first project template. Contains source logic,
+      documentation, scripts, and tooling configuration.
+    children:
+
+      - name: docs
+        subtitle: Documentation Area
+        color: "#2E75B6"
+        description: Primary documentation tree for the project.
+        children:
+          - name: diagrams
+            subtitle: Diagram Sources
+            description: >
+              Ilograph YAML workspace overviews and other diagram source files.
+          - name: internal
+            subtitle: Internal Notes
+            description: Internal decisions, meeting records, and operational notes.
+          - name: vendor
+            subtitle: Vendor Docs
+            description: Vendor-supplied documentation, manuals, and reference material.
+
+      - name: src
+        subtitle: Runtime Logic
+        color: "#17A2B8"
+        description: >
+          Runtime service logic (rule loading, matching, mailbox polling,
+          message filing).
+
+      - name: test
+        subtitle: Unit Tests
+        color: "#28A745"
+        description: Focused unit tests for rules and service behavior.
+
+      - name: scripts
+        subtitle: Utility Scripts
+        color: "#F0AD4E"
+        description: >
+          Utility scripts invoked by Makefile targets and Git hooks.
+          Each script has both a Bash (.sh) and PowerShell (.ps1) counterpart.
+        children:
+          - name: bootstrap-package-name
+            subtitle: Package Bootstrap
+            description: >
+              Updates package.json name and description from template defaults
+              to repository-derived values.
+          - name: install-hooks
+            subtitle: Hook Installer
+            description: Configures Git to use .githooks/ as the hooks directory.
+          - name: lint-docs
+            subtitle: Docs Linter
+            description: Runs markdownlint-cli2 against all markdown files.
+          - name: settings-sort
+            subtitle: Settings Sorter
+            description: >
+              Delegates to sort-vscode-settings and sort-vscode-extensions
+              to normalize VS Code workspace files.
+          - name: sort-vscode-extensions
+            subtitle: Extensions Sorter
+            description: Alphabetically sorts .vscode/extensions.json recommendations.
+          - name: sort-vscode-settings
+            subtitle: Settings Sorter
+            description: Alphabetically sorts keys in .vscode/settings.json.
+          - name: sort-word-list
+            subtitle: Word List Sorter
+            description: Sorts the cSpell custom word list in .vscode/.
+
+      - name: .githooks
+        subtitle: Git Hooks
+        description: Local Git hook scripts for pre-commit and pre-push validation.
+        children:
+          - name: pre-commit
+            subtitle: Pre-Commit Hook
+            description: >
+              Runs markdownlint, settings sort, and extensions sort before
+              each commit.
+          - name: pre-push
+            subtitle: Pre-Push Hook
+            description: Validates repository state before pushing to remote.
+
+      - name: .github
+        subtitle: GitHub Configuration
+        description: GitHub-specific configuration, Copilot instructions, and CI workflows.
+        children:
+          - name: copilot-instructions.md
+            subtitle: Copilot Root Instructions
+            description: >
+              Global Copilot custom instructions: markdown compliance gate,
+              diagram standards, commit recovery, and temp file placement rules.
+          - name: instructions
+            subtitle: Instruction Files
+            description: >
+              Scoped Copilot instruction files for specific workflows and
+              language conventions.
+            children:
+              - name: copilot-pr-conversation-workflow.instructions.md
+                subtitle: PR Conversation Workflow
+                description: >
+                  End-to-end workflow for handling PR review threads: fix,
+                  commit, reply in-thread, and resolve.
+              - name: ilograph-sync.instructions.md
+                subtitle: Ilograph Sync Rules
+                description: >
+                  Requires diagram sources in docs/diagrams/ to be updated
+                  when repository structure or runtime flow changes.
+              - name: powershell-approved-verbs.instructions.md
+                subtitle: PowerShell Verb Rules
+                description: Enforces use of approved PowerShell verbs in .ps1/.psm1 files.
+              - name: script-shell-parity.instructions.md
+                subtitle: Shell Parity Rules
+                description: >
+                  Requires Bash and PowerShell counterparts for every script
+                  in scripts/ unless explicitly documented as platform-specific.
+          - name: workflows
+            subtitle: GitHub Actions
+            description: CI workflows for automated validation.
+            children:
+              - name: markdown-lint-helpers.yml
+                subtitle: Markdown Lint CI
+                description: Runs markdownlint on pull requests and pushes.
+              - name: powershell-lint.yml
+                subtitle: PowerShell Lint CI
+                description: Runs PSScriptAnalyzer on all .ps1 files.
+
+      - name: .vscode
+        subtitle: VS Code Workspace Config
+        description: Editor settings, extension recommendations, and MCP configuration.
+        children:
+          - name: extensions.json
+            subtitle: Extension Recommendations
+            description: Recommended extensions for contributors (sorted alphabetically).
+          - name: generic-project-words.txt
+            subtitle: cSpell Word List
+            description: Project-specific cSpell custom dictionary.
+          - name: mcp.json
+            subtitle: MCP Configuration
+            description: Model Context Protocol server configuration for Copilot.
+          - name: settings.json
+            subtitle: Workspace Settings
+            description: Workspace-level VS Code settings (sorted alphabetically).
+
+      - name: .markdownlint.yaml
+        subtitle: Markdownlint Config
+        description: Shared markdownlint rule configuration used by hooks and CI.
+
+      - name: Makefile
+        subtitle: Task Runner
+        description: >
+          Shortcut targets: init, lint-docs, lint-docs-fix, settings-sort,
+          and hook installation.
+
+      - name: package.json
+        subtitle: Node Metadata
+        description: Node.js project metadata and markdownlint-cli2 dev dependency.
+
+perspectives:
+  - name: Repository Structure
+    color: "#2E75B6"
+    description: High-level layout of folders and ownership boundaries.
+    notes: High-level repository map for quick contributor onboarding.
+    relations:
+      - from: Makefile
+        to: scripts/install-hooks
+        label: init → install-hooks
+      - from: Makefile
+        to: scripts/lint-docs
+        label: lint-docs
+      - from: Makefile
+        to: scripts/settings-sort
+        label: settings-sort
+      - from: .githooks/pre-commit
+        to: scripts/lint-docs
+        label: invokes
+      - from: .githooks/pre-commit
+        to: scripts/settings-sort
+        label: invokes
+      - from: scripts/settings-sort
+        to: scripts/sort-vscode-extensions
+        label: delegates to
+      - from: scripts/settings-sort
+        to: scripts/sort-vscode-settings
+        label: delegates to
+      - from: scripts/bootstrap-package-name
+        to: package.json
+        label: updates
+      - from: scripts/sort-word-list
+        to: .vscode/generic-project-words.txt
+        label: sorts
+      - from: .github/workflows/markdown-lint-helpers.yml
+        to: scripts/lint-docs
+        label: runs via CI
+      - from: .github/workflows/powershell-lint.yml
+        to: scripts
+        label: lints .ps1 files
+      - from: .github/instructions/ilograph-sync.instructions.md
+        to: docs/diagrams
+        label: governs updates to

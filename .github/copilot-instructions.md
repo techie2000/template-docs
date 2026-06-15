@@ -16,6 +16,30 @@ The configuration has been tailored specifically for this repository.
 
 ## Special Instructions
 
+### README Structure Maintenance (REQUIRED)
+
+When a change adds, removes, renames, or repurposes folders or significant files,
+update the repository structure sections in `README.md` in the same change.
+
+Follow:
+
+- `.github/instructions/readme-structure-maintenance.instructions.md`
+
+### Ilograph Diagram Sync (REQUIRED)
+
+When a change updates repository structure, significant files, or runtime flow,
+update Ilograph sources in `docs/diagrams/` in the same change to avoid drift.
+
+Keep `workspace-overview.ilograph.yaml` deterministic as files evolve:
+
+- Keep top-level sections in functional order (`docs`, `src`, `test`, `scripts`, then tooling/config).
+- Keep nested children alphabetized unless explicit runtime flow ordering is needed.
+- Keep relations grouped in a consistent sequence (tasks/hooks, CI, governance).
+
+Follow:
+
+- `.github/instructions/ilograph-sync.instructions.md`
+
 ### PR Conversation Handling (REQUIRED)
 
 When asked to process PR conversations/review threads end-to-end, follow:
@@ -89,7 +113,15 @@ When creating or editing markdown files, use the `markdownlint` rules defined in
 
 ### Diagram Standards (REQUIRED)
 
-**All diagrams MUST use Mermaid format for consistency and version control.**
+**Prescribe both Mermaid and Ilograph where they each fit best.**
+
+- **Mermaid for inline docs**: Keep diagrams embedded in markdown so they render
+  directly in GitHub and VS Code without extra tooling.
+- **Ilograph for deep-dive architecture**: Use `docs/diagrams/*.ilograph.yaml`
+  when interactive exploration and richer multi-perspective views improve
+  understanding.
+- **Keep both in sync** when a markdown Mermaid view and an Ilograph view describe
+  the same structure or runtime behavior.
 
 - **Format**: Mermaid markdown code blocks
 - **Location**: Embedded in README.md, ADRs, or separate `.md` files in `docs/diagrams/`

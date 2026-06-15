@@ -10,9 +10,12 @@ and operational references for the software or service being documented.
 | Folder | Purpose |
 | ------ | ------- |
 | [docs/](docs/) | Documentation index for the docs area and subfolders |
+| [docs/diagrams/](docs/diagrams/) | Diagram source files, including Ilograph workspace overviews |
 | [docs/internal/](docs/internal/) | Internal notes, decisions, and meeting records |
 | [docs/vendor/](docs/vendor/) | Vendor-supplied documentation, manuals, and reference material |
 | [images/](images/) | Supporting screenshots and diagrams |
+| [src/](src/) | Runtime service logic (rule loading, matching, mailbox polling, message filing) |
+| [test/](test/) | Focused unit tests for rules and service behavior |
 
 ## Tooling
 
@@ -21,6 +24,7 @@ and operational references for the software or service being documented.
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
+| [.vscode/](.vscode/) | Workspace settings and extension recommendations for contributors |
 | [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |
 | [.markdownlintignore](.markdownlintignore) | Ignore rules for transient markdown artifacts such as .tmp/ output |
