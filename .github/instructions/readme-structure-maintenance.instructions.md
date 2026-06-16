@@ -44,9 +44,11 @@ Update README.md in the same PR when:
 
 Update relevant README sections when:
 
-1. New root-level workflow files are added (e.g., new Makefile target, new root config file)
+1. New root-level workflow files are added (for example, a new root config file
+  or a new top-level automation script)
 2. Existing root-level files are removed or renamed
-3. Critical config files change their scope or purpose (e.g., a `.vscode/` setting becomes permanent vs. temporary)
+3. Critical config files change their scope or purpose (for example, a
+  `.vscode/` setting becomes permanent instead of temporary)
 
 ### What to Update
 
@@ -91,7 +93,9 @@ Example structure:
 
 When updating README.md for structure changes:
 
-1. Also update Ilograph sources in `docs/diagrams/workspace-overview.ilograph.yaml` in the same change (enforced by `ilograph-sync.instructions.md`)
+1. Also update Ilograph sources in
+  `docs/diagrams/workspace-overview.ilograph.yaml` in the same change
+  (enforced by `ilograph-sync.instructions.md`)
 2. Ensure any referenced instruction files exist and are correctly formatted
 3. Run `make lint-docs` before committing markdown changes (enforced by `copilot-instructions.md`)
 

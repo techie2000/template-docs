@@ -120,7 +120,8 @@ Rules:
 - While drafting or editing markdown prose, hard-wrap text to 120 characters or fewer.
 - Do not wait for lint output to discover long lines; wrap proactively as part of authoring.
 - For changed markdown files, run a pre-check for long lines before final linting:
-  `rg -n "^.{121,}$" -- *.md docs/**/*.md .github/**/*.md` (or equivalent PowerShell search).
+  `rg -n "^.{121,}$" --glob "*.md" --glob "docs/**/*.md" --glob ".github/**/*.md"`
+  (or equivalent PowerShell search).
 - If a long line is unavoidable (for example, a URL), use valid markdown structure that avoids
   overlong prose lines where possible (reference links, list formatting, or line breaks).
 
