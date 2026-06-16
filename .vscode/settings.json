@@ -15,6 +15,10 @@
   "chat.sessionSync.enabled": true,
   "chat.tools.terminal.autoApprove": {
     ".vscode/settings.json": true,
+    "/^node --test(\\s+.*)?$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
     "ConvertFrom-Json": true,
     "ConvertTo-Json": true,
     "ForEach-Object": true,
@@ -24,6 +28,7 @@
     "git commit": true,
     "git push": true,
     "git restore": true,
+    "git rev-parse": true,
     "make": true,
     "mkdir": true,
     "New-Item": true,
