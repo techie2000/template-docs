@@ -31,6 +31,8 @@ README.md serves as the primary human entrypoint for the repository. It must:
 
 ## Required Updates
 
+Repository design decisions come first; README reflects those decisions.
+
 ### When Folders Change
 
 Update README.md in the same PR when:
@@ -56,6 +58,15 @@ Update relevant README sections when:
 - **Tooling table**: Add/remove root-level files and `.github/` entries as applicable
 - **Descriptions**: Keep purpose statements in sync with actual folder usage
 - **Links**: Ensure all folder and file links are correct and point to existing resources
+- If a path is intentionally omitted from README, document the reason in the PR summary.
+
+## What Counts As Significant
+
+Treat these as significant by default:
+
+- Root-level automation/config files (for example: `Makefile`, `package.json`, `.markdownlint.yaml`)
+- Automation and policy folders (for example: `.github/`, `.githooks/`, `.vscode/`, `scripts/`)
+- Runtime or test entry-point folders/files (for example: `src/`, `test/`, key scripts in `scripts/`)
 
 ## Best Practices
 
@@ -111,3 +122,11 @@ Before finalizing a README change:
 - [ ] Related README files in subdirectories have been updated if applicable
 - [ ] Ilograph sources have been updated (if structure changed)
 - [ ] `make lint-docs` passes without errors
+
+## Quality Gate
+
+Before finalizing markdown changes:
+
+1. Run `make lint-docs-fix`
+2. Run `make lint-docs`
+3. Resolve any remaining markdown lint issues
