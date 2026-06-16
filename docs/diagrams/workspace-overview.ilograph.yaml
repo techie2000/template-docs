@@ -111,6 +111,11 @@ resources:
               - name: powershell-approved-verbs.instructions.md
                 subtitle: PowerShell Verb Rules
                 description: Enforces use of approved PowerShell verbs in .ps1/.psm1 files.
+              - name: readme-structure-maintenance.instructions.md
+                subtitle: README Structure Rules
+                description: >
+                  Keeps README files synchronized with stable top-level
+                  folders, root workflow files, and related structure changes.
               - name: script-shell-parity.instructions.md
                 subtitle: Shell Parity Rules
                 description: >
