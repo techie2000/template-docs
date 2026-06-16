@@ -171,7 +171,10 @@ customDictionaries[dictionaryName] = {
 const formattedSettings = `${JSON.stringify(sortNode(settings), null, 2)}\n`;
 fs.writeFileSync(settingsPath, formattedSettings, "utf8");
 
-const docsToken = "{{PROJECT_NAME}}";
+const docsTokens = new Map([
+  ["{{PROJECT_NAME}}", projectName],
+  ["{{REPO_NAME}}", repoName],
+]);
 const docsRoot = "docs";
 let docsUpdated = 0;
 
@@ -184,16 +187,23 @@ function walkDirectory(rootPath) {
       continue;
     }
 
-    if (!entry.isFile() || path.extname(entry.name).toLowerCase() !== ".md") {
+    const isMarkdown = path.extname(entry.name).toLowerCase() === ".md";
+    const isIlograph = entry.name.toLowerCase().endsWith(".ilograph.yaml");
+    if (!entry.isFile() || (!isMarkdown && !isIlograph)) {
       continue;
     }
 
     const content = fs.readFileSync(fullPath, "utf8");
-    if (!content.includes(docsToken)) {
+    let updatedContent = content;
+    for (const [token, value] of docsTokens) {
+      updatedContent = updatedContent.split(token).join(value);
+    }
+
+    if (updatedContent === content) {
       continue;
     }
 
-    fs.writeFileSync(fullPath, content.split(docsToken).join(projectName), "utf8");
+    fs.writeFileSync(fullPath, updatedContent, "utf8");
     docsUpdated += 1;
   }
 }

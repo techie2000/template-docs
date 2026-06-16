@@ -1,7 +1,7 @@
-description: Quick workspace overview for template-docs. Use this in Ilograph to explore repository areas and key file relationships.
+description: Quick workspace overview for {{PROJECT_NAME}}. Use this in Ilograph to explore repository areas and key file relationships.
 
 resources:
-  - name: template-docs
+  - name: {{REPO_NAME}}
     subtitle: Repository Root
     color: "#1F4E79"
     description: >

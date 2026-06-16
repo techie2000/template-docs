@@ -175,17 +175,27 @@ if (-not $formattedSettings.EndsWith("`n")) {
 [System.IO.File]::WriteAllText((Join-Path (Get-Location) $settingsPath), $formattedSettings, [System.Text.UTF8Encoding]::new($false))
 Write-Host "Ensured cSpell dictionary registration: $dictionaryName"
 
-$docsToken = "{{PROJECT_NAME}}"
+$docsTokens = [ordered]@{
+    "{{PROJECT_NAME}}" = $projectName
+    "{{REPO_NAME}}" = $repoName
+}
 $docsPath = Join-Path (Get-Location) "docs"
 $docsUpdated = 0
 if (Test-Path -LiteralPath $docsPath -PathType Container) {
-    foreach ($docFile in (Get-ChildItem -Path $docsPath -Recurse -File -Filter "*.md")) {
+    foreach ($docFile in (Get-ChildItem -Path $docsPath -Recurse -File | Where-Object {
+        $_.Extension -eq ".md" -or $_.Name -like "*.ilograph.yaml"
+    })) {
         $content = [System.IO.File]::ReadAllText($docFile.FullName)
-        if (-not $content.Contains($docsToken)) {
+
+        $updatedContent = $content
+        foreach ($token in $docsTokens.Keys) {
+            $updatedContent = $updatedContent.Replace($token, $docsTokens[$token])
+        }
+
+        if ($updatedContent -eq $content) {
             continue
         }
 
-        $updatedContent = $content.Replace($docsToken, $projectName)
         [System.IO.File]::WriteAllText($docFile.FullName, $updatedContent, [System.Text.UTF8Encoding]::new($false))
         $docsUpdated += 1
     }
