@@ -25,6 +25,7 @@
     "gh": true,
     "git add": true,
     "git checkout": true,
+    "git cherry-pick": true,
     "git commit": true,
     "git push": true,
     "git restore": true,
@@ -35,21 +36,22 @@
     "npm ci": true,
     "npm pkg": true,
     "Out-Null": true,
-    "Set-Content": true
+    "Set-Content": true,
+    "Test-Path": true
   },
   "chat.tools.urls.autoApprove": {
     "https://code.visualstudio.com": true,
-    "https://github.com/microsoft/vscode/wiki/*": true,
     "https://documenter.getpostman.com": true,
     "https://github.com": {
       "approveRequest": true,
       "approveResponse": true
     },
+    "https://github.com/microsoft/vscode/wiki/*": true,
+    "https://pkg.go.dev": true,
     "https://raw.githubusercontent.com": {
       "approveRequest": true,
       "approveResponse": true
-    },
-    "https://pkg.go.dev": true
+    }
   },
   "chat.useAgentSkills": true,
   "chat.useCustomizationsInParentRepositories": true,
