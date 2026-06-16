@@ -75,6 +75,7 @@ Each subdirectory README must:
 - Not duplicate information from parent README or upper-level docs
 
 Example structure:
+
 - `docs/README.md` → high-level docs layout
 - `docs/internal/README.md` → what belongs in internal docs
 - `docs/vendor/README.md` → what belongs in vendor docs

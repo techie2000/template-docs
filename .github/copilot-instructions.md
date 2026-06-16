@@ -111,6 +111,27 @@ When creating or editing markdown files, use the `markdownlint` rules defined in
 
 1. Before pushing, run `make lint-docs-fix` then `make lint-docs`; if lint still fails, fix manually until clean.
 
+### Markdown Line Length Prevention (REQUIRED)
+
+Prevent line-length lint failures (`MD013`) before running lint commands.
+
+Rules:
+
+- While drafting or editing markdown prose, hard-wrap text to 120 characters or fewer.
+- Do not wait for lint output to discover long lines; wrap proactively as part of authoring.
+- For changed markdown files, run a pre-check for long lines before final linting:
+  `rg -n "^.{121,}$" -- *.md docs/**/*.md .github/**/*.md` (or equivalent PowerShell search).
+- If a long line is unavoidable (for example, a URL), use valid markdown structure that avoids
+  overlong prose lines where possible (reference links, list formatting, or line breaks).
+
+Workflow requirement for markdown edits:
+
+1. Write/update markdown with proactive wrapping.
+2. Run long-line pre-check and fix hits.
+3. Run `make lint-docs-fix`.
+4. Run `make lint-docs`.
+5. Resolve any remaining markdownlint issues before commit.
+
 ### Diagram Standards (REQUIRED)
 
 **Prescribe both Mermaid and Ilograph where they each fit best.**
