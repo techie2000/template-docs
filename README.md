@@ -24,6 +24,7 @@ and operational references for the software or service being documented.
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
+| [AGENTS.md](AGENTS.md) | Cross-agent repository entrypoint that delegates to the canonical policy in [.github/copilot-instructions.md](.github/copilot-instructions.md) |
 | [.vscode/](.vscode/) | Workspace settings and extension recommendations for contributors |
 | [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |

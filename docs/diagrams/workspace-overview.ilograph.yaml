@@ -144,6 +144,12 @@ resources:
             subtitle: Workspace Settings
             description: Workspace-level VS Code settings (sorted alphabetically).
 
+      - name: AGENTS.md
+        subtitle: Cross-Agent Entrypoint
+        description: >
+          Root discovery file for AI tools. Delegates repository-wide policy
+          to .github/copilot-instructions.md.
+
       - name: .markdownlint.yaml
         subtitle: Markdownlint Config
         description: Shared markdownlint rule configuration used by hooks and CI.
@@ -197,6 +203,9 @@ perspectives:
       - from: .github/workflows/powershell-lint.yml
         to: scripts
         label: lints .ps1 files
+      - from: AGENTS.md
+        to: .github/copilot-instructions.md
+        label: delegates to
       - from: .github/instructions/ilograph-sync.instructions.md
         to: docs/diagrams
         label: governs updates to
