@@ -124,13 +124,26 @@ Rules:
 - If a long line is unavoidable (for example, a URL), use valid markdown structure that avoids
   overlong prose lines where possible (reference links, list formatting, or line breaks).
 
+### Markdown EOF Hygiene (REQUIRED)
+
+Prevent end-of-file formatting failures before running lint commands.
+
+Rules:
+
+- End every markdown file with exactly one trailing newline.
+- Do not leave a markdown file without a final newline after edits.
+- Do not accumulate extra blank lines at the end of the file while patching or appending content.
+- Before final linting, do a quick EOF sanity check on changed markdown files if the edit path did
+  not already preserve the final newline.
+
 Workflow requirement for markdown edits:
 
 1. Write/update markdown with proactive wrapping.
-2. Run long-line pre-check and fix hits.
-3. Run `make lint-docs-fix`.
-4. Run `make lint-docs`.
-5. Resolve any remaining markdownlint issues before commit.
+2. Ensure the file still ends with exactly one trailing newline.
+3. Run long-line pre-check and fix hits.
+4. Run `make lint-docs-fix`.
+5. Run `make lint-docs`.
+6. Resolve any remaining markdownlint issues before commit.
 
 ### Diagram Standards (REQUIRED)
 
