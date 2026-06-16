@@ -50,6 +50,9 @@ next action.
   CLI fallback for replies.
 - Do not post only a top-level PR summary when the request asks for conversation handling;
   replies must be in-thread.
+- Before posting or editing in-thread replies, sanitize body text to printable characters
+  (plus normal newline/tab) and remove control characters such as form feed (`\f`).
+  If a bad character is discovered after posting, patch the comment body immediately.
 
 ## Verification Checklist
 
