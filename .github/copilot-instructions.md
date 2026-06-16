@@ -111,6 +111,28 @@ When creating or editing markdown files, use the `markdownlint` rules defined in
 
 1. Before pushing, run `make lint-docs-fix` then `make lint-docs`; if lint still fails, fix manually until clean.
 
+### Markdown Line Length Prevention (REQUIRED)
+
+Prevent line-length lint failures (`MD013`) before running lint commands.
+
+Rules:
+
+- While drafting or editing markdown prose, hard-wrap text to 120 characters or fewer.
+- Do not wait for lint output to discover long lines; wrap proactively as part of authoring.
+- For changed markdown files, run a pre-check for long lines before final linting:
+  `rg -n "^.{121,}$" --glob "*.md" --glob "docs/**/*.md" --glob ".github/**/*.md"`
+  (or equivalent PowerShell search).
+- If a long line is unavoidable (for example, a URL), use valid markdown structure that avoids
+  overlong prose lines where possible (reference links, list formatting, or line breaks).
+
+Workflow requirement for markdown edits:
+
+1. Write/update markdown with proactive wrapping.
+2. Run long-line pre-check and fix hits.
+3. Run `make lint-docs-fix`.
+4. Run `make lint-docs`.
+5. Resolve any remaining markdownlint issues before commit.
+
 ### Diagram Standards (REQUIRED)
 
 **Prescribe both Mermaid and Ilograph where they each fit best.**
@@ -220,3 +242,190 @@ errors/validation: "#D9534F" (medium red) with white text
 warnings/DLQ: "#F0AD4E" (medium orange) with dark text
 backgrounds: "#555" (dark gray) with white text
 ```
+
+## Documentation Artifact Guidance
+
+This section provides **trigger-based** guidance on when to create durable
+documentation artifacts. Only create artifacts when they serve a clear purpose;
+avoid over-prescribing documentation.
+
+### ADR (Architecture Decision Record)
+
+**Trigger**: A change introduces a durable architectural, tooling, governance,
+or workflow decision.
+
+**When to create**:
+
+- Alternatives were evaluated and a choice was made
+- The decision affects multiple areas or future contributors
+- The decision is unlikely to change in the near term
+- Future maintainers would benefit from understanding the "why," not just
+  the "what"
+
+**Why**: Durable decisions deserve justification and historical context. ADRs
+prevent rehashing decisions and document the trade-offs considered.
+
+### Runbooks and Checklists
+
+**Trigger**: A process is repeatable, operational, and easy to get wrong.
+
+**When to create**:
+
+- Setup flows or onboarding procedures
+- Incident response or troubleshooting workflows
+- Maintenance tasks that happen periodically
+- Complex workflows with many manual steps or decision points
+
+**Why**: Step-by-step guidance reduces operational errors and onboarding
+friction. Checklists ensure nothing is missed in high-stress situations.
+
+### Changelog or Release Notes
+
+**Trigger**: Only for versioned releases or externally visible behavior changes.
+
+**When to create**:
+
+- New version is being released to users or customers
+- A breaking change or significant feature is introduced
+- Users or external teams need to know about the change
+
+**When NOT to create**:
+
+- Internal refactoring with no user-visible impact
+- Every internal documentation edit
+- Temporary fixes or experiments
+
+**Why**: Avoid changelog noise. Focus on signal for end users; changelogs are not development journals.
+
+### Log Files (log.md)
+
+**Trigger**: Only for bounded chronological records with a clear owner and
+retention purpose.
+
+**When to create**:
+
+- Migration logs (tracking progress and decisions during a migration)
+- Meeting notes or decision journals (with dates, attendees, outcomes)
+- Incident timelines (when and how issues were discovered and resolved)
+- Ongoing records with a clear owner and maintenance commitment
+
+**When NOT to create**:
+
+- Generic "log.md" files scattered across the repo without purpose
+- Logs with no clear retention policy or owner
+- Transient debug output or build artifacts (use `.tmp/` for these)
+
+**Why**: Focused, purposeful logs aid troubleshooting and knowledge transfer.
+Unfocused or orphaned logs create clutter and confusion.
+
+## Documentation Conventions
+
+This section formalizes the minimal set of conventions for maintaining
+consistent, navigable documentation across the repository. Follow these rules
+to ensure clarity, discoverability, and low maintenance burden.
+
+### 1. README.md is the Primary Human Entrypoint
+
+README.md at the repository root must:
+
+- List all stable top-level folders that contributors navigate directly
+- Include critical root-level workflow files (Makefile, package.json, key
+  config files)
+- Provide a clear mental model of repository purpose and structure
+- Link to deeper documentation where needed
+
+When repository structure changes, update README.md in the same PR.
+
+### 2. Each Subdirectory Has a Local README.md
+
+Subdirectories with multiple files or a distinct purpose must have their own README.md:
+
+- `docs/README.md` → overview of docs area and its subfolders
+- `docs/internal/README.md` → what belongs in internal documentation
+- `docs/vendor/README.md` → what belongs in vendor documentation
+- `scripts/README.md` → overview of available scripts (if complex)
+
+Each local README acts as a landing page for that directory and documents what
+belongs there, not a duplicate of parent README information.
+
+### 3. Repo-Wide Agent Policy Has One Canonical Source
+
+All agent and automation policy is maintained in one place:
+
+- `.github/copilot-instructions.md` is the canonical source for all repo-wide policies
+- `.github/instructions/` contains scoped rules (language-specific, workflow-specific)
+- Cross-tool agent files (e.g., AGENTS.md, CLAUDE.md, CURSOR.md) must
+  **delegate** to these canonical sources instead of duplicating rules
+
+Maintain one source of truth. Prevent policy drift through duplication.
+
+### 4. Update README.md and Ilograph Sources Together
+
+When repository structure, major workflow, or ownership boundaries change:
+
+- Update README.md in the same PR
+- Update Ilograph sources in `docs/diagrams/workspace-overview.ilograph.yaml`
+  in the same change
+
+This ensures both human-facing navigation and machine-readable architecture stay
+in sync. (Already enforced by `ilograph-sync.instructions.md` and
+`readme-structure-maintenance.instructions.md`.)
+
+### 5. Create an ADR for Durable Decisions
+
+Create an ADR when a change introduces an architectural, tooling, governance,
+or contributor workflow decision and alternatives were considered.
+
+Location: `docs/internal/adr-<date>-<short-title>.md` (or similar ADR naming convention).
+
+Do not create ADRs for every change; only for decisions that will stand and
+matter to future maintainers.
+
+### 6. Create Runbooks for Repeatable Operations
+
+Create a runbook or checklist for repeatable operational procedures:
+
+- Setup flows and onboarding procedures
+- Incident response or troubleshooting workflows
+- Maintenance tasks that happen periodically
+- Complex workflows with many manual steps or decision points
+
+Location: `docs/internal/runbook-<title>.md` or `docs/internal/<title>-checklist.md`.
+
+### 7. Create Changelogs Only for Versioned or External Changes
+
+Create or update changelog/release-note entries only for:
+
+- Versioned releases published to users or customers
+- Breaking changes or significant features with external impact
+- Changes users or external teams need to know about
+
+Do NOT force changelog entries for:
+
+- Internal refactoring with no user-visible impact
+- Every internal documentation edit
+- Temporary fixes or experiments
+
+### 8. Create Logs Only for Bounded Records with Purpose
+
+Create log-style documents only for:
+
+- Migration logs (track progress and decisions during migrations)
+- Meeting notes or decision journals (with dates, attendees, outcomes)
+- Incident timelines (discovery, escalation, resolution)
+- Ongoing records with a clear owner and maintenance commitment
+
+Do NOT scatter generic `log.md` files across the repo; logs must have purpose and ownership.
+
+### 9. Prefer Tool-Neutral Documentation
+
+Documentation files should be tool-agnostic. Only add tool-specific instruction
+files (e.g., CLAUDE.md, GEMINI.md, CURSOR.md) when:
+
+- The tool actually requires repo-root discovery files
+- Team verification confirms the tool looks for these files
+- The tool-specific file is a minimal stub that delegates to canonical policy
+  (not a full policy duplicate)
+
+Avoid maintaining separate instruction files per tool unless absolutely
+necessary. A single AGENTS.md entrypoint is preferable.
