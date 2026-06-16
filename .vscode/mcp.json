@@ -9,6 +9,7 @@
         "-i",
         "--rm",
         "ghcr.io/quincymillerdev/ilograph-mcp-server:latest"
+      ]
     }
   }
 }
