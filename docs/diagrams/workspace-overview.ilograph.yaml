@@ -58,8 +58,8 @@ resources:
         subtitle: Runtime Logs
         color: "#6C757D"
         description: >
-          Repository-tracked log directory anchor containing only .gitkeep while
-          runtime logs are Git-ignored.
+          Repository-tracked log directory containing .gitkeep and README guidance
+          while runtime logs are gitignored.
         children:
           - id: logs_gitkeep
             name: logs/.gitkeep
