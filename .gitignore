@@ -16,6 +16,9 @@ node_modules/
 # Repository-local transient outputs
 .tmp/*
 !.tmp/.gitkeep
+logs/*
+!logs/.gitkeep
+!logs/README.md
 
 # Python cache files
 __pycache__/

@@ -37,6 +37,24 @@ resources:
         color: "#28A745"
         description: Placeholder for automated tests (unit/integration) covering `src/`.
 
+      - name: logs
+        subtitle: Runtime Logs
+        color: "#6C757D"
+        description: >
+          Repository-tracked log directory anchor containing only .gitkeep while
+          runtime logs are Git-ignored.
+        children:
+          - name: .gitkeep
+            subtitle: Directory Anchor
+            description: >
+              Ensures the logs directory exists in all clones without tracking
+              generated log files.
+          - name: README.md
+            subtitle: Log Directory Guidance
+            description: >
+              Documents logging intent, retention controls, and commit
+              expectations for logs/.
+
       - name: scripts
         subtitle: Utility Scripts
         color: "#F0AD4E"
@@ -69,6 +87,24 @@ resources:
           - name: sort-word-list
             subtitle: Word List Sorter
             description: Sorts the cSpell custom word list in .vscode/.
+
+      - name: tooling
+        id: tooling
+        subtitle: Project Tooling Folders
+        description: Automation and policy folders that support contribution workflows.
+        children:
+          - id: github
+            name: .github/
+            description: CI workflows, Copilot instructions, and repo policy configuration.
+          - id: githooks
+            name: .githooks/
+            description: Local hook scripts used by contributor tooling.
+          - id: vscode
+            name: .vscode/
+            description: Workspace settings, recommendations, and MCP server configuration.
+          - id: images
+            name: images/
+            description: Supporting visual assets referenced by documentation.
 
       - name: .githooks
         subtitle: Git Hooks
@@ -175,6 +211,39 @@ perspectives:
     description: High-level layout of folders and ownership boundaries.
     notes: High-level repository map for quick contributor onboarding.
     relations:
+      - from: {{REPO_NAME}}
+        to: src
+        label: contains
+      - from: {{REPO_NAME}}
+        to: test
+        label: contains
+      - from: {{REPO_NAME}}
+        to: logs
+        label: contains
+      - from: {{REPO_NAME}}
+        to: scripts
+        label: contains
+      - from: {{REPO_NAME}}
+        to: tooling
+        label: contains
+      - from: tooling
+        to: github
+        label: supports
+      - from: tooling
+        to: githooks
+        label: supports
+      - from: tooling
+        to: vscode
+        label: supports
+      - from: tooling
+        to: images
+        label: supports
+      - from: logs
+        to: logs/.gitkeep
+        label: anchors
+      - from: logs
+        to: logs/README.md
+        label: documents
       - from: Makefile
         to: scripts/install-hooks
         label: init → install-hooks

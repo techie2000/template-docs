@@ -14,6 +14,7 @@ and operational references for the software or service being documented.
 | [docs/internal/](docs/internal/) | Internal notes, decisions, and meeting records |
 | [docs/vendor/](docs/vendor/) | Vendor-supplied documentation, manuals, and reference material |
 | [images/](images/) | Supporting screenshots and diagrams |
+| [logs/](logs/) | Runtime audit log directory (tracked via `.gitkeep` and `README.md`; generated log files remain ignored) |
 | [src/](src/) | Placeholder for application/source code (add runtime logic here) |
 | [test/](test/) | Placeholder for automated tests covering `src/` behavior |
 
