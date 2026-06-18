@@ -62,6 +62,25 @@ Rules:
 - Do not commit markdown changes while markdown lint is failing.
 - Treat markdown lint failures as blocking, not advisory.
 
+### Markdownlint Ignore Sync (REQUIRED)
+
+Keep markdown ignore behavior aligned across repo linting and local editor diagnostics.
+
+Rules:
+
+- Use `.markdownlintignore` as the canonical source of ignored markdown paths for repo/CI linting.
+- When `.markdownlintignore` changes, update matching markdownlint workspace settings in
+  `.vscode/settings.json` in the same change.
+- Keep exclusions semantically equivalent between CLI and editor, especially for transient folders
+  such as `.tmp/`.
+- Do not rely on only one side (CLI ignore or VS Code ignore); keep both aligned to avoid drift.
+
+Verification:
+
+1. Run `make lint-docs-fix`.
+2. Run `make lint-docs`.
+3. Confirm excluded paths do not surface markdownlint diagnostics in VS Code.
+
 ### Commit Failure Recovery (REQUIRED)
 
 If a commit fails because pre-commit checks fail, agents must automatically attempt remediation
