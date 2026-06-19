@@ -27,7 +27,7 @@ and operational references for the software or service being documented.
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 | [.vscode/](.vscode/) | Workspace settings and extension recommendations for contributors |
 | [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |
-| [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |
+| [.markdownlint.yaml](.markdownlint.yaml) | Base markdownlint rule set extended by [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) |
 | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | Shared markdownlint-cli2 config for editor and command-line ignores/globs |
 | [.markdownlintignore](.markdownlintignore) | Ignore rules for transient markdown artifacts such as .tmp/ output |
 | [AGENTS.md](AGENTS.md) | Cross-agent repository entrypoint that delegates to the canonical policy in [.github/copilot-instructions.md](.github/copilot-instructions.md) |
