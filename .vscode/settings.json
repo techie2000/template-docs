@@ -63,17 +63,38 @@
   "cSpell.autocorrect": false,
   "cSpell.caseSensitive": true,
   "cSpell.customDictionaries": {
+    "finance-words": {
+      "addWords": true,
+      "description": "Finance-domain accepted words",
+      "name": "finance-words",
+      "path": "${workspaceFolder}/.vscode/finance-words.txt",
+      "scope": "workspace"
+    },
     "generic-project-words": {
       "addWords": true,
       "description": "Project-specific accepted words",
       "name": "generic-project-words",
       "path": "${workspaceFolder}/.vscode/generic-project-words.txt",
       "scope": "workspace"
+    },
+    "it-words": {
+      "addWords": true,
+      "description": "IT and tooling accepted words",
+      "name": "it-words",
+      "path": "${workspaceFolder}/.vscode/it-words.txt",
+      "scope": "workspace"
     }
   },
   "cSpell.enabled": true,
   "cSpell.enabledFileTypes": {
-    "markdown": true
+    "json": true,
+    "jsonc": true,
+    "makefile": false,
+    "markdown": true,
+    "plaintext": true,
+    "shellscript": false,
+    "yaml": true,
+    "powershell": false
   },
   "cSpell.ignoreRegExpList": [],
   "cSpell.language": "en,en-GB",

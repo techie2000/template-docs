@@ -1,0 +1,15 @@
+autofetch
+Claude
+github
+gitlab
+gitlabce
+ilograph
+pgsql
+precommit
+prepush
+pycache
+setext
+sslmode
+toplevel
+websearch
+winget
