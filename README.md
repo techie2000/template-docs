@@ -14,6 +14,7 @@ and operational references for the software or service being documented.
 | [docs/internal/](docs/internal/) | Internal notes, decisions, and meeting records |
 | [docs/vendor/](docs/vendor/) | Vendor-supplied documentation, manuals, and reference material |
 | [images/](images/) | Supporting screenshots and diagrams |
+| [logs/](logs/) | Runtime audit log directory (tracked via `.gitkeep` and `README.md`; generated log files remain ignored) |
 | [src/](src/) | Placeholder for application/source code (add runtime logic here) |
 | [test/](test/) | Placeholder for automated tests covering `src/` behavior |
 
@@ -24,11 +25,12 @@ and operational references for the software or service being documented.
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
-| [AGENTS.md](AGENTS.md) | Cross-agent repository entrypoint that delegates to the canonical policy in [.github/copilot-instructions.md](.github/copilot-instructions.md) |
 | [.vscode/](.vscode/) | Workspace settings and extension recommendations for contributors |
 | [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |
-| [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by the pre-commit hook |
+| [.markdownlint.yaml](.markdownlint.yaml) | Base markdownlint rule set extended by [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) |
+| [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | Shared markdownlint-cli2 config for editor and command-line ignores/globs |
 | [.markdownlintignore](.markdownlintignore) | Ignore rules for transient markdown artifacts such as .tmp/ output |
+| [AGENTS.md](AGENTS.md) | Cross-agent repository entrypoint that delegates to the canonical policy in [.github/copilot-instructions.md](.github/copilot-instructions.md) |
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
 | [package.json](package.json) | Generic Node metadata and markdownlint-cli2 development dependency |
 

@@ -22,7 +22,7 @@ if ($targets.Count -eq 0) {
     exit 0
 }
 
-$argsList = @('--no-install', 'markdownlint-cli2', '--config', '.markdownlint.yaml')
+$argsList = @('--no-install', 'markdownlint-cli2', '--config', '.markdownlint-cli2.yaml')
 if ($Fix) {
     $argsList += '--fix'
 }

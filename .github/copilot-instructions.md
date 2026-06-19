@@ -68,12 +68,15 @@ Keep markdown ignore behavior aligned across repo linting and local editor diagn
 
 Rules:
 
-- Use `.markdownlintignore` as the canonical source of ignored markdown paths for repo/CI linting.
-- When `.markdownlintignore` changes, update matching markdownlint workspace settings in
-  `.vscode/settings.json` in the same change.
-- Keep exclusions semantically equivalent between CLI and editor, especially for transient folders
-  such as `.tmp/`.
-- Do not rely on only one side (CLI ignore or VS Code ignore); keep both aligned to avoid drift.
+- Use `.markdownlint-cli2.yaml` as the canonical source for markdownlint-cli2/editor ignore globs
+  (for example `.tmp/**` and `**/.tmp/**`).
+- Keep `.markdownlint.yaml` focused on rule configuration only; do not duplicate ignore globs there.
+- Keep `.vscode/settings.json` aligned by setting `markdownlint.configFile` to
+  `.markdownlint-cli2.yaml`.
+- Keep `package.json` scripts and `scripts/lint-docs.*` commands aligned to use
+  `--config .markdownlint-cli2.yaml`.
+- If `.markdownlintignore` is changed for other tooling, ensure equivalent `.tmp` exclusions remain in
+  `.markdownlint-cli2.yaml` so VS Code diagnostics and CLI lint behavior do not drift.
 
 Verification:
 

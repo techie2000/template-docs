@@ -15,9 +15,9 @@ fi
 if [ "$#" -gt 0 ]; then
   # Lint explicit paths passed by caller.
   if [ -n "$fix_flag" ]; then
-    npx --no-install markdownlint-cli2 --config .markdownlint.yaml --fix "$@"
+    npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml --fix "$@"
   else
-    npx --no-install markdownlint-cli2 --config .markdownlint.yaml "$@"
+    npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml "$@"
   fi
   exit $?
 fi
@@ -30,7 +30,7 @@ fi
 
 # Lint all tracked markdown files in the repository.
 if [ -n "$fix_flag" ]; then
-  git ls-files -z '*.md' | xargs -0 npx --no-install markdownlint-cli2 --config .markdownlint.yaml --fix
+  git ls-files -z '*.md' | xargs -0 npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml --fix
 else
-  git ls-files -z '*.md' | xargs -0 npx --no-install markdownlint-cli2 --config .markdownlint.yaml
+  git ls-files -z '*.md' | xargs -0 npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml
 fi

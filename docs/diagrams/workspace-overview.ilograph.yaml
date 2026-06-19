@@ -1,7 +1,8 @@
 description: Quick workspace overview for {{PROJECT_NAME}}. Use this in Ilograph to explore repository areas and key file relationships.
 
 resources:
-  - name: {{REPO_NAME}}
+  - id: repo
+    name: {{REPO_NAME}}
     subtitle: Repository Root
     color: "#1F4E79"
     description: >
@@ -9,165 +10,255 @@ resources:
       documentation, scripts, and tooling configuration.
     children:
 
-      - name: docs
+      - id: docs
+        name: docs/
         subtitle: Documentation Area
         color: "#2E75B6"
         description: Primary documentation tree for the project.
         children:
-          - name: diagrams
+          - id: docs_readme
+            name: docs/README.md
+            subtitle: Docs Index
+            description: Entry point for documentation organization and usage notes.
+          - id: docs_diagrams
+            name: docs/diagrams/
             subtitle: Diagram Sources
             description: >
               Ilograph YAML workspace overviews and other diagram source files.
-          - name: internal
+            children:
+              - id: ilograph_workspace
+                name: workspace-overview.ilograph.yaml
+                subtitle: This Ilograph Source
+                description: High-level repository map showing folder and file relationships.
+          - id: docs_internal
+            name: docs/internal/
             subtitle: Internal Notes
             description: Internal decisions, meeting records, and operational notes.
-          - name: vendor
+          - id: docs_vendor
+            name: docs/vendor/
             subtitle: Vendor Docs
             description: Vendor-supplied documentation, manuals, and reference material.
 
-      - name: src
+      - id: src
+        name: src/
         subtitle: Source / Runtime Logic
         color: "#17A2B8"
         description: >
           Placeholder for application/source code. Add the runtime/service logic for
           your project here.
 
-      - name: test
+      - id: test
+        name: test/
         subtitle: Tests
         color: "#28A745"
         description: Placeholder for automated tests (unit/integration) covering `src/`.
 
-      - name: scripts
+      - id: scripts
+        name: scripts/
         subtitle: Utility Scripts
         color: "#F0AD4E"
         description: >
           Utility scripts invoked by Makefile targets and Git hooks.
           Each script has both a Bash (.sh) and PowerShell (.ps1) counterpart.
         children:
-          - name: bootstrap-package-name
+          - id: scripts_readme
+            name: scripts/README.md
+            subtitle: Scripts Index
+            description: Script usage and conventions for contributors.
+          - id: scripts_bootstrap
+            name: bootstrap-package-name
             subtitle: Package Bootstrap
             description: >
               Updates package.json name and description from template defaults
               to repository-derived values.
-          - name: install-hooks
+          - id: scripts_install_hooks
+            name: install-hooks
             subtitle: Hook Installer
             description: Configures Git to use .githooks/ as the hooks directory.
-          - name: lint-docs
+          - id: scripts_lint_docs
+            name: lint-docs
             subtitle: Docs Linter
             description: Runs markdownlint-cli2 against all markdown files.
-          - name: settings-sort
+          - id: scripts_settings_sort
+            name: settings-sort
             subtitle: Settings Sorter
             description: >
               Delegates to sort-vscode-settings and sort-vscode-extensions
               to normalize VS Code workspace files.
-          - name: sort-vscode-extensions
+          - id: scripts_sort_extensions
+            name: sort-vscode-extensions
             subtitle: Extensions Sorter
             description: Alphabetically sorts .vscode/extensions.json recommendations.
-          - name: sort-vscode-settings
-            subtitle: Settings Sorter
+          - id: scripts_sort_settings
+            name: sort-vscode-settings
+            subtitle: Settings Sorter (Canonical)
             description: Alphabetically sorts keys in .vscode/settings.json.
-          - name: sort-word-list
+          - id: scripts_sort_word_list
+            name: sort-word-list
             subtitle: Word List Sorter
             description: Sorts the cSpell custom word list in .vscode/.
 
-      - name: .githooks
-        subtitle: Git Hooks
-        description: Local Git hook scripts for pre-commit and pre-push validation.
-        children:
-          - name: pre-commit
-            subtitle: Pre-Commit Hook
-            description: >
-              Runs markdownlint, settings sort, and extensions sort before
-              each commit.
-          - name: pre-push
-            subtitle: Pre-Push Hook
-            description: Validates repository state before pushing to remote.
-
-      - name: .github
-        subtitle: GitHub Configuration
-        description: GitHub-specific configuration, Copilot instructions, and CI workflows.
-        children:
-          - name: copilot-instructions.md
-            subtitle: Copilot Root Instructions
-            description: >
-              Global Copilot custom instructions: markdown compliance gate,
-              diagram standards, commit recovery, and temp file placement rules.
-          - name: instructions
-            subtitle: Instruction Files
-            description: >
-              Scoped Copilot instruction files for specific workflows and
-              language conventions.
-            children:
-              - name: copilot-pr-conversation-workflow.instructions.md
-                subtitle: PR Conversation Workflow
-                description: >
-                  End-to-end workflow for handling PR review threads: fix,
-                  commit, reply in-thread, and resolve.
-              - name: ilograph-sync.instructions.md
-                subtitle: Ilograph Sync Rules
-                description: >
-                  Requires diagram sources in docs/diagrams/ to be updated
-                  when repository structure or runtime flow changes.
-              - name: powershell-approved-verbs.instructions.md
-                subtitle: PowerShell Verb Rules
-                description: Enforces use of approved PowerShell verbs in .ps1/.psm1 files.
-              - name: readme-structure-maintenance.instructions.md
-                subtitle: README Structure Rules
-                description: >
-                  Keeps README files synchronized with stable top-level
-                  folders, root workflow files, and related structure changes.
-              - name: script-shell-parity.instructions.md
-                subtitle: Shell Parity Rules
-                description: >
-                  Requires Bash and PowerShell counterparts for every script
-                  in scripts/ unless explicitly documented as platform-specific.
-          - name: workflows
-            subtitle: GitHub Actions
-            description: CI workflows for automated validation.
-            children:
-              - name: markdown-lint-helpers.yml
-                subtitle: Markdown Lint CI
-                description: Runs markdownlint on pull requests and pushes.
-              - name: powershell-lint.yml
-                subtitle: PowerShell Lint CI
-                description: Runs PSScriptAnalyzer on all .ps1 files.
-
-      - name: .vscode
-        subtitle: VS Code Workspace Config
-        description: Editor settings, extension recommendations, and MCP configuration.
-        children:
-          - name: extensions.json
-            subtitle: Extension Recommendations
-            description: Recommended extensions for contributors (sorted alphabetically).
-          - name: generic-project-words.txt
-            subtitle: cSpell Word List
-            description: Project-specific cSpell custom dictionary.
-          - name: mcp.json
-            subtitle: MCP Configuration
-            description: Model Context Protocol server configuration for Copilot.
-          - name: settings.json
-            subtitle: Workspace Settings
-            description: Workspace-level VS Code settings (sorted alphabetically).
-
-      - name: AGENTS.md
-        subtitle: Cross-Agent Entrypoint
+      - id: logs
+        name: logs/
+        subtitle: Runtime Logs
+        color: "#6C757D"
         description: >
-          Root discovery file for AI tools. Delegates repository-wide policy
-          to .github/copilot-instructions.md.
+          Repository-tracked log directory containing .gitkeep and README guidance
+          while runtime logs are gitignored.
+        children:
+          - id: logs_gitkeep
+            name: logs/.gitkeep
+            subtitle: Directory Anchor
+            description: >
+              Ensures the logs directory exists in all clones without tracking
+              generated log files.
+          - id: logs_readme
+            name: logs/README.md
+            subtitle: Log Directory Guidance
+            description: >
+              Documents logging intent, retention controls, and commit
+              expectations for logs/.
 
-      - name: .markdownlint.yaml
-        subtitle: Markdownlint Config
-        description: Shared markdownlint rule configuration used by hooks and CI.
+      - id: config
+        name: Root Config
+        subtitle: Root-Level Config and Entrypoints
+        color: "#D9534F"
+        description: Top-level configuration files and repository entrypoints.
+        children:
+          - id: agents_md
+            name: AGENTS.md
+            subtitle: Cross-Agent Entrypoint
+            description: >
+              Root discovery file for AI tools. Delegates repository-wide policy
+              to .github/copilot-instructions.md.
+          - id: makefile
+            name: Makefile
+            subtitle: Task Runner
+            description: >
+              Shortcut targets: init, lint-docs, lint-docs-fix, settings-sort,
+              and hook installation.
+          - id: markdownlint_cli2
+            name: .markdownlint-cli2.yaml
+            description: Shared markdownlint-cli2 config that aligns editor and command-line ignore behavior.
+          - id: markdownlint_yaml
+            name: .markdownlint.yaml
+            subtitle: Markdownlint Config
+            description: Shared markdownlint rule configuration used by hooks and CI.
+          - id: markdownlintignore
+            name: .markdownlintignore
+            subtitle: Markdownlint Ignore
+            description: Ignore rules for transient markdown artifacts such as .tmp/ output.
+          - id: package_json
+            name: package.json
+            subtitle: Node Metadata
+            description: Node.js project metadata and markdownlint-cli2 dev dependency.
 
-      - name: Makefile
-        subtitle: Task Runner
-        description: >
-          Shortcut targets: init, lint-docs, lint-docs-fix, settings-sort,
-          and hook installation.
-
-      - name: package.json
-        subtitle: Node Metadata
-        description: Node.js project metadata and markdownlint-cli2 dev dependency.
+      - id: tooling
+        name: Project Tooling Folders
+        subtitle: Policies and Local IDE Config
+        description: Automation and policy folders that support contribution workflows.
+        children:
+          - id: github
+            name: .github/
+            subtitle: GitHub Configuration
+            description: >
+              GitHub-specific configuration, Copilot instructions, and CI workflows.
+            children:
+              - id: copilot_instructions
+                name: copilot-instructions.md
+                subtitle: Copilot Root Instructions
+                description: >
+                  Global Copilot custom instructions: markdown compliance gate,
+                  diagram standards, commit recovery, and temp file placement rules.
+              - id: instructions
+                name: instructions/
+                subtitle: Instruction Files
+                description: >
+                  Scoped Copilot instruction files for specific workflows and
+                  language conventions.
+                children:
+                  - id: instr_pr_workflow
+                    name: copilot-pr-conversation-workflow.instructions.md
+                    subtitle: PR Conversation Workflow
+                    description: >
+                      End-to-end workflow for handling PR review threads: fix,
+                      commit, reply in-thread, and resolve.
+                  - id: instr_ilograph_sync
+                    name: ilograph-sync.instructions.md
+                    subtitle: Ilograph Sync Rules
+                    description: >
+                      Requires diagram sources in docs/diagrams/ to be updated
+                      when repository structure or runtime flow changes.
+                  - id: instr_ps_verbs
+                    name: powershell-approved-verbs.instructions.md
+                    subtitle: PowerShell Verb Rules
+                    description: >
+                      Enforces use of approved PowerShell verbs in .ps1/.psm1 files.
+                  - id: instr_readme_maint
+                    name: readme-structure-maintenance.instructions.md
+                    subtitle: README Structure Rules
+                    description: >
+                      Keeps README files synchronized with stable top-level
+                      folders, root workflow files, and related structure changes.
+                  - id: instr_shell_parity
+                    name: script-shell-parity.instructions.md
+                    subtitle: Shell Parity Rules
+                    description: >
+                      Requires Bash and PowerShell counterparts for every script
+                      in scripts/ unless explicitly documented as platform-specific.
+              - id: workflows
+                name: workflows/
+                subtitle: GitHub Actions
+                description: CI workflows for automated validation.
+                children:
+                  - id: workflow_md_lint
+                    name: markdown-lint-helpers.yml
+                    subtitle: Markdown Lint CI
+                    description: Runs markdownlint on pull requests and pushes.
+                  - id: workflow_ps_lint
+                    name: powershell-lint.yml
+                    subtitle: PowerShell Lint CI
+                    description: Runs PSScriptAnalyzer on all .ps1 files.
+          - id: githooks
+            name: .githooks/
+            subtitle: Git Hooks
+            description: Local Git hook scripts for pre-commit and pre-push validation.
+            children:
+              - id: githooks_precommit
+                name: pre-commit
+                subtitle: Pre-Commit Hook
+                description: >
+                  Runs markdownlint, settings sort, and extensions sort before
+                  each commit.
+              - id: githooks_prepush
+                name: pre-push
+                subtitle: Pre-Push Hook
+                description: Validates repository state before pushing to remote.
+          - id: vscode
+            name: .vscode/
+            subtitle: VS Code Workspace Config
+            description: Editor settings, extension recommendations, and MCP configuration.
+            children:
+              - id: vscode_extensions
+                name: extensions.json
+                subtitle: Extension Recommendations
+                description: Recommended extensions for contributors (sorted alphabetically).
+              - id: vscode_words
+                name: generic-project-words.txt
+                subtitle: cSpell Word List
+                description: Project-specific cSpell custom dictionary.
+              - id: vscode_mcp
+                name: mcp.json
+                subtitle: MCP Configuration
+                description: Model Context Protocol server configuration for Copilot.
+              - id: vscode_settings
+                name: settings.json
+                subtitle: Workspace Settings
+                description: Workspace-level VS Code settings (sorted alphabetically).
+          - id: images
+            name: images/
+            subtitle: Visual Assets
+            description: Supporting visual assets referenced by documentation.
 
 perspectives:
   - name: Repository Structure
@@ -175,42 +266,114 @@ perspectives:
     description: High-level layout of folders and ownership boundaries.
     notes: High-level repository map for quick contributor onboarding.
     relations:
-      - from: Makefile
-        to: scripts/install-hooks
+      - from: repo
+        to: docs
+        label: contains
+      - from: repo
+        to: src
+        label: contains
+      - from: repo
+        to: test
+        label: contains
+      - from: repo
+        to: logs
+        label: contains
+      - from: repo
+        to: scripts
+        label: contains
+      - from: repo
+        to: config
+        label: contains
+      - from: repo
+        to: tooling
+        label: contains
+      - from: docs
+        to: docs_readme
+        label: organizes
+      - from: docs
+        to: docs_diagrams
+        label: organizes
+      - from: docs
+        to: docs_internal
+        label: organizes
+      - from: docs
+        to: docs_vendor
+        label: organizes
+      - from: docs_diagrams
+        to: ilograph_workspace
+        label: includes
+      - from: logs
+        to: logs_gitkeep
+        label: anchors
+      - from: logs
+        to: logs_readme
+        label: documents
+      - from: scripts
+        to: scripts_readme
+        label: documents
+      - from: config
+        to: agents_md
+        label: defines
+      - from: config
+        to: makefile
+        label: defines
+      - from: config
+        to: markdownlint_cli2
+        label: defines
+      - from: config
+        to: markdownlint_yaml
+        label: defines
+      - from: config
+        to: package_json
+        label: defines
+      - from: tooling
+        to: github
+        label: supports
+      - from: tooling
+        to: githooks
+        label: supports
+      - from: tooling
+        to: vscode
+        label: supports
+      - from: tooling
+        to: images
+        label: supports
+      - from: makefile
+        to: scripts_install_hooks
         label: init → install-hooks
-      - from: Makefile
-        to: scripts/lint-docs
+      - from: makefile
+        to: scripts_lint_docs
         label: lint-docs
-      - from: Makefile
-        to: scripts/settings-sort
+      - from: makefile
+        to: scripts_settings_sort
         label: settings-sort
-      - from: .githooks/pre-commit
-        to: scripts/lint-docs
-        label: invokes
-      - from: .githooks/pre-commit
-        to: scripts/settings-sort
-        label: invokes
-      - from: scripts/settings-sort
-        to: scripts/sort-vscode-extensions
+      - from: scripts_settings_sort
+        to: scripts_sort_extensions
         label: delegates to
-      - from: scripts/settings-sort
-        to: scripts/sort-vscode-settings
+      - from: scripts_settings_sort
+        to: scripts_sort_settings
         label: delegates to
-      - from: scripts/bootstrap-package-name
-        to: package.json
+      - from: scripts_bootstrap
+        to: package_json
         label: updates
-      - from: scripts/sort-word-list
-        to: .vscode/generic-project-words.txt
+      - from: scripts_sort_word_list
+        to: vscode_words
         label: sorts
-      - from: .github/workflows/markdown-lint-helpers.yml
-        to: scripts/lint-docs
+      - from: githooks_precommit
+        to: scripts_lint_docs
+        label: invokes
+      - from: githooks_precommit
+        to: scripts_settings_sort
+        label: invokes
+      - from: workflow_md_lint
+        to: scripts_lint_docs
         label: runs via CI
-      - from: .github/workflows/powershell-lint.yml
+      - from: workflow_ps_lint
         to: scripts
         label: lints .ps1 files
-      - from: AGENTS.md
-        to: .github/copilot-instructions.md
-        label: delegates to
-      - from: .github/instructions/ilograph-sync.instructions.md
-        to: docs/diagrams
+      - from: agents_md
+        to: github
+        label: delegates policy to
+      - from: instr_ilograph_sync
+        to: docs_diagrams
         label: governs updates to

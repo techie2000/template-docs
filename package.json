@@ -4,8 +4,8 @@
   "description": "Reusable template for documentation-first projects.",
   "private": true,
   "scripts": {
-    "lint-docs": "markdownlint-cli2 --config .markdownlint.yaml \"**/*.md\"",
-    "lint-docs:fix": "markdownlint-cli2 --config .markdownlint.yaml --fix \"**/*.md\"",
+    "lint-docs": "markdownlint-cli2 --config .markdownlint-cli2.yaml \"**/*.md\"",
+    "lint-docs:fix": "markdownlint-cli2 --config .markdownlint-cli2.yaml --fix \"**/*.md\"",
     "bootstrap:package": "pwsh ./scripts/bootstrap-package-name.ps1"
   },
   "devDependencies": {
