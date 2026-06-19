@@ -25,7 +25,7 @@ is unavailable, the push is **blocked** — you must sort the file before pushin
 #### 2. Markdown linting
 
 Runs `npx --no-install markdownlint-cli2` against every staged `.md` file using the project rules in
-`.markdownlint.yaml`.
+`.markdownlint-cli2.yaml`.
 
 **Rules enforced:**
 

@@ -172,10 +172,7 @@
   "logViewer.showStatusBarItemOnChange": true,
   "makefile.configureOnOpen": true,
   "markdown-mermaid.controls.show": "always",
-  "markdownlint.ignore": [
-    ".tmp/**",
-    "**/.tmp/**"
-  ],
+  "markdownlint.configFile": ".markdownlint-cli2.yaml",
   "markdownlint.lintWorkspaceGlobs": [
     "**/*.md",
     "!**/.tmp/**"

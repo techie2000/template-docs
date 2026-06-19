@@ -137,6 +137,9 @@ resources:
             description: >
               Shortcut targets: init, lint-docs, lint-docs-fix, settings-sort,
               and hook installation.
+          - id: markdownlint_cli2
+            name: .markdownlint-cli2.yaml
+            description: Shared markdownlint-cli2 config that aligns editor and command-line ignore behavior.
           - id: markdownlint_yaml
             name: .markdownlint.yaml
             subtitle: Markdownlint Config
@@ -313,6 +316,9 @@ perspectives:
         label: defines
       - from: config
         to: makefile
+        label: defines
+      - from: config
+        to: markdownlint_cli2
         label: defines
       - from: config
         to: markdownlint_yaml
