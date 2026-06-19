@@ -53,27 +53,6 @@ resources:
         color: "#28A745"
         description: Placeholder for automated tests (unit/integration) covering `src/`.
 
-      - id: logs
-        name: logs/
-        subtitle: Runtime Logs
-        color: "#6C757D"
-        description: >
-          Repository-tracked log directory containing .gitkeep and README guidance
-          while runtime logs are gitignored.
-        children:
-          - id: logs_gitkeep
-            name: logs/.gitkeep
-            subtitle: Directory Anchor
-            description: >
-              Ensures the logs directory exists in all clones without tracking
-              generated log files.
-          - id: logs_readme
-            name: logs/README.md
-            subtitle: Log Directory Guidance
-            description: >
-              Documents logging intent, retention controls, and commit
-              expectations for logs/.
-
       - id: scripts
         name: scripts/
         subtitle: Utility Scripts
@@ -118,6 +97,27 @@ resources:
             name: sort-word-list
             subtitle: Word List Sorter
             description: Sorts the cSpell custom word list in .vscode/.
+
+      - id: logs
+        name: logs/
+        subtitle: Runtime Logs
+        color: "#6C757D"
+        description: >
+          Repository-tracked log directory containing .gitkeep and README guidance
+          while runtime logs are gitignored.
+        children:
+          - id: logs_gitkeep
+            name: logs/.gitkeep
+            subtitle: Directory Anchor
+            description: >
+              Ensures the logs directory exists in all clones without tracking
+              generated log files.
+          - id: logs_readme
+            name: logs/README.md
+            subtitle: Log Directory Guidance
+            description: >
+              Documents logging intent, retention controls, and commit
+              expectations for logs/.
 
       - id: config
         name: Root Config
