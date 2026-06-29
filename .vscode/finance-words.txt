@@ -1,4 +1,4 @@
 Clearstream
-Euroclear
 DTCC
+Euroclear
 ISIN
