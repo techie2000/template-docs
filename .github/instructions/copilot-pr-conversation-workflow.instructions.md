@@ -50,9 +50,30 @@ next action.
   CLI fallback for replies.
 - Do not post only a top-level PR summary when the request asks for conversation handling;
   replies must be in-thread.
+- Use this as the default posting pattern for all multiline thread replies:
+  - Write reply content to a `.tmp/` body file first.
+  - Run file write/validation and `gh api` posting as separate commands.
+  - Process one thread at a time (reply -> verify -> resolve), not one large batch script.
+  - If command output is missing or truncated, verify thread/comment state before any retry.
 - Before posting or editing in-thread replies, sanitize body text to printable characters
   (plus normal newline/tab) and remove control characters such as form feed (`\f`).
   If a bad character is discovered after posting, patch the comment body immediately.
+
+## PR/Issue Body Encoding Guard (Required)
+
+Use these rules whenever creating or editing top-level PR descriptions, PR comments,
+or issue comments.
+
+- Always write multiline markdown content to a `.tmp/` body file first and use
+  `--body-file` (or read file content for GraphQL body fields).
+- Never pass multiline markdown directly as an inline `--body "..."` string.
+- Use ASCII punctuation in generated body text (`-` instead of em dash) unless
+  non-ASCII characters are explicitly required by the content.
+- Validate posted content immediately after submission (`gh pr view --json body`,
+  `gh pr comment --editor` check, or equivalent API readback).
+- If formatting corruption is detected (for example broken backticks, escaped path
+  fragments, mojibake), patch the body immediately using a body file and do not
+  proceed until verification is clean.
 
 ## Verification Checklist
 
@@ -173,6 +194,11 @@ Summary:
 - <why this resolves feedback>
 "@ | Set-Content -Encoding utf8 $bodyPath
 
+# Validate file exists before posting
+if (-not (Test-Path $bodyPath)) {
+  throw "Reply body file was not created: $bodyPath"
+}
+
 $replyBody = Get-Content -Raw $bodyPath
 
 $replyMutation = @'
@@ -186,7 +212,39 @@ mutation($threadId:ID!, $body:String!) {
 gh api graphql -f query="$replyMutation" -F threadId="$threadId" -f body="$replyBody"
 ```
 
-### 4. Resolve The Thread After Reply Is Posted
+### 4. Verify Reply Before Resolving (Required)
+
+```powershell
+# Verify the thread has the newly posted reply before resolving.
+# If verification is inconclusive, do not resolve yet.
+$verifyQuery = @'
+query($owner:String!, $repo:String!, $number:Int!, $threadId:ID!) {
+  repository(owner:$owner, name:$repo) {
+    pullRequest(number:$number) {
+      reviewThreads(first:100) {
+        nodes {
+          id
+          comments(last:1) { nodes { body url } }
+        }
+      }
+    }
+  }
+}
+'@
+
+$verifyResult = gh api graphql -f query="$verifyQuery" -F owner="$owner" -F repo="$repo" -F number=$prNumber | ConvertFrom-Json
+$thread = $verifyResult.data.repository.pullRequest.reviewThreads.nodes | Where-Object { $_.id -eq $threadId }
+
+if (-not $thread) {
+  throw "Thread not found during verification: $threadId"
+}
+
+if (-not $thread.comments.nodes -or -not $thread.comments.nodes[0].url) {
+  throw "Reply verification failed for thread: $threadId"
+}
+```
+
+### 5. Resolve The Thread After Reply Is Posted
 
 ```powershell
 $resolveMutation = @'
@@ -200,7 +258,7 @@ mutation($threadId:ID!) {
 gh api graphql -f query="$resolveMutation" -F threadId="$threadId"
 ```
 
-### 5. Verify No Intended Threads Were Missed
+### 6. Verify No Intended Threads Were Missed
 
 ```powershell
 $result = gh api graphql -f query="$query" -F owner="$owner" -F repo="$repo" -F number=$prNumber | ConvertFrom-Json
@@ -212,6 +270,13 @@ $result.data.repository.pullRequest.reviewThreads.nodes |
 ```
 
 If any thread remains unresolved intentionally, leave a blocker reply and keep it open.
+
+### 7. Repeat Per Thread (No Bulk Posting)
+
+```powershell
+# Repeat steps 3, 4, and 5 for each thread ID individually.
+# Avoid posting/replying to multiple thread IDs in one combined loop command.
+```
 
 ## Post-Merge Cleanup
 

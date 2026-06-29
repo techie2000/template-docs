@@ -26,7 +26,8 @@ function Get-SortedWordListContent {
         }
     }
 
-    $sortedEntries = $entries | Sort-Object -Unique
+    # Preserve case variants (e.g., Euroclear and euroclear) while removing exact duplicates.
+    $sortedEntries = $entries | Sort-Object -CaseSensitive -Unique
     $formatted = ($sortedEntries -join "`n")
     if (-not $formatted.EndsWith("`n")) {
         $formatted += "`n"
