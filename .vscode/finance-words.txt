@@ -1,3 +1,5 @@
 Clearstream
+CUSIP
 DTCC
+Euroclear
 ISIN
