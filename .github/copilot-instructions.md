@@ -49,6 +49,17 @@ When asked to process PR conversations/review threads end-to-end, follow:
 This covers the required flow to review each thread, apply fixes, commit with traceability,
 reply in-thread with commit references, and resolve each conversation.
 
+This instruction file also defines a required PR/issue body encoding guard: use
+`.tmp/` body files for multiline content and verify posted content to avoid
+escaping/encoding corruption.
+
+### PR Template Usage (REQUIRED)
+
+When creating a new pull request, always base the PR description on
+`.github/pull_request_template.md`. Populate all sections; do not leave the
+template placeholders as-is. The checklist gates in the template mirror the
+required gates in these instructions.
+
 ### Markdown Compliance Gate (REQUIRED)
 
 When an agent edits any `*.md` file, it must run this loop before commit or PR update:
@@ -82,7 +93,12 @@ Verification:
 
 1. Run `make lint-docs-fix`.
 2. Run `make lint-docs`.
-3. Confirm excluded paths do not surface markdownlint diagnostics in VS Code.
+3. Create a sample markdown file under `.tmp/` (for example
+  `Set-Content -Encoding utf8 ./.tmp/markdownlint-ignore-check.md "# sample"`).
+4. Run `npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml ./.tmp/markdownlint-ignore-check.md`
+  and verify `Linting: 0 file(s)`.
+5. Remove the sample file after verification.
+6. Confirm excluded paths do not surface markdownlint diagnostics in VS Code.
 
 ### Commit Failure Recovery (REQUIRED)
 
@@ -375,10 +391,10 @@ When repository structure changes, update README.md in the same PR.
 
 Subdirectories with multiple files or a distinct purpose must have their own README.md:
 
-- `docs/README.md` → overview of docs area and its subfolders
-- `docs/internal/README.md` → what belongs in internal documentation
-- `docs/vendor/README.md` → what belongs in vendor documentation
-- `scripts/README.md` → overview of available scripts (if complex)
+- `docs/README.md` -> overview of docs area and its subfolders
+- `docs/internal/README.md` -> what belongs in internal documentation
+- `docs/vendor/README.md` -> what belongs in vendor documentation
+- `scripts/README.md` -> overview of available scripts (if complex)
 
 Each local README acts as a landing page for that directory and documents what
 belongs there, not a duplicate of parent README information.
@@ -389,7 +405,7 @@ All agent and automation policy is maintained in one place:
 
 - `.github/copilot-instructions.md` is the canonical source for all repo-wide policies
 - `.github/instructions/` contains scoped rules (language-specific, workflow-specific)
-- Cross-tool agent files (e.g., AGENTS.md, CLAUDE.md, CURSOR.md) must
+- Cross-tool agent files (for example, `AGENTS.md`, `CLAUDE.md`, `CURSOR.md`) must
   **delegate** to these canonical sources instead of duplicating rules
 
 Maintain one source of truth. Prevent policy drift through duplication.
@@ -455,7 +471,7 @@ Do NOT scatter generic `log.md` files across the repo; logs must have purpose an
 ### 9. Prefer Tool-Neutral Documentation
 
 Documentation files should be tool-agnostic. Only add tool-specific instruction
-files (e.g., CLAUDE.md, GEMINI.md, CURSOR.md) when:
+files (for example, `CLAUDE.md`, `GEMINI.md`, `CURSOR.md`) when:
 
 - The tool actually requires repo-root discovery files
 - Team verification confirms the tool looks for these files
@@ -463,4 +479,4 @@ files (e.g., CLAUDE.md, GEMINI.md, CURSOR.md) when:
   (not a full policy duplicate)
 
 Avoid maintaining separate instruction files per tool unless absolutely
-necessary. A single AGENTS.md entrypoint is preferable.
+necessary. A single `AGENTS.md` entrypoint is preferable.

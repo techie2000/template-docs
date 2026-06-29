@@ -22,6 +22,7 @@
     "ConvertFrom-Json": true,
     "ConvertTo-Json": true,
     "ForEach-Object": true,
+    "Get-CimInstance": true,
     "gh": true,
     "git add": true,
     "git checkout": true,
@@ -35,6 +36,8 @@
     "New-Item": true,
     "npm ci": true,
     "npm pkg": true,
+    "npx --no-install": true,
+    "npx markdownlint-cli2": true,
     "Out-Null": true,
     "Set-Content": true,
     "Test-Path": true

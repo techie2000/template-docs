@@ -23,7 +23,9 @@ and operational references for the software or service being documented.
 | File/Folder | Purpose |
 | ----------- | ------- |
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
+| [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/) | Issue form templates used for standardized request intake |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
+| [.github/pull_request_template.md](.github/pull_request_template.md) | Standard pull request template used for PR descriptions and review checklists |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 | [.vscode/](.vscode/) | Workspace settings and extension recommendations for contributors |
 | [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |

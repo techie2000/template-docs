@@ -164,6 +164,10 @@ resources:
             description: >
               GitHub-specific configuration, Copilot instructions, and CI workflows.
             children:
+              - id: issue_templates
+                name: ISSUE_TEMPLATE/
+                subtitle: Issue Forms
+                description: Standardized issue templates for structured request intake.
               - id: copilot_instructions
                 name: copilot-instructions.md
                 subtitle: Copilot Root Instructions
@@ -206,6 +210,10 @@ resources:
                     description: >
                       Requires Bash and PowerShell counterparts for every script
                       in scripts/ unless explicitly documented as platform-specific.
+              - id: pull_request_template
+                name: pull_request_template.md
+                subtitle: PR Template
+                description: Standard pull request template with summary and validation checklist.
               - id: workflows
                 name: workflows/
                 subtitle: GitHub Actions
