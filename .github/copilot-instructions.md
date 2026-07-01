@@ -40,6 +40,15 @@ Follow:
 
 - `.github/instructions/ilograph-sync.instructions.md`
 
+### GitHub Issue Management (REQUIRED)
+
+When asked to create, close, or otherwise manage GitHub issues, follow:
+
+- `.github/instructions/github-issue-management.instructions.md`
+
+This covers the required workflow for avoiding duplicate issue creation and for
+closing duplicate issues with a clear pointer back to the canonical issue.
+
 ### PR Conversation Handling (REQUIRED)
 
 When asked to process PR conversations/review threads end-to-end, follow:

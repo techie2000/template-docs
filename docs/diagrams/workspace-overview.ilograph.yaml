@@ -193,6 +193,12 @@ resources:
                     description: >
                       Requires diagram sources in docs/diagrams/ to be updated
                       when repository structure or runtime flow changes.
+                  - id: instr_issue_management
+                    name: github-issue-management.instructions.md
+                    subtitle: GitHub Issue Workflow
+                    description: >
+                      Defines duplicate-prevention checks before issue creation
+                      and duplicate-closure pointer requirements.
                   - id: instr_ps_verbs
                     name: powershell-approved-verbs.instructions.md
                     subtitle: PowerShell Verb Rules
