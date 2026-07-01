@@ -40,7 +40,12 @@
     "npx markdownlint-cli2": true,
     "Out-Null": true,
     "Set-Content": true,
-    "Test-Path": true
+    "Test-Path": true,
+    "npm audit": true,
+    "/^node --version; npm --version$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   },
   "chat.tools.urls.autoApprove": {
     "https://code.visualstudio.com": true,
@@ -95,9 +100,9 @@
     "makefile": false,
     "markdown": true,
     "plaintext": true,
+    "powershell": false,
     "shellscript": false,
-    "yaml": true,
-    "powershell": false
+    "yaml": true
   },
   "cSpell.ignoreRegExpList": [],
   "cSpell.language": "en,en-GB",
