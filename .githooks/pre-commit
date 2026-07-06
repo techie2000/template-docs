@@ -17,6 +17,14 @@ if [ -f ".vscode/settings.json" ] || [ -f ".vscode/settings.generic.json" ] || [
         fi
 
         settings_profile=${WORK_TEMPLATE_SETTINGS_PROFILE:-generic}
+        case "$settings_profile" in
+            generic|opinionated)
+                ;;
+            *)
+                echo "Invalid WORK_TEMPLATE_SETTINGS_PROFILE '$settings_profile'; defaulting to 'generic'"
+                settings_profile=generic
+                ;;
+        esac
         echo "Checking VS Code settings profile: $settings_profile"
         if ! pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/settings-profile.ps1 -Action check -Profile "$settings_profile"; then
             echo "settings.json does not match profile '$settings_profile'"

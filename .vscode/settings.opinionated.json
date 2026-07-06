@@ -10,6 +10,10 @@
   },
   "chat.tools.terminal.autoApprove": {
     ".vscode/settings.json": true,
+    "/^git push (-u )?origin HEAD(:[A-Za-z0-9._\\/-]+)?$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
     "/^node --test(\\s+.*)?$/": {
       "approve": true,
       "matchCommandLine": true
@@ -27,7 +31,6 @@
     "git checkout": true,
     "git cherry-pick": true,
     "git commit": true,
-    "git push": true,
     "git restore": true,
     "git rev-parse": true,
     "git stash": true,

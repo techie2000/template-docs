@@ -75,7 +75,7 @@ function Write-HashtableAsJson {
     [System.IO.File]::WriteAllText((Join-Path (Get-Location) $Path), $formatted, [System.Text.UTF8Encoding]::new($false))
 }
 
-function Merge-SettingsMaps {
+function Join-SettingsMaps {
     param(
         [hashtable]$Generic,
         [hashtable]$Opinionated
@@ -130,7 +130,7 @@ function Get-KeyScope {
     return "unknown"
 }
 
-function Split-SettingsByPolicy {
+function Group-SettingsByPolicy {
     param(
         [hashtable]$Settings,
         [hashtable]$Policy,
@@ -180,10 +180,10 @@ function Get-ExpectedSettings {
         return $Generic
     }
 
-    return (Merge-SettingsMaps -Generic $Generic -Opinionated $Opinionated)
+    return (Join-SettingsMaps -Generic $Generic -Opinionated $Opinionated)
 }
 
-function Convert-JsonText {
+function Format-JsonText {
     param([hashtable]$Node)
 
     $sorted = ConvertTo-SortedJsonNode -Node $Node
@@ -211,7 +211,7 @@ switch ($Action) {
     }
     "check" {
         $expected = Get-ExpectedSettings -RequestedProfile $Profile -Generic $genericSettings -Opinionated $opinionatedSettings
-        $expectedText = Convert-JsonText -Node $expected
+        $expectedText = Format-JsonText -Node $expected
 
         if (-not (Test-Path -LiteralPath $SettingsPath)) {
             Write-Error "Missing settings file: $SettingsPath"
@@ -224,7 +224,7 @@ switch ($Action) {
             exit 0
         }
 
-        Write-Error "settings.json does not match the generated '$Profile' profile. Run: pwsh ./scripts/settings-profile.ps1 -Action apply -Profile $Profile"
+        Write-Error "${SettingsPath} does not match the generated '$Profile' profile. Run: pwsh ./scripts/settings-profile.ps1 -Action apply -Profile $Profile"
         exit 1
     }
     "distribute" {
@@ -233,7 +233,7 @@ switch ($Action) {
         }
 
         $settings = Read-JsonAsHashtable -Path $SettingsPath
-        $split = Split-SettingsByPolicy -Settings $settings -Policy $policy -UnknownScope $UnknownKeyScope
+        $split = Group-SettingsByPolicy -Settings $settings -Policy $policy -UnknownScope $UnknownKeyScope
         $unknownKeys = @($split.unknownKeys)
 
         if ($unknownKeys.Count -gt 0) {
