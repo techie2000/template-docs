@@ -1,8 +1,16 @@
 ## Summary
 
-Closes #ISSUE_NUMBER <!-- Replace ISSUE_NUMBER with the linked issue number, or remove this line if not applicable. -->
-
 REPLACE_WITH_SUMMARY <!-- Replace with one or two sentences describing what this PR does and why. -->
+
+## Linked Work
+
+- Issue(s): <!-- Refs #N (preferred) | Closes/Fixes #N (ISSUES ONLY, never PRs) -->
+
+<!-- No backing issue? Check the box and type a brief reason directly after "reason:" -->
+<!-- (e.g. hotfix, chore, Dependabot). A reason is required - the override is ignored if nothing follows the colon. -->
+<!-- Bot-authored PRs are exempt automatically. -->
+
+- [ ] No linked issue - reason:
 
 ## Changes
 
