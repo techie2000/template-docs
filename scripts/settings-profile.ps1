@@ -1,8 +1,9 @@
 param(
     [ValidateSet("apply", "check", "distribute", "classify")]
     [string]$Action = "apply",
+    [Alias("Profile")]
     [ValidateSet("generic", "opinionated")]
-    [string]$Profile = "generic",
+    [string]$SettingsProfile = "generic",
     [string]$SettingsPath = ".vscode/settings.json",
     [string]$GenericSettingsPath = ".vscode/settings.generic.json",
     [string]$OpinionatedSettingsPath = ".vscode/settings.opinionated.json",
@@ -205,12 +206,12 @@ $opinionatedSettings = Read-JsonAsHashtable -Path $OpinionatedSettingsPath
 
 switch ($Action) {
     "apply" {
-        $expected = Get-ExpectedSettings -RequestedProfile $Profile -Generic $genericSettings -Opinionated $opinionatedSettings
+        $expected = Get-ExpectedSettings -RequestedProfile $SettingsProfile -Generic $genericSettings -Opinionated $opinionatedSettings
         Write-HashtableAsJson -Path $SettingsPath -Data $expected
-        Write-Host "Applied settings profile '$Profile' to $SettingsPath"
+        Write-Host "Applied settings profile '$SettingsProfile' to $SettingsPath"
     }
     "check" {
-        $expected = Get-ExpectedSettings -RequestedProfile $Profile -Generic $genericSettings -Opinionated $opinionatedSettings
+        $expected = Get-ExpectedSettings -RequestedProfile $SettingsProfile -Generic $genericSettings -Opinionated $opinionatedSettings
         $expectedText = Format-JsonText -Node $expected
 
         if (-not (Test-Path -LiteralPath $SettingsPath)) {
@@ -220,11 +221,11 @@ switch ($Action) {
 
         $actualText = (Get-Content -LiteralPath $SettingsPath -Raw) -replace "`r`n", "`n"
         if ($actualText -ceq $expectedText) {
-            Write-Host "Settings profile check passed for '$Profile'."
+            Write-Host "Settings profile check passed for '$SettingsProfile'."
             exit 0
         }
 
-        Write-Error "${SettingsPath} does not match the generated '$Profile' profile. Run: pwsh ./scripts/settings-profile.ps1 -Action apply -Profile $Profile"
+        Write-Error "${SettingsPath} does not match the generated '$SettingsProfile' profile. Run: pwsh ./scripts/settings-profile.ps1 -Action apply -Profile $SettingsProfile"
         exit 1
     }
     "distribute" {
@@ -244,10 +245,10 @@ switch ($Action) {
         Write-HashtableAsJson -Path $GenericSettingsPath -Data $split.generic
         Write-HashtableAsJson -Path $OpinionatedSettingsPath -Data $split.opinionated
 
-        $expected = Get-ExpectedSettings -RequestedProfile $Profile -Generic $split.generic -Opinionated $split.opinionated
+        $expected = Get-ExpectedSettings -RequestedProfile $SettingsProfile -Generic $split.generic -Opinionated $split.opinionated
         Write-HashtableAsJson -Path $SettingsPath -Data $expected
 
-        Write-Host "Distributed settings into profile sources and applied '$Profile' to $SettingsPath"
+        Write-Host "Distributed settings into profile sources and applied '$SettingsProfile' to $SettingsPath"
     }
     "classify" {
         if (-not (Test-Path -LiteralPath $SettingsPath)) {
