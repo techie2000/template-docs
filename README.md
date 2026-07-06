@@ -10,29 +10,27 @@ and operational references for the software or service being documented.
 | Folder | Purpose |
 | ------ | ------- |
 | [docs/](docs/) | Documentation index for the docs area and subfolders |
-| [docs/diagrams/](docs/diagrams/) | Diagram source files, including Ilograph workspace overviews |
 | [docs/internal/](docs/internal/) | Internal notes, decisions, and meeting records |
 | [docs/vendor/](docs/vendor/) | Vendor-supplied documentation, manuals, and reference material |
 | [images/](images/) | Supporting screenshots and diagrams |
-| [logs/](logs/) | Runtime audit log directory (tracked via `.gitkeep` and `README.md`; generated log files remain ignored) |
-| [src/](src/) | Placeholder for application/source code (add runtime logic here) |
-| [test/](test/) | Placeholder for automated tests covering `src/` behavior |
+| [logs/](logs/) | Tracked log guidance and anchor files; generated runtime logs remain ignored |
+| [scripts/](scripts/) | Helper scripts for bootstrap, linting, hook installation, and workspace normalization |
+| [src/](src/) | Placeholder for application or service source code |
+| [test/](test/) | Placeholder for automated tests covering `src/` |
 
 ## Tooling
 
 | File/Folder | Purpose |
 | ----------- | ------- |
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
-| [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/) | Issue form templates used for standardized request intake |
+| [.github/](.github/) | GitHub configuration, Copilot policy, issue templates, and workflows |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
-| [.github/pull_request_template.md](.github/pull_request_template.md) | Standard pull request template used for PR descriptions and review checklists |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
-| [.vscode/](.vscode/) | Workspace settings and extension recommendations for contributors |
-| [scripts/](scripts/) | Utility scripts used by hooks (settings/extensions/word-list sorting) |
-| [.markdownlint.yaml](.markdownlint.yaml) | Base markdownlint rule set extended by [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) |
-| [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | Shared markdownlint-cli2 config for editor and command-line ignores/globs |
+| [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | markdownlint-cli2 configuration aligned with repository linting behavior |
+| [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by hooks and CI |
 | [.markdownlintignore](.markdownlintignore) | Ignore rules for transient markdown artifacts such as .tmp/ output |
-| [AGENTS.md](AGENTS.md) | Cross-agent repository entrypoint that delegates to the canonical policy in [.github/copilot-instructions.md](.github/copilot-instructions.md) |
+| [.vscode/](.vscode/) | Workspace settings, extension recommendations, MCP config, and cSpell dictionaries |
+| [AGENTS.md](AGENTS.md) | Thin cross-agent entrypoint delegating to the canonical Copilot instructions |
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
 | [package.json](package.json) | Generic Node metadata and markdownlint-cli2 development dependency |
 
@@ -51,6 +49,27 @@ word list in `.vscode/` and registers it in
 `cSpell.customDictionaries` automatically. Documentation placeholders such as
 `{{PROJECT_NAME}}` under [docs/](docs/) are also replaced with the project
 name derived from the repository folder (with a leading `work-` prefix removed).
+
+The template uses a split VS Code settings model:
+
+- [`.vscode/settings.generic.json`](.vscode/settings.generic.json) stores
+   template-safe defaults suitable for all generated repositories.
+- [`.vscode/settings.opinionated.json`](.vscode/settings.opinionated.json)
+   stores optional personal/team preferences.
+- [`.vscode/settings.json`](.vscode/settings.json) is generated from these
+   sources and defaults to the `generic` profile during bootstrap.
+
+Use `WORK_TEMPLATE_SETTINGS_PROFILE=opinionated` when running bootstrap to
+generate an opinionated `settings.json`, or run profile targets directly:
+
+```bash
+make settings-profile-generic
+make settings-profile-opinionated
+make settings-profile-check-generic
+```
+
+Pre-commit enforces that `.vscode/settings.json` matches the selected profile
+(`WORK_TEMPLATE_SETTINGS_PROFILE`, default `generic`) and fails when out of sync.
 
 Git does not allow a repository template to enforce local `.git/config` values
 automatically, so this bootstrap step must be run once per cloned/generated

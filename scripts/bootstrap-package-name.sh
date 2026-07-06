@@ -84,8 +84,13 @@ else
 fi
 
 settings_path=".vscode/settings.json"
-if [ ! -f "$settings_path" ]; then
-  echo "No $settings_path found; skipping cSpell bootstrap."
+settings_source_path=".vscode/settings.generic.json"
+if [ ! -f "$settings_source_path" ]; then
+  settings_source_path="$settings_path"
+fi
+
+if [ ! -f "$settings_source_path" ]; then
+  echo "No $settings_source_path found; skipping cSpell bootstrap."
   exit 0
 fi
 
@@ -93,7 +98,7 @@ dict_name="${sanitized}-words"
 dict_file=".vscode/${dict_name}.txt"
 template_dict_file=".vscode/generic-project-words.txt"
 
-node - "$repo_name" "$project_name" "$sanitized" "$settings_path" "$dict_name" "$dict_file" "$template_dict_file" <<'NODE'
+node - "$repo_name" "$project_name" "$sanitized" "$settings_source_path" "$dict_name" "$dict_file" "$template_dict_file" <<'NODE'
 const fs = require("fs");
 const path = require("path");
 
@@ -229,3 +234,15 @@ console.log(`Ensured cSpell word list: ${dictionaryFilePath}`);
 console.log(`Ensured cSpell dictionary registration: ${dictionaryName}`);
 console.log(`Updated docs placeholders: ${docsUpdated}`);
 NODE
+
+requested_profile=${WORK_TEMPLATE_SETTINGS_PROFILE:-generic}
+if [ "$requested_profile" != "generic" ] && [ "$requested_profile" != "opinionated" ]; then
+  echo "Invalid WORK_TEMPLATE_SETTINGS_PROFILE '$requested_profile'; defaulting to generic."
+  requested_profile="generic"
+fi
+
+if [ -f "./scripts/settings-profile.ps1" ] && command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/settings-profile.ps1 -Action apply -Profile "$requested_profile"
+elif [ "$settings_source_path" != "$settings_path" ]; then
+  cp "$settings_source_path" "$settings_path"
+fi

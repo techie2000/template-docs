@@ -269,6 +269,14 @@ resources:
                 name: settings.json
                 subtitle: Workspace Settings
                 description: Workspace-level VS Code settings (sorted alphabetically).
+              - id: vscode_settings_generic
+                name: settings.generic.json
+                subtitle: Generic Settings Profile
+                description: Template-safe VS Code settings shared by all generated repositories.
+              - id: vscode_settings_opinionated
+                name: settings.opinionated.json
+                subtitle: Opinionated Settings Profile
+                description: Optional personal/team VS Code preferences layered onto generic defaults.
           - id: images
             name: images/
             subtitle: Visual Assets
@@ -349,6 +357,12 @@ perspectives:
       - from: tooling
         to: vscode
         label: supports
+      - from: vscode
+        to: vscode_settings_generic
+        label: includes
+      - from: vscode
+        to: vscode_settings_opinionated
+        label: includes
       - from: tooling
         to: images
         label: supports

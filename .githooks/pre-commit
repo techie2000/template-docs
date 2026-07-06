@@ -2,7 +2,7 @@
 # Pre-commit hook: sort VS Code workspace files and lint staged markdown files.
 # Install: git config core.hooksPath .githooks
 
-if [ -f ".vscode/settings.json" ] || [ -f ".vscode/extensions.json" ] || ls .vscode/*-words.txt >/dev/null 2>&1; then
+if [ -f ".vscode/settings.json" ] || [ -f ".vscode/settings.generic.json" ] || [ -f ".vscode/settings.opinionated.json" ] || [ -f ".vscode/extensions.json" ] || ls .vscode/*-words.txt >/dev/null 2>&1; then
     if command -v pwsh > /dev/null 2>&1; then
         echo "Sorting VS Code workspace files..."
         if ! pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/settings-sort.ps1; then
@@ -11,9 +11,25 @@ if [ -f ".vscode/settings.json" ] || [ -f ".vscode/extensions.json" ] || ls .vsc
         fi
 
         # Keep index in sync if a sorter changed any tracked VS Code workspace files.
-        if ! git diff --quiet -- .vscode/settings.json .vscode/extensions.json .vscode/*-words.txt; then
-            git add .vscode/settings.json .vscode/extensions.json .vscode/*-words.txt
+        if ! git diff --quiet -- .vscode/settings.json .vscode/settings.generic.json .vscode/settings.opinionated.json .vscode/extensions.json .vscode/*-words.txt; then
+            git add .vscode/settings.json .vscode/settings.generic.json .vscode/settings.opinionated.json .vscode/extensions.json .vscode/*-words.txt
             echo "Sorted and staged VS Code workspace files"
+        fi
+
+        settings_profile=${WORK_TEMPLATE_SETTINGS_PROFILE:-generic}
+        case "$settings_profile" in
+            generic|opinionated)
+                ;;
+            *)
+                echo "Invalid WORK_TEMPLATE_SETTINGS_PROFILE '$settings_profile'; defaulting to 'generic'"
+                settings_profile=generic
+                ;;
+        esac
+        echo "Checking VS Code settings profile: $settings_profile"
+        if ! pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/settings-profile.ps1 -Action check -Profile "$settings_profile"; then
+            echo "settings.json does not match profile '$settings_profile'"
+            echo "Run: pwsh ./scripts/settings-profile.ps1 -Action apply -Profile $settings_profile"
+            exit 1
         fi
     else
         echo "pwsh not found; skipping VS Code file sort"
