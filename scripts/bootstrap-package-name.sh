@@ -42,8 +42,11 @@ if [ -z "$current_name" ] || [ "$current_name" = "template-docs" ] || [ "$curren
   should_replace=true
 fi
 
+package_metadata_updated=false
+
 if [ "$should_replace" = "true" ] && [ "$current_name" != "$sanitized" ]; then
   npm pkg set "name=$sanitized" >/dev/null
+  package_metadata_updated=true
   echo "Updated package.json name: $current_name -> $sanitized"
 else
   echo "Keeping package.json name: $current_name"
@@ -58,6 +61,7 @@ fi
 
 if [ "$should_replace_description" = "true" ] && [ "$current_description" != "$default_description" ]; then
   npm pkg set "description=$default_description" >/dev/null
+  package_metadata_updated=true
   echo "Updated package.json description: $current_description -> $default_description"
 else
   echo "Keeping package.json description: $current_description"
@@ -65,9 +69,18 @@ fi
 
 if [ "$should_replace" = "true" ] || [ -z "$current_private" ]; then
   npm pkg set "private=true" --json >/dev/null
+  package_metadata_updated=true
   echo "Ensured package.json private=true"
 else
   echo "Keeping package.json private: $current_private"
+fi
+
+if [ "$package_metadata_updated" = "true" ]; then
+  # Regenerate package-lock.json to match the updated package.json
+  npm install --package-lock-only >/dev/null
+  echo "Regenerated package-lock.json"
+else
+  echo "Skipped package-lock.json regeneration; package metadata unchanged"
 fi
 
 settings_path=".vscode/settings.json"
