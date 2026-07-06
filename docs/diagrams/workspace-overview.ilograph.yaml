@@ -412,10 +412,10 @@ perspectives:
         to: scripts_settings_sort
         label: invokes
       - from: workflow_auto_label
-        to: pr_template
+        to: pull_request_template
         label: reads override checkbox from
       - from: workflow_check_issue_link
-        to: pr_template
+        to: pull_request_template
         label: validates issue linkage from
       - from: workflow_md_lint
         to: scripts_lint_docs
