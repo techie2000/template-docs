@@ -130,7 +130,8 @@ Use this sequence in local VS Code sessions when processing review conversations
 ```powershell
 # Confirm current branch and active PR
 $branch = git branch --show-current
-$prNumber = [int](gh pr view --json number --jq '.number')
+$prInfo = gh pr view --json number | ConvertFrom-Json
+$prNumber = [int]$prInfo.number
 
 # List unresolved review threads (id + path + line + first comment)
 $query = @'
