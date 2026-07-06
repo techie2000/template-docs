@@ -19,6 +19,10 @@
       "approve": true,
       "matchCommandLine": true
     },
+    "/^node --version; npm --version$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
     "ConvertFrom-Json": true,
     "ConvertTo-Json": true,
     "ForEach-Object": true,
@@ -34,18 +38,14 @@
     "make": true,
     "mkdir": true,
     "New-Item": true,
+    "npm audit": true,
     "npm ci": true,
     "npm pkg": true,
     "npx --no-install": true,
     "npx markdownlint-cli2": true,
     "Out-Null": true,
     "Set-Content": true,
-    "Test-Path": true,
-    "npm audit": true,
-    "/^node --version; npm --version$/": {
-      "approve": true,
-      "matchCommandLine": true
-    }
+    "Test-Path": true
   },
   "chat.tools.urls.autoApprove": {
     "https://code.visualstudio.com": true,
