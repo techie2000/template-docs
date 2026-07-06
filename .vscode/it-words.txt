@@ -4,10 +4,12 @@ github
 gitlab
 gitlabce
 ilograph
+mojibake
 pgsql
 precommit
 prepush
 pycache
+readback
 setext
 sslmode
 toplevel
