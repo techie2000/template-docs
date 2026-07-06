@@ -58,6 +58,10 @@ if ($shouldReplace -or [string]::IsNullOrWhiteSpace($currentPrivate)) {
     Write-Host "Keeping package.json private: $currentPrivate"
 }
 
+# Regenerate package-lock.json to match the updated package.json
+& npm install --package-lock-only | Out-Null
+Write-Host "Regenerated package-lock.json"
+
 $settingsPath = ".vscode/settings.json"
 if (-not (Test-Path -LiteralPath $settingsPath)) {
     Write-Host "No $settingsPath found; skipping cSpell bootstrap."
