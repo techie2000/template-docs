@@ -6,9 +6,11 @@ REPLACE_WITH_SUMMARY <!-- Replace with one or two sentences describing what this
 
 - Issue(s): <!-- Refs #N (preferred) | Closes/Fixes #N (ISSUES ONLY, never PRs) -->
 
-<!-- No backing issue? Check the box and briefly explain. Bot-authored PRs are exempt automatically. -->
+<!-- No backing issue? Check the box and type a brief reason directly after "reason:" -->
+<!-- (e.g. hotfix, chore, Dependabot). A reason is required - the override is ignored if nothing follows the colon. -->
+<!-- Bot-authored PRs are exempt automatically. -->
 
-- [ ] No linked issue - reason: <!-- hotfix / chore / Dependabot / etc. -->
+- [ ] No linked issue - reason:
 
 ## Changes
 
