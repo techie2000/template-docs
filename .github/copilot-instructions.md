@@ -49,6 +49,34 @@ When asked to create, close, or otherwise manage GitHub issues, follow:
 This covers the required workflow for avoiding duplicate issue creation and for
 closing duplicate issues with a clear pointer back to the canonical issue.
 
+### PR/Issue Linkage Guardrails (REQUIRED)
+
+Template repositories include workflow guardrails for PR-to-issue linkage and issue lifecycle labels.
+
+Files:
+
+- `.github/workflows/check-pr-issue-link.yml`
+- `.github/workflows/auto-label-prs.yml`
+- `.github/workflows/sync-issue-status-from-pr.yml`
+
+Behavior:
+
+- Validates PRs include linked issue references (`Refs #N` preferred).
+- Allows approved override via the PR template checkbox:
+  `- [x] No linked issue - reason: ...`
+- Ensures `Closes/Fixes/Resolves` targets issues only (never PR numbers).
+- Applies `no-issue-needed` label for bots or checked override.
+- Syncs linked issue status labels across PR lifecycle (`status: triage`, `status: in progress`,
+  `status: done`).
+
+Enforcement mode:
+
+- Default mode is advisory.
+- Set repository variable `ISSUE_LINK_ENFORCEMENT_MODE=required` to fail checks
+  when no linked issue or override is present.
+- For strict enforcement, also configure branch protection to require the
+  `Check PR Issue Link` status check.
+
 ### PR Conversation Handling (REQUIRED)
 
 When asked to process PR conversations/review threads end-to-end, follow:

@@ -225,6 +225,18 @@ resources:
                 subtitle: GitHub Actions
                 description: CI workflows for automated validation.
                 children:
+                  - id: workflow_auto_label
+                    name: auto-label-prs.yml
+                    subtitle: Auto Label PRs
+                    description: >-
+                      Auto-creates and applies the no-issue-needed label on
+                      bot-authored or override-checked PRs.
+                  - id: workflow_check_issue_link
+                    name: check-pr-issue-link.yml
+                    subtitle: Check PR Issue Link
+                    description: >-
+                      Validates PRs reference a linked issue; prevents
+                      Closes/Fixes keywords from targeting PRs instead of issues.
                   - id: workflow_md_lint
                     name: markdown-lint-helpers.yml
                     subtitle: Markdown Lint CI
@@ -233,6 +245,12 @@ resources:
                     name: powershell-lint.yml
                     subtitle: PowerShell Lint CI
                     description: Runs PSScriptAnalyzer on all .ps1 files.
+                  - id: workflow_sync_issue_status
+                    name: sync-issue-status-from-pr.yml
+                    subtitle: Sync Issue Status From PR
+                    description: >-
+                      Syncs status: triage / in progress / done labels on linked
+                      issues across the PR lifecycle.
           - id: githooks
             name: .githooks/
             subtitle: Git Hooks
@@ -393,12 +411,21 @@ perspectives:
       - from: githooks_precommit
         to: scripts_settings_sort
         label: invokes
+      - from: workflow_auto_label
+        to: pr_template
+        label: reads override checkbox from
+      - from: workflow_check_issue_link
+        to: pr_template
+        label: validates issue linkage from
       - from: workflow_md_lint
         to: scripts_lint_docs
         label: runs via CI
       - from: workflow_ps_lint
         to: scripts
         label: lints .ps1 files
+      - from: workflow_sync_issue_status
+        to: workflow_check_issue_link
+        label: complements
       - from: agents_md
         to: github
         label: delegates policy to
