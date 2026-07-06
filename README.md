@@ -110,7 +110,8 @@ gh api --method PATCH "/repos/$OWNER/$REPO" -f delete_branch_on_merge=true
 #### PowerShell
 
 ```powershell
-$owner = gh api user --jq '.login'
+$user = gh api user | ConvertFrom-Json
+$owner = $user.login
 $templateOwner = 'techie2000'
 $templateRepo = 'work-template-docs'
 $repo = 'replace-with-your-new-repo-name'
@@ -139,7 +140,8 @@ gh api --method PATCH "/repos/$OWNER/$REPO" -f delete_branch_on_merge=true
 #### PowerShell
 
 ```powershell
-$owner = gh api user --jq '.login'
+$user = gh api user | ConvertFrom-Json
+$owner = $user.login
 $repo = 'replace-with-your-existing-repo-name'
 
 gh api --method PATCH "/repos/$owner/$repo" -f delete_branch_on_merge=true
