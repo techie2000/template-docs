@@ -70,10 +70,6 @@ else
   echo "Keeping package.json private: $current_private"
 fi
 
-# Regenerate package-lock.json to match the updated package.json
-npm install --package-lock-only >/dev/null
-echo "Regenerated package-lock.json"
-
 settings_path=".vscode/settings.json"
 if [ ! -f "$settings_path" ]; then
   echo "No $settings_path found; skipping cSpell bootstrap."
