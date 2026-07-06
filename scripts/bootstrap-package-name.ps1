@@ -32,9 +32,11 @@ if ([string]::IsNullOrWhiteSpace($sanitized)) {
 
 $placeholders = @("template-docs", "work-template-docs")
 $shouldReplace = [string]::IsNullOrWhiteSpace($currentName) -or $placeholders.Contains($currentName)
+$packageMetadataUpdated = $false
 
 if ($shouldReplace -and $currentName -ne $sanitized) {
     & npm pkg set "name=$sanitized" | Out-Null
+    $packageMetadataUpdated = $true
     Write-Host "Updated package.json name: $currentName -> $sanitized"
 } else {
     Write-Host "Keeping package.json name: $currentName"
@@ -46,6 +48,7 @@ $shouldReplaceDescription = $shouldReplace -or [string]::IsNullOrWhiteSpace($cur
 
 if ($shouldReplaceDescription -and $currentDescription -ne $defaultDescription) {
     & npm pkg set "description=$defaultDescription" | Out-Null
+    $packageMetadataUpdated = $true
     Write-Host "Updated package.json description: $currentDescription -> $defaultDescription"
 } else {
     Write-Host "Keeping package.json description: $currentDescription"
@@ -53,9 +56,18 @@ if ($shouldReplaceDescription -and $currentDescription -ne $defaultDescription) 
 
 if ($shouldReplace -or [string]::IsNullOrWhiteSpace($currentPrivate)) {
     & npm pkg set "private=true" --json | Out-Null
+    $packageMetadataUpdated = $true
     Write-Host "Ensured package.json private=true"
 } else {
     Write-Host "Keeping package.json private: $currentPrivate"
+}
+
+if ($packageMetadataUpdated) {
+    # Regenerate package-lock.json to match the updated package.json
+    & npm install --package-lock-only | Out-Null
+    Write-Host "Regenerated package-lock.json"
+} else {
+    Write-Host "Skipped package-lock.json regeneration; package metadata unchanged"
 }
 
 $settingsPath = ".vscode/settings.json"
