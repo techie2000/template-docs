@@ -128,6 +128,27 @@ Rules:
 - Do not stop at "lint failed" when auto-fix commands are available.
 - Only escalate to manual intervention after auto-fix + recheck still fails.
 
+### Cross-Platform NPM Script Portability (REQUIRED)
+
+When editing `package.json` scripts, ensure commands behave the same across
+Windows PowerShell/cmd, Bash, and CI shells.
+
+Rules:
+
+- Do not rely on shell-side glob expansion in npm scripts (for example,
+  `**/*.test.js`) because expansion behavior differs by shell and npm runtime.
+- Prefer Node-native discovery patterns that are shell-agnostic (for example,
+  `node --test`), or implement explicit file enumeration in JavaScript when
+  scoping is required.
+- After changing scripts, validate on the current platform by running the
+  script directly (for example, `npm test`) before commit.
+
+Verification:
+
+1. Run the changed npm script(s) locally.
+2. Confirm expected files/tasks are discovered and executed.
+3. If behavior depends on shell expansion, refactor to a shell-agnostic form.
+
 ## Temporary and Diagnostic Output File Placement (REQUIRED)
 
 When running commands or scripts that produce log files, timing files, build output, or any other
