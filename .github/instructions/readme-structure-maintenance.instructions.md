@@ -74,9 +74,9 @@ Treat these as significant by default:
 
 Use consistent ordering so README diffs remain small:
 
-1. Keep top-level folders in functional order: `docs`, `src`, `test`, `scripts`, then tooling/config sections
-2. Within each section, maintain alphabetical order unless a functional sequence is required
-3. Keep root-level files grouped by purpose (source, tooling, config)
+1. Sort each structure or tooling table alphabetically by the displayed path in its first column
+2. Keep folder and file lists alphabetical unless a functional sequence is explicitly more useful
+3. Preserve existing section groupings, but keep entries alphabetical within each section
 
 ### Subdirectory README Pattern
 

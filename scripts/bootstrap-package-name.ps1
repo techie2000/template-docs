@@ -59,8 +59,9 @@ if ($shouldReplace -or [string]::IsNullOrWhiteSpace($currentPrivate)) {
 }
 
 $settingsPath = ".vscode/settings.json"
-if (-not (Test-Path -LiteralPath $settingsPath)) {
-    Write-Host "No $settingsPath found; skipping cSpell bootstrap."
+$settingsSourcePath = if (Test-Path -LiteralPath ".vscode/settings.generic.json") { ".vscode/settings.generic.json" } else { $settingsPath }
+if (-not (Test-Path -LiteralPath $settingsSourcePath)) {
+    Write-Host "No $settingsSourcePath found; skipping cSpell bootstrap."
     exit 0
 }
 
@@ -147,7 +148,7 @@ if (-not $wordListContent.EndsWith("`n")) {
 [System.IO.File]::WriteAllText((Join-Path (Get-Location) $dictionaryPath), $wordListContent, [System.Text.UTF8Encoding]::new($false))
 Write-Host "Ensured cSpell word list: $dictionaryPath"
 
-$settings = Get-Content -LiteralPath $settingsPath -Raw | ConvertFrom-Json -AsHashtable
+$settings = Get-Content -LiteralPath $settingsSourcePath -Raw | ConvertFrom-Json -AsHashtable
 
 if (-not $settings.ContainsKey("cSpell") -or -not ($settings["cSpell"] -is [System.Collections.IDictionary])) {
     $settings["cSpell"] = @{}
@@ -172,8 +173,23 @@ $formattedSettings = ($sortedSettings | ConvertTo-Json -Depth 100) -replace "`r?
 if (-not $formattedSettings.EndsWith("`n")) {
     $formattedSettings += "`n"
 }
-[System.IO.File]::WriteAllText((Join-Path (Get-Location) $settingsPath), $formattedSettings, [System.Text.UTF8Encoding]::new($false))
+[System.IO.File]::WriteAllText((Join-Path (Get-Location) $settingsSourcePath), $formattedSettings, [System.Text.UTF8Encoding]::new($false))
 Write-Host "Ensured cSpell dictionary registration: $dictionaryName"
+
+$settingsProfileScript = Join-Path $PSScriptRoot "settings-profile.ps1"
+if (Test-Path -LiteralPath $settingsProfileScript) {
+    $requestedProfile = $env:WORK_TEMPLATE_SETTINGS_PROFILE
+    if ([string]::IsNullOrWhiteSpace($requestedProfile)) {
+        $requestedProfile = "generic"
+    }
+
+    if ($requestedProfile -ne "generic" -and $requestedProfile -ne "opinionated") {
+        Write-Warning "Invalid WORK_TEMPLATE_SETTINGS_PROFILE '$requestedProfile'; defaulting to 'generic'."
+        $requestedProfile = "generic"
+    }
+
+    & $settingsProfileScript -Action apply -Profile $requestedProfile
+}
 
 $docsTokens = [ordered]@{
     "{{PROJECT_NAME}}" = $projectName

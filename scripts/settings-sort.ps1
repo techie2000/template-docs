@@ -1,5 +1,9 @@
 param(
     [string]$SettingsPath = ".vscode/settings.json",
+    [string[]]$AdditionalSettingsPaths = @(
+        ".vscode/settings.generic.json",
+        ".vscode/settings.opinionated.json"
+    ),
     [string]$ExtensionsPath = ".vscode/extensions.json",
     [string[]]$WordListPaths = @(),
     [string]$WordListGlob = ".vscode/*-words.txt",
@@ -18,10 +22,15 @@ if ($CheckOnly) {
     $commonParams.CheckOnly = $true
 }
 
-if (Test-Path -LiteralPath $SettingsPath) {
-    & $settingsSorterScript -SettingsPath $SettingsPath @commonParams
-} else {
-    Write-Host "Skipping missing settings file: $SettingsPath"
+$resolvedSettingsPaths = @($SettingsPath) + $AdditionalSettingsPaths
+$resolvedSettingsPaths = @($resolvedSettingsPaths | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -Unique)
+
+foreach ($path in $resolvedSettingsPaths) {
+    if (Test-Path -LiteralPath $path) {
+        & $settingsSorterScript -SettingsPath $path @commonParams
+    } else {
+        Write-Host "Skipping missing settings file: $path"
+    }
 }
 
 if (Test-Path -LiteralPath $ExtensionsPath) {
