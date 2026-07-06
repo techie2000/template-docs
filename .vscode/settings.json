@@ -19,6 +19,10 @@
       "approve": true,
       "matchCommandLine": true
     },
+    "/^node --version; npm --version$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
     "ConvertFrom-Json": true,
     "ConvertTo-Json": true,
     "ForEach-Object": true,
@@ -34,6 +38,7 @@
     "make": true,
     "mkdir": true,
     "New-Item": true,
+    "npm audit": true,
     "npm ci": true,
     "npm pkg": true,
     "npx --no-install": true,
@@ -95,9 +100,9 @@
     "makefile": false,
     "markdown": true,
     "plaintext": true,
+    "powershell": false,
     "shellscript": false,
-    "yaml": true,
-    "powershell": false
+    "yaml": true
   },
   "cSpell.ignoreRegExpList": [],
   "cSpell.language": "en,en-GB",
