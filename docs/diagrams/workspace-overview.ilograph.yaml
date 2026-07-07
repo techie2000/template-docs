@@ -225,12 +225,24 @@ resources:
                 subtitle: GitHub Actions
                 description: CI workflows for automated validation.
                 children:
+                  - id: workflow_auto_label_issues
+                    name: auto-label-issues.yml
+                    subtitle: Auto Label Issues
+                    description: >-
+                      Auto-creates status/type labels and applies triage/type
+                      labels for issue open/edit/reopen events.
                   - id: workflow_auto_label
                     name: auto-label-prs.yml
                     subtitle: Auto Label PRs
                     description: >-
-                      Auto-creates and applies the no-issue-needed label on
-                      bot-authored or override-checked PRs.
+                      Auto-manages no-issue-needed and linked-issue labels based
+                      on PR linkage signals, override checkbox, and bot authorship.
+                  - id: workflow_backfill_labels
+                    name: backfill-labels.yml
+                    subtitle: Backfill Labels
+                    description: >-
+                      Manual workflow to backfill issue/PR labels in scoped
+                      ranges with dry-run support and summary artifacts.
                   - id: workflow_check_issue_link
                     name: check-pr-issue-link.yml
                     subtitle: Check PR Issue Link
@@ -414,6 +426,12 @@ perspectives:
       - from: workflow_auto_label
         to: pull_request_template
         label: reads override checkbox from
+      - from: workflow_auto_label_issues
+        to: workflow_sync_issue_status
+        label: initializes status labels for
+      - from: workflow_backfill_labels
+        to: workflow_auto_label
+        label: aligns PR label state with
       - from: workflow_check_issue_link
         to: pull_request_template
         label: validates issue linkage from
