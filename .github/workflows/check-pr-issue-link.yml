@@ -31,6 +31,13 @@ jobs:
             const pr = context.payload.pull_request
             const actor = pr.user.login
 
+            function isIntegrationPermissionError(error) {
+              return (
+                error?.status === 403 &&
+                /resource not accessible by integration/i.test(String(error?.message || error))
+              )
+            }
+
             if (pr?.head?.repo?.fork) {
               core.info('Fork PR source detected; skipping issue link check.')
               return
@@ -154,10 +161,10 @@ jobs:
               return
             }
 
-            let alreadyAdvised = false
+            const allComments = []
             let page = 1
             let hasMore = true
-            while (hasMore && !alreadyAdvised) {
+            while (hasMore) {
               const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -165,35 +172,44 @@ jobs:
                 page,
                 per_page: 50,
               })
-              alreadyAdvised = comments.some(
-                (c) =>
-                  c.user.login === 'github-actions[bot]' &&
-                  c.body.includes('<!-- pr-issue-link-advisory -->')
-              )
+              allComments.push(...comments)
               hasMore = comments.length === 50
               page += 1
             }
+
+            const alreadyAdvised = allComments.some(
+              (c) =>
+                c.user.login === 'github-actions[bot]' &&
+                c.body.includes('<!-- pr-issue-link-advisory -->')
+            )
 
             if (alreadyAdvised) {
               core.info('Advisory already posted.')
               return
             }
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr.number,
-              body: [
-                '<!-- pr-issue-link-advisory -->',
-                '> [!TIP]',
-                '> This PR does not appear to reference a linked issue.',
-                '> If one exists, add an issue reference in the PR description, for example:',
-                '> Refs #123 (preferred)',
-                '> Closes #123 (issue only; do not use for pull requests)',
-                '>',
-                '> If this PR does not need a backing issue, check the No linked issue box and add a brief reason.'
-              ].join('\n'),
-            })
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: [
+                  '<!-- pr-issue-link-advisory -->',
+                  '> [!TIP]',
+                  '> This PR does not appear to reference a linked issue.',
+                  '> If one exists, add an issue reference in the PR description, for example:',
+                  '> Refs #123 (preferred)',
+                  '> Closes #123 (issue only; do not use for pull requests)',
+                  '>',
+                  '> If this PR does not need a backing issue, check the No linked issue box and add a brief reason.'
+                ].join('\n'),
+              })
+            } catch (error) {
+              if (isIntegrationPermissionError(error)) {
+                core.warning('Unable to post advisory comment due to token restrictions; continuing in advisory mode.')
+                return
+              }
+              throw error
+            }
 
             core.info(`Advisory comment posted on PR #${pr.number}`)
-

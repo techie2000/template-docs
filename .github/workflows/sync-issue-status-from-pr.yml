@@ -17,6 +17,9 @@ permissions:
 
 jobs:
   sync-issue-status:
+    concurrency:
+      group: sync-issue-status-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - name: Sync linked issue lifecycle labels
@@ -245,11 +248,24 @@ jobs:
                 .map((label) => label.name)
                 .filter((name) => allStatusNames.includes(name))
 
-              for (const labelName of currentStatusNames) {
-                if (labelName === desiredStatus) {
-                  continue
-                }
+              // Once an issue reaches done, do not regress it back to in progress/triage.
+              const effectiveDesiredStatus = currentStatusNames.includes('status: done')
+                ? 'status: done'
+                : desiredStatus
 
+              const conflictingStatusNames = currentStatusNames.filter(
+                (name) => name !== effectiveDesiredStatus
+              )
+
+              if (
+                conflictingStatusNames.length === 0 &&
+                currentStatusNames.includes(effectiveDesiredStatus)
+              ) {
+                core.info(`Issue #${issue.number} already has expected labels.`)
+                continue
+              }
+
+              for (const labelName of conflictingStatusNames) {
                 try {
                   await github.rest.issues.removeLabel({
                     owner: context.repo.owner,
@@ -264,15 +280,14 @@ jobs:
                 }
               }
 
-              if (!currentStatusNames.includes(desiredStatus)) {
+              if (!currentStatusNames.includes(effectiveDesiredStatus)) {
                 await github.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: issue.number,
-                  labels: [desiredStatus],
+                  labels: [effectiveDesiredStatus],
                 })
               }
 
-              core.info(`Issue #${issue.number} set to ${desiredStatus}`)
+              core.info(`Issue #${issue.number} set to ${effectiveDesiredStatus}`)
             }
-

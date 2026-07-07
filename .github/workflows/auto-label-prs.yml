@@ -20,7 +20,7 @@ jobs:
   auto-label-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Ensure no-issue-needed label and apply when eligible
+      - name: Ensure PR linkage labels and apply based on PR body
         uses: actions/github-script@v7
         with:
           script: |
@@ -39,53 +39,194 @@ jobs:
               description: 'PR does not require a backing issue',
             }
 
-            try {
-              await github.rest.issues.getLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: noIssueLabelDef.name,
-              })
-            } catch (e) {
-              if (e.status === 404) {
-                try {
-                  await github.rest.issues.createLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    name: noIssueLabelDef.name,
-                    color: noIssueLabelDef.color,
-                    description: noIssueLabelDef.description,
-                  })
-                } catch (createError) {
-                  if (createError.status !== 422) {
-                    throw createError
-                  }
+            const linkedIssueLabelDef = {
+              name: 'linked-issue',
+              color: '1d76db',
+              description: 'PR references one or more issues',
+            }
+
+            function isIntegrationPermissionError(error) {
+              return (
+                error?.status === 403 &&
+                /resource not accessible by integration/i.test(String(error?.message || error))
+              )
+            }
+
+            let canMutateLabels = true
+
+            async function ensureLabel(labelDef) {
+              if (!canMutateLabels) {
+                return
+              }
+
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: labelDef.name,
+                })
+              } catch (e) {
+                if (isIntegrationPermissionError(e)) {
+                  core.warning(
+                    `Cannot inspect label '${labelDef.name}' due to token restrictions; skipping label mutation.`
+                  )
+                  canMutateLabels = false
+                  return
                 }
-              } else {
-                throw e
+
+                if (e.status === 404) {
+                  try {
+                    await github.rest.issues.createLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      name: labelDef.name,
+                      color: labelDef.color,
+                      description: labelDef.description,
+                    })
+                  } catch (createError) {
+                    if (isIntegrationPermissionError(createError)) {
+                      core.warning(
+                        `Cannot create label '${labelDef.name}' due to token restrictions; skipping label mutation.`
+                      )
+                      canMutateLabels = false
+                      return
+                    }
+
+                    if (createError.status !== 422) {
+                      throw createError
+                    }
+                  }
+                } else {
+                  throw e
+                }
               }
             }
 
-            const noIssueChecked = /- \[x\] no linked issue\s*-\s*reason\s*:\s*\S+/i.test(pr.body || '')
-            if (!isBotActor && !noIssueChecked) {
-              core.info('No auto-label condition met.')
+            await ensureLabel(noIssueLabelDef)
+            await ensureLabel(linkedIssueLabelDef)
+
+            if (!canMutateLabels) {
+              core.info('Skipping PR label automation due to token permission restrictions.')
               return
             }
+
+            const prText = `${pr.title || ''}\n${pr.body || ''}`
+            const hasIssueReferenceKeyword = /\b(?:closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#\d+\b/i.test(prText)
+            let hasClosingIssuesReference = false
+            try {
+              const query = `
+                query($owner: String!, $repo: String!, $number: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    pullRequest(number: $number) {
+                      closingIssuesReferences(first: 1) {
+                        totalCount
+                      }
+                    }
+                  }
+                }
+              `
+
+              const result = await github.graphql(query, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                number: pr.number,
+              })
+
+              hasClosingIssuesReference =
+                (result?.repository?.pullRequest?.closingIssuesReferences?.totalCount || 0) > 0
+            } catch (error) {
+              core.warning(`Unable to read closingIssuesReferences for PR #${pr.number}: ${error?.message || error}`)
+            }
+
+            const hasLinkedIssueReference = hasIssueReferenceKeyword || hasClosingIssuesReference
+
+            const noIssueChecked = /- \[x\] no linked issue\s*-\s*reason\s*:\s*\S+/i.test(pr.body || '')
 
             const existingLabelNames = (pr.labels || []).map((l) =>
               typeof l === 'string' ? l : l.name
             )
 
-            if (existingLabelNames.includes('no-issue-needed')) {
-              core.info('no-issue-needed already present.')
+            async function addLabelIfMissing(labelName) {
+              if (!canMutateLabels) {
+                return
+              }
+
+              if (existingLabelNames.includes(labelName)) {
+                return
+              }
+
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  labels: [labelName],
+                })
+              } catch (error) {
+                if (isIntegrationPermissionError(error)) {
+                  core.warning(
+                    `Cannot add label '${labelName}' on PR #${pr.number} due to token restrictions.`
+                  )
+                  canMutateLabels = false
+                  return
+                }
+                throw error
+              }
+
+              existingLabelNames.push(labelName)
+            }
+
+            async function removeLabelIfPresent(labelName) {
+              if (!canMutateLabels) {
+                return
+              }
+
+              if (!existingLabelNames.includes(labelName)) {
+                return
+              }
+
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  name: labelName,
+                })
+              } catch (error) {
+                if (isIntegrationPermissionError(error)) {
+                  core.warning(
+                    `Cannot remove label '${labelName}' on PR #${pr.number} due to token restrictions.`
+                  )
+                  canMutateLabels = false
+                  return
+                }
+
+                if (error.status !== 404) {
+                  throw error
+                }
+              }
+
+              const idx = existingLabelNames.indexOf(labelName)
+              if (idx >= 0) {
+                existingLabelNames.splice(idx, 1)
+              }
+            }
+
+            const shouldUseNoIssueNeeded = isBotActor || noIssueChecked
+            if (shouldUseNoIssueNeeded) {
+              await addLabelIfMissing('no-issue-needed')
+              await removeLabelIfPresent('linked-issue')
+              core.info(`Applied no-issue-needed on PR #${pr.number}`)
               return
             }
 
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr.number,
-              labels: ['no-issue-needed'],
-            })
+            await removeLabelIfPresent('no-issue-needed')
 
-            core.info(`Applied no-issue-needed on PR #${pr.number}`)
+            if (hasLinkedIssueReference) {
+              await addLabelIfMissing('linked-issue')
+              core.info(`Applied linked-issue on PR #${pr.number}`)
+              return
+            }
 
+            await removeLabelIfPresent('linked-issue')
+            core.info('No PR linkage label condition met.')
