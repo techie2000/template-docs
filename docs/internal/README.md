@@ -7,6 +7,7 @@ This folder is reserved for internal {{PROJECT_NAME}} notes and team-authored do
 | File | Description |
 | --- | --- |
 | [.gitkeep](.gitkeep) | Placeholder file so the folder remains tracked while no internal docs are present. |
+| [github-label-usage.md](github-label-usage.md) | Label governance reference for issue and PR lifecycle workflows. |
 
 ## Suggested Content
 

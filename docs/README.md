@@ -14,6 +14,8 @@ This folder stores documentation artifacts for the {{PROJECT_NAME}} repository.
 
 - Keep vendor originals in [vendor/](vendor/) without altering source content.
 - Place internal working notes in [internal/](internal/).
+- Use [internal/GitHub Label Usage](internal/github-label-usage.md) for issue
+  and PR label governance rules.
 - Keep Ilograph source files in [diagrams/](diagrams/).
 
 ## How to View Ilograph Files

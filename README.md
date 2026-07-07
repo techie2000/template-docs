@@ -31,6 +31,7 @@ and operational references for the software or service being documented.
 | [.markdownlintignore](.markdownlintignore) | Ignore rules for transient markdown artifacts such as .tmp/ output |
 | [.vscode/](.vscode/) | Workspace settings, extension recommendations, MCP config, and cSpell dictionaries |
 | [AGENTS.md](AGENTS.md) | Thin cross-agent entrypoint delegating to the canonical Copilot instructions |
+| [docs/internal/github-label-usage.md](docs/internal/github-label-usage.md) | Label governance reference for issue/PR lifecycle and automation behavior |
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
 | [package.json](package.json) | Generic Node metadata and markdownlint-cli2 development dependency |
 

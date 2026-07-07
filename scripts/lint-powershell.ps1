@@ -52,10 +52,12 @@ catch {
 }
 
 # Determine which files to lint
-if (@($Files).Count -gt 0) {
-    $FilesToLint = @($Files)
+if ($Files -and ($Files.Count -gt 0 -or ($Files -is [string] -and $Files -ne ''))) {
+    # Files parameter provided and non-empty
+    $FilesToLint = @($Files) | Where-Object { $_ } # Filter out empty strings
 }
 else {
+    # No files specified; find all .ps1 files in scripts directory
     $FilesToLint = @(Get-ChildItem -Path $ScriptsDir -Filter '*.ps1' -File |
         Where-Object { $_.Name -ne 'PSScriptAnalyzerSettings.psd1' } |
         Select-Object -ExpandProperty FullName)
