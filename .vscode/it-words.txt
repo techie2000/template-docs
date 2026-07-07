@@ -1,8 +1,12 @@
 autofetch
 Claude
+Claude
+GitHub
 github
+GitLab
 gitlab
 gitlabce
+Ilograph
 ilograph
 mojibake
 pgsql
