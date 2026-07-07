@@ -78,6 +78,8 @@ jobs:
 
             const body = pr.body || ''
             const hasIssueReferenceKeyword = /\b(closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#\d+/i.test(body)
+            const hasCloseOnMergeKeyword = /\b(closes?|fixes?|resolves?)(?:\s+|:\s*)#\d+/i.test(body)
+            const keepOpenChecked = /- \[x\] keep linked issue\(s\) open\s*-\s*reason\s*:\s*\S+/i.test(body)
 
             // Guardrail: closing keywords must target issues, not pull requests.
             const closingKeywordMatches = [...body.matchAll(/\b(closes?|fixes?|resolves?)(?:\s+|:\s*)#(\d+)\b/gi)]
@@ -148,6 +150,61 @@ jobs:
               result?.repository?.pullRequest?.closingIssuesReferences?.totalCount || 0
             const hasLinkedClosingIssue = linkedIssueCount > 0
             const noIssueChecked = /- \[x\] no linked issue\s*-\s*reason\s*:\s*\S+/i.test(body)
+
+            const hasLinkedIssueReference = hasIssueReferenceKeyword || hasLinkedClosingIssue
+
+            if (hasLinkedIssueReference && !hasCloseOnMergeKeyword && !keepOpenChecked) {
+              if (enforcementMode === 'required') {
+                core.setFailed(
+                  'Linked issue detected but closure intent is missing. Add Closes/Fixes #N for issues to close on merge, or check "Keep linked issue(s) open" with a reason.'
+                )
+                return
+              }
+
+              let alreadyWarnedAboutClosureIntent = false
+              let pageForClosureIntent = 1
+              let hasMoreClosureIntent = true
+              while (hasMoreClosureIntent && !alreadyWarnedAboutClosureIntent) {
+                const { data: comments } = await github.rest.issues.listComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  page: pageForClosureIntent,
+                  per_page: 50,
+                })
+
+                alreadyWarnedAboutClosureIntent = comments.some(
+                  (c) =>
+                    c.user.login === 'github-actions[bot]' &&
+                    c.body.includes('<!-- pr-issue-closure-intent-advisory -->')
+                )
+
+                hasMoreClosureIntent = comments.length === 50
+                pageForClosureIntent += 1
+              }
+
+              if (!alreadyWarnedAboutClosureIntent) {
+                try {
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    body: [
+                      '<!-- pr-issue-closure-intent-advisory -->',
+                      '> [!TIP]',
+                      '> This PR links one or more issues but does not specify whether those issues should close on merge.',
+                      '> Add `Closes #N` / `Fixes #N` for issues that should auto-close, or check `Keep linked issue(s) open` with a reason.'
+                    ].join('\n'),
+                  })
+                } catch (error) {
+                  if (isIntegrationPermissionError(error)) {
+                    core.warning('Unable to post closure-intent advisory due to token restrictions; continuing in advisory mode.')
+                  } else {
+                    throw error
+                  }
+                }
+              }
+            }
 
             if (hasIssueReferenceKeyword || hasLinkedClosingIssue || noIssueChecked) {
               core.info('Issue link or override found.')
