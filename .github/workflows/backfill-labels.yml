@@ -388,7 +388,9 @@ jobs:
               pull_requests: prChanges,
             }
 
-            const summaryPath = path.join(process.env.GITHUB_WORKSPACE, 'backfill-label-summary.json')
+            const tmpDir = path.join(process.env.GITHUB_WORKSPACE, '.tmp')
+            fs.mkdirSync(tmpDir, { recursive: true })
+            const summaryPath = path.join(tmpDir, 'backfill-label-summary.json')
             fs.writeFileSync(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8')
             core.info(`Wrote summary artifact payload to ${summaryPath}`)
 
@@ -400,5 +402,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backfill-label-summary-${{ github.run_id }}
-          path: backfill-label-summary.json
+          path: .tmp/backfill-label-summary.json
           if-no-files-found: error
