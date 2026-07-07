@@ -55,7 +55,6 @@ echo "$STAGED_MD_FILES"
 
 if git diff --cached --name-only --diff-filter=ACM -z | tr '\0' '\n' | grep '\.md$' | tr '\n' '\0' | xargs -0 npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml; then
     echo "Markdown linting passed"
-    exit 0
 else
     echo ""
     echo "Markdown linting failed"
@@ -67,6 +66,35 @@ else
     echo ""
     echo "To fix automatically (where possible):"
     echo "  npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml --fix <file>.md"
+    echo ""
+    echo "To skip this check (not recommended):"
+    echo "  git commit --no-verify"
+    exit 1
+fi
+
+echo "Running PowerShell linting..."
+
+if ! command -v pwsh > /dev/null 2>&1; then
+    echo "pwsh not found; skipping PowerShell linting"
+    exit 0
+fi
+
+STAGED_PS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$')
+
+if [ -z "$STAGED_PS_FILES" ]; then
+    echo "No PowerShell files to lint"
+    exit 0
+fi
+
+echo "Linting PowerShell files:"
+echo "$STAGED_PS_FILES"
+
+if pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-powershell.ps1 -Files $(echo "$STAGED_PS_FILES" | tr '\n' ' '); then
+    echo "PowerShell linting passed"
+    exit 0
+else
+    echo ""
+    echo "PowerShell linting failed"
     echo ""
     echo "To skip this check (not recommended):"
     echo "  git commit --no-verify"
