@@ -77,9 +77,10 @@ jobs:
             }
 
             const body = pr.body || ''
+            const bodyWithoutHtmlComments = body.replace(/<!--[\s\S]*?-->/g, ' ')
             const hasIssueReferenceKeyword = /\b(closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#\d+/i.test(body)
             const hasCloseOnMergeKeyword = /\b(closes?|fixes?|resolves?)(?:\s+|:\s*)#\d+/i.test(body)
-            const keepOpenChecked = /- \[x\] keep linked issue\(s\) open\s*-\s*reason\s*:\s*\S+/i.test(body)
+            const keepOpenChecked = /- \[x\] keep linked issue\(s\) open\s*-\s*reason\s*:\s*\S+/i.test(bodyWithoutHtmlComments)
 
             // Guardrail: closing keywords must target issues, not pull requests.
             const closingKeywordMatches = [...body.matchAll(/\b(closes?|fixes?|resolves?)(?:\s+|:\s*)#(\d+)\b/gi)]
