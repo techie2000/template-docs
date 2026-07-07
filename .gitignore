@@ -20,6 +20,10 @@ logs/*
 !logs/.gitkeep
 !logs/README.md
 
+# JVM crash logs
+hs_err_pid*.log
+replay_pid*.log
+
 # Python cache files
 __pycache__/
 *.py[cod]
