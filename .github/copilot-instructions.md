@@ -40,6 +40,21 @@ Follow:
 
 - `.github/instructions/ilograph-sync.instructions.md`
 
+### Dependabot Configuration Sync (REQUIRED)
+
+When a change adds, removes, or reorganizes package managers, ecosystems, or directories,
+update `.github/dependabot.yml` in the same change to reflect the new structure.
+
+Keep Dependabot configuration synchronized with repository evolution:
+
+- Add entries for new package managers or ecosystems
+- Update or remove entries for reorganized or removed directories
+- Verify all `directory` paths point to existing manifest files
+
+Follow:
+
+- `.github/instructions/dependabot-sync.instructions.md`
+
 ### GitHub Issue Management (REQUIRED)
 
 When asked to create, close, or otherwise manage GitHub issues, follow:

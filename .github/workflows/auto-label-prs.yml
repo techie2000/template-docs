@@ -45,6 +45,29 @@ jobs:
               description: 'PR references one or more issues',
             }
 
+            const dependabotLabelDefs = [
+              {
+                name: 'dependencies',
+                color: '0075ca',
+                description: 'Pull requests that update a dependency file',
+              },
+              {
+                name: 'npm',
+                color: 'cb3837',
+                description: 'Pull requests that update npm packages',
+              },
+              {
+                name: 'github-actions',
+                color: '2088ff',
+                description: 'Pull requests that update GitHub Actions',
+              },
+              {
+                name: 'ci',
+                color: 'e4e669',
+                description: 'Changes to CI configuration and scripts',
+              },
+            ]
+
             function isIntegrationPermissionError(error) {
               return (
                 error?.status === 403 &&
