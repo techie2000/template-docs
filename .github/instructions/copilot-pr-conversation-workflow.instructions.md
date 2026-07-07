@@ -21,10 +21,10 @@ including prompts such as:
 1. Discover unresolved review conversations on the active PR.
 2. For each conversation thread, determine whether code/docs changes are needed.
 3. Implement only the required change for that thread.
-4. Commit with traceability:
-   - Prefer one commit per conversation when practical.
-   - If multiple threads require tightly related edits, group them in a single commit.
-   - Use a commit message that references the thread topic or concern.
+4. Commit with traceability. Prefer one commit per conversation when practical.
+  If multiple threads require tightly related edits, group them in a single
+  commit. Use a Conventional Commit subject that references the thread topic
+  or concern.
 5. Reply in the same conversation thread with:
    - What changed
    - Why it addresses the feedback
@@ -84,7 +84,8 @@ or issue comments.
 
 ## Commit Message Templates
 
-Use one of these templates so a commit can be traced back to a conversation quickly.
+Use one of these Conventional Commit templates so a commit can be traced back to
+a conversation quickly.
 
 Preferred single-thread format:
 
@@ -118,8 +119,8 @@ Why:
 - <brief rationale>
 ```
 
-Avoid generic messages such as `fix feedback` or `update files`; the subject should make
-the conversation reason obvious without opening the diff.
+Avoid generic messages such as `fix feedback` or `update files`; the subject
+should make the conversation reason obvious without opening the diff.
 
 ## Ready-To-Run GH CLI Playbook
 
@@ -172,7 +173,7 @@ $threads | Select-Object id,path,line,@{Name='comment';Expression={$_.comments.n
 ```powershell
 # After making code/doc changes for one thread:
 git add -A
-git commit -m "fix(pr-thread): address <short thread topic>"
+git commit -m "fix(pr-thread): <path or topic> - <short action>"
 
 # Capture commit SHA for thread reply text
 $sha = git rev-parse --short HEAD

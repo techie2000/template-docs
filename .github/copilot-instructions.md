@@ -97,6 +97,28 @@ When creating a new pull request, always base the PR description on
 template placeholders as-is. The checklist gates in the template mirror the
 required gates in these instructions.
 
+### Conventional Commits (REQUIRED)
+
+Use Conventional Commit subjects for all commits created in repositories based
+on this template.
+
+Rules:
+
+- Format the subject as `type(scope): summary` when a scope adds clarity, or
+  `type: summary` when it does not.
+- Prefer standard types such as `feat`, `fix`, `docs`, `refactor`, `test`,
+  `build`, `ci`, and `chore`.
+- Keep the subject concise, imperative, and specific to the change.
+- Match any workflow-specific scopes or templates already required elsewhere in
+  these instructions, such as `fix(pr-thread): ...`.
+- Avoid vague subjects such as `updates`, `misc fixes`, or `address feedback`.
+
+Examples:
+
+- `docs: clarify bootstrap behavior in README`
+- `fix(pr-thread): scripts/lint-docs - handle empty markdown set`
+- `chore(githooks): align pre-commit markdown lint config`
+
 ### Markdown Compliance Gate (REQUIRED)
 
 When an agent edits any `*.md` file, it must run this loop before commit or PR update:

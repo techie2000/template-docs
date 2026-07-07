@@ -34,6 +34,18 @@ and operational references for the software or service being documented.
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
 | [package.json](package.json) | Generic Node metadata and markdownlint-cli2 development dependency |
 
+## Commit Conventions
+
+Repositories based on this template should use Conventional Commits.
+
+- Prefer `type(scope): summary` when a scope adds clarity, or `type: summary`
+   when it does not.
+- Use standard types such as `feat`, `fix`, `docs`, `refactor`, `test`,
+   `build`, `ci`, and `chore`.
+- Keep the subject concise and specific to the change.
+- When handling PR review threads, keep using the repository workflow examples
+   such as `fix(pr-thread): <path or topic> - <short action>`.
+
 ## Quick Start
 
 ```bash
