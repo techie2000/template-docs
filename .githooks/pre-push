@@ -9,7 +9,7 @@ else
     TRACKED_PS_FILES=$(git ls-files | grep '\.ps1$' || true)
 
     if [ -n "$TRACKED_PS_FILES" ]; then
-        if ! pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-powershell.ps1 -Files $(echo "$TRACKED_PS_FILES" | tr '\n' ' '); then
+        if ! echo "$TRACKED_PS_FILES" | xargs -I {} pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-powershell.ps1 -Files {}; then
             echo ""
             echo "Push blocked: PowerShell linting failed"
             echo "Fix violations and retry"
