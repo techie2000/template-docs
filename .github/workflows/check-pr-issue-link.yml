@@ -161,10 +161,10 @@ jobs:
               return
             }
 
-            const allComments = []
+            let alreadyAdvised = false
             let page = 1
             let hasMore = true
-            while (hasMore) {
+            while (hasMore && !alreadyAdvised) {
               const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -172,16 +172,14 @@ jobs:
                 page,
                 per_page: 50,
               })
-              allComments.push(...comments)
+              alreadyAdvised = comments.some(
+                (c) =>
+                  c.user.login === 'github-actions[bot]' &&
+                  c.body.includes('<!-- pr-issue-link-advisory -->')
+              )
               hasMore = comments.length === 50
               page += 1
             }
-
-            const alreadyAdvised = allComments.some(
-              (c) =>
-                c.user.login === 'github-actions[bot]' &&
-                c.body.includes('<!-- pr-issue-link-advisory -->')
-            )
 
             if (alreadyAdvised) {
               core.info('Advisory already posted.')
