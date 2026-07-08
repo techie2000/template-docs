@@ -42,11 +42,8 @@ if [ -z "$current_name" ] || [ "$current_name" = "template-docs" ] || [ "$curren
   should_replace=true
 fi
 
-package_metadata_updated=false
-
 if [ "$should_replace" = "true" ] && [ "$current_name" != "$sanitized" ]; then
   npm pkg set "name=$sanitized" >/dev/null
-  package_metadata_updated=true
   echo "Updated package.json name: $current_name -> $sanitized"
 else
   echo "Keeping package.json name: $current_name"
@@ -61,7 +58,6 @@ fi
 
 if [ "$should_replace_description" = "true" ] && [ "$current_description" != "$default_description" ]; then
   npm pkg set "description=$default_description" >/dev/null
-  package_metadata_updated=true
   echo "Updated package.json description: $current_description -> $default_description"
 else
   echo "Keeping package.json description: $current_description"
@@ -69,28 +65,18 @@ fi
 
 if [ "$should_replace" = "true" ] || [ -z "$current_private" ]; then
   npm pkg set "private=true" --json >/dev/null
-  package_metadata_updated=true
   echo "Ensured package.json private=true"
 else
   echo "Keeping package.json private: $current_private"
 fi
 
-if [ "$package_metadata_updated" = "true" ]; then
-  # Regenerate package-lock.json to match the updated package.json
-  npm install --package-lock-only >/dev/null
-  echo "Regenerated package-lock.json"
-else
-  echo "Skipped package-lock.json regeneration; package metadata unchanged"
-fi
+# Regenerate package-lock.json to match the updated package.json
+npm install --package-lock-only >/dev/null
+echo "Regenerated package-lock.json"
 
 settings_path=".vscode/settings.json"
-settings_source_path=".vscode/settings.generic.json"
-if [ ! -f "$settings_source_path" ]; then
-  settings_source_path="$settings_path"
-fi
-
-if [ ! -f "$settings_source_path" ]; then
-  echo "No $settings_source_path found; skipping cSpell bootstrap."
+if [ ! -f "$settings_path" ]; then
+  echo "No $settings_path found; skipping cSpell bootstrap."
   exit 0
 fi
 
@@ -98,7 +84,7 @@ dict_name="${sanitized}-words"
 dict_file=".vscode/${dict_name}.txt"
 template_dict_file=".vscode/generic-project-words.txt"
 
-node - "$repo_name" "$project_name" "$sanitized" "$settings_source_path" "$dict_name" "$dict_file" "$template_dict_file" <<'NODE'
+node - "$repo_name" "$project_name" "$sanitized" "$settings_path" "$dict_name" "$dict_file" "$template_dict_file" <<'NODE'
 const fs = require("fs");
 const path = require("path");
 
@@ -234,15 +220,3 @@ console.log(`Ensured cSpell word list: ${dictionaryFilePath}`);
 console.log(`Ensured cSpell dictionary registration: ${dictionaryName}`);
 console.log(`Updated docs placeholders: ${docsUpdated}`);
 NODE
-
-requested_profile=${WORK_TEMPLATE_SETTINGS_PROFILE:-generic}
-if [ "$requested_profile" != "generic" ] && [ "$requested_profile" != "opinionated" ]; then
-  echo "Invalid WORK_TEMPLATE_SETTINGS_PROFILE '$requested_profile'; defaulting to generic."
-  requested_profile="generic"
-fi
-
-if [ -f "./scripts/settings-profile.ps1" ] && command -v pwsh >/dev/null 2>&1; then
-  pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/settings-profile.ps1 -Action apply -Profile "$requested_profile"
-elif [ "$settings_source_path" != "$settings_path" ]; then
-  cp "$settings_source_path" "$settings_path"
-fi

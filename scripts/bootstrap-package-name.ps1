@@ -32,11 +32,9 @@ if ([string]::IsNullOrWhiteSpace($sanitized)) {
 
 $placeholders = @("template-docs", "work-template-docs")
 $shouldReplace = [string]::IsNullOrWhiteSpace($currentName) -or $placeholders.Contains($currentName)
-$packageMetadataUpdated = $false
 
 if ($shouldReplace -and $currentName -ne $sanitized) {
     & npm pkg set "name=$sanitized" | Out-Null
-    $packageMetadataUpdated = $true
     Write-Host "Updated package.json name: $currentName -> $sanitized"
 } else {
     Write-Host "Keeping package.json name: $currentName"
@@ -48,7 +46,6 @@ $shouldReplaceDescription = $shouldReplace -or [string]::IsNullOrWhiteSpace($cur
 
 if ($shouldReplaceDescription -and $currentDescription -ne $defaultDescription) {
     & npm pkg set "description=$defaultDescription" | Out-Null
-    $packageMetadataUpdated = $true
     Write-Host "Updated package.json description: $currentDescription -> $defaultDescription"
 } else {
     Write-Host "Keeping package.json description: $currentDescription"
@@ -56,24 +53,18 @@ if ($shouldReplaceDescription -and $currentDescription -ne $defaultDescription) 
 
 if ($shouldReplace -or [string]::IsNullOrWhiteSpace($currentPrivate)) {
     & npm pkg set "private=true" --json | Out-Null
-    $packageMetadataUpdated = $true
     Write-Host "Ensured package.json private=true"
 } else {
     Write-Host "Keeping package.json private: $currentPrivate"
 }
 
-if ($packageMetadataUpdated) {
-    # Regenerate package-lock.json to match the updated package.json
-    & npm install --package-lock-only | Out-Null
-    Write-Host "Regenerated package-lock.json"
-} else {
-    Write-Host "Skipped package-lock.json regeneration; package metadata unchanged"
-}
+# Regenerate package-lock.json to match the updated package.json
+& npm install --package-lock-only | Out-Null
+Write-Host "Regenerated package-lock.json"
 
 $settingsPath = ".vscode/settings.json"
-$settingsSourcePath = if (Test-Path -LiteralPath ".vscode/settings.generic.json") { ".vscode/settings.generic.json" } else { $settingsPath }
-if (-not (Test-Path -LiteralPath $settingsSourcePath)) {
-    Write-Host "No $settingsSourcePath found; skipping cSpell bootstrap."
+if (-not (Test-Path -LiteralPath $settingsPath)) {
+    Write-Host "No $settingsPath found; skipping cSpell bootstrap."
     exit 0
 }
 
@@ -160,7 +151,7 @@ if (-not $wordListContent.EndsWith("`n")) {
 [System.IO.File]::WriteAllText((Join-Path (Get-Location) $dictionaryPath), $wordListContent, [System.Text.UTF8Encoding]::new($false))
 Write-Host "Ensured cSpell word list: $dictionaryPath"
 
-$settings = Get-Content -LiteralPath $settingsSourcePath -Raw | ConvertFrom-Json -AsHashtable
+$settings = Get-Content -LiteralPath $settingsPath -Raw | ConvertFrom-Json -AsHashtable
 
 if (-not $settings.ContainsKey("cSpell") -or -not ($settings["cSpell"] -is [System.Collections.IDictionary])) {
     $settings["cSpell"] = @{}
@@ -185,23 +176,8 @@ $formattedSettings = ($sortedSettings | ConvertTo-Json -Depth 100) -replace "`r?
 if (-not $formattedSettings.EndsWith("`n")) {
     $formattedSettings += "`n"
 }
-[System.IO.File]::WriteAllText((Join-Path (Get-Location) $settingsSourcePath), $formattedSettings, [System.Text.UTF8Encoding]::new($false))
+[System.IO.File]::WriteAllText((Join-Path (Get-Location) $settingsPath), $formattedSettings, [System.Text.UTF8Encoding]::new($false))
 Write-Host "Ensured cSpell dictionary registration: $dictionaryName"
-
-$settingsProfileScript = Join-Path $PSScriptRoot "settings-profile.ps1"
-if (Test-Path -LiteralPath $settingsProfileScript) {
-    $requestedProfile = $env:WORK_TEMPLATE_SETTINGS_PROFILE
-    if ([string]::IsNullOrWhiteSpace($requestedProfile)) {
-        $requestedProfile = "generic"
-    }
-
-    if ($requestedProfile -ne "generic" -and $requestedProfile -ne "opinionated") {
-        Write-Warning "Invalid WORK_TEMPLATE_SETTINGS_PROFILE '$requestedProfile'; defaulting to 'generic'."
-        $requestedProfile = "generic"
-    }
-
-    & $settingsProfileScript -Action apply -Profile $requestedProfile
-}
 
 $docsTokens = [ordered]@{
     "{{PROJECT_NAME}}" = $projectName
