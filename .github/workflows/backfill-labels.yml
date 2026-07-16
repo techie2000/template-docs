@@ -399,7 +399,7 @@ jobs:
             )
 
       - name: Upload backfill summary artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backfill-label-summary-${{ github.run_id }}
           path: .tmp/backfill-label-summary.json
