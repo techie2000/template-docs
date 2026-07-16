@@ -10,6 +10,8 @@ and operational references for the software or service being documented.
 | Folder | Purpose |
 | ------ | ------- |
 | [docs/](docs/) | Documentation index for the docs area and subfolders |
+| [docs/internal/](docs/internal/) | Internal notes, ADRs, runbooks, and operational references |
+| [docs/vendor/](docs/vendor/) | Vendor documentation and third-party references |
 | [images/](images/) | Supporting screenshots and diagrams |
 | [logs/](logs/) | Tracked log guidance and anchor files; generated runtime logs remain ignored |
 | [scripts/](scripts/) | Helper scripts for bootstrap, linting, hook installation, and workspace normalization |
@@ -22,6 +24,7 @@ and operational references for the software or service being documented.
 | ----------- | ------- |
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
 | [.github/](.github/) | GitHub configuration, Copilot policy, issue templates, and workflows |
+| [.github/dependabot.yml](.github/dependabot.yml) | Dependabot configuration for automated dependency updates |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | markdownlint-cli2 configuration aligned with repository linting behavior |
@@ -61,8 +64,7 @@ The template uses a split VS Code settings model:
 - [`.vscode/settings.json`](.vscode/settings.json) is derived from these
    sources via the settings profile workflow.
 
-Use `WORK_TEMPLATE_SETTINGS_PROFILE=opinionated` when applying/checking the
-profile to use the opinionated mode, or run profile targets directly:
+Run profile targets directly via `make` to apply or check a profile:
 
 ```bash
 make settings-profile-generic

@@ -45,6 +45,7 @@ fi
 if [ "$should_replace" = "true" ] && [ "$current_name" != "$sanitized" ]; then
   npm pkg set "name=$sanitized" >/dev/null
   echo "Updated package.json name: $current_name -> $sanitized"
+  metadata_changed=true
 else
   echo "Keeping package.json name: $current_name"
 fi
@@ -59,20 +60,27 @@ fi
 if [ "$should_replace_description" = "true" ] && [ "$current_description" != "$default_description" ]; then
   npm pkg set "description=$default_description" >/dev/null
   echo "Updated package.json description: $current_description -> $default_description"
+  metadata_changed=true
 else
   echo "Keeping package.json description: $current_description"
 fi
 
+metadata_changed=${metadata_changed:-false}
 if [ "$should_replace" = "true" ] || [ -z "$current_private" ]; then
   npm pkg set "private=true" --json >/dev/null
   echo "Ensured package.json private=true"
+  metadata_changed=true
 else
   echo "Keeping package.json private: $current_private"
 fi
 
-# Regenerate package-lock.json to match the updated package.json
-npm install --package-lock-only >/dev/null
-echo "Regenerated package-lock.json"
+# Regenerate package-lock.json only when package.json metadata was actually updated
+if [ "$metadata_changed" = "true" ]; then
+  npm install --package-lock-only >/dev/null
+  echo "Regenerated package-lock.json"
+else
+  echo "No package.json metadata changed; skipping package-lock.json regeneration."
+fi
 
 settings_path=".vscode/settings.json"
 if [ ! -f "$settings_path" ]; then

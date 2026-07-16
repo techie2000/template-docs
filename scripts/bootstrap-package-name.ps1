@@ -36,6 +36,7 @@ $shouldReplace = [string]::IsNullOrWhiteSpace($currentName) -or $placeholders.Co
 if ($shouldReplace -and $currentName -ne $sanitized) {
     & npm pkg set "name=$sanitized" | Out-Null
     Write-Host "Updated package.json name: $currentName -> $sanitized"
+    $metadataChanged = $true
 } else {
     Write-Host "Keeping package.json name: $currentName"
 }
@@ -43,10 +44,12 @@ if ($shouldReplace -and $currentName -ne $sanitized) {
 $templateDescription = "Reusable template for documentation-first projects."
 $defaultDescription = "Documentation for $projectName."
 $shouldReplaceDescription = $shouldReplace -or [string]::IsNullOrWhiteSpace($currentDescription) -or $currentDescription -eq $templateDescription
+$metadataChanged = $false
 
 if ($shouldReplaceDescription -and $currentDescription -ne $defaultDescription) {
     & npm pkg set "description=$defaultDescription" | Out-Null
     Write-Host "Updated package.json description: $currentDescription -> $defaultDescription"
+    $metadataChanged = $true
 } else {
     Write-Host "Keeping package.json description: $currentDescription"
 }
@@ -54,13 +57,18 @@ if ($shouldReplaceDescription -and $currentDescription -ne $defaultDescription) 
 if ($shouldReplace -or [string]::IsNullOrWhiteSpace($currentPrivate)) {
     & npm pkg set "private=true" --json | Out-Null
     Write-Host "Ensured package.json private=true"
+    $metadataChanged = $true
 } else {
     Write-Host "Keeping package.json private: $currentPrivate"
 }
 
-# Regenerate package-lock.json to match the updated package.json
-& npm install --package-lock-only | Out-Null
-Write-Host "Regenerated package-lock.json"
+# Regenerate package-lock.json only when package.json metadata was actually updated
+if ($metadataChanged) {
+    & npm install --package-lock-only | Out-Null
+    Write-Host "Regenerated package-lock.json"
+} else {
+    Write-Host "No package.json metadata changed; skipping package-lock.json regeneration."
+}
 
 $settingsPath = ".vscode/settings.json"
 if (-not (Test-Path -LiteralPath $settingsPath)) {
