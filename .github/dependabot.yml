@@ -13,7 +13,6 @@ updates:
       - npm
     commit-message:
       prefix: "chore(deps):"
-      prefix-major: "chore(deps-major):"
       include: "scope"
 
   # GitHub Actions workflow dependencies

@@ -1,13 +1,13 @@
 autofetch
 Claude
-Claude
-GitHub
+frontmatter
 github
-GitLab
+GitHub
 gitlab
+GitLab
 gitlabce
-Ilograph
 ilograph
+Ilograph
 mojibake
 pgsql
 precommit
