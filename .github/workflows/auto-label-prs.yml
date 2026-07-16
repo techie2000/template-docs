@@ -127,6 +127,9 @@ jobs:
 
             await ensureLabel(noIssueLabelDef)
             await ensureLabel(linkedIssueLabelDef)
+            for (const labelDef of dependabotLabelDefs) {
+              await ensureLabel(labelDef)
+            }
 
             if (!canMutateLabels) {
               core.info('Skipping PR label automation due to token permission restrictions.')
