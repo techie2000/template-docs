@@ -84,6 +84,22 @@ sync.
 Use [.github/workflows/check-template-updates.yml](.github/workflows/check-template-updates.yml)
 to detect and triage drift between a derived repository and this template.
 
+### Prerequisites
+
+For the workflow to create pull requests automatically, enable the following setting in your derived repository:
+
+#### Repository Settings → Actions → General → Workflow permissions
+
+1. Navigate to your repository on GitHub
+2. Go to **Settings → Actions → General**
+3. Under **Workflow permissions**, select **Read and write permissions**
+4. Check **Allow GitHub Actions to create and approve pull requests**
+5. Click **Save**
+
+> **Note:** This setting cannot be enabled programmatically during repository creation.
+> It must be configured manually for each derived repository before triggering the
+> workflow with `create_sync_pr: true`.
+
 ### Configure baseline metadata
 
 Set a baseline commit in
