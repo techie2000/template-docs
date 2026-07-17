@@ -94,15 +94,15 @@ repository:
 template_repo: "techie2000/work-template-docs"
 template_ref: "main"
 baseline_ref: "<template_commit_sha_used_for_generation_or_rebaseline>"
-comparison_exclude_paths: ".vscode,docs/internal"
+comparison_exclude_paths: ""
 ```
 
 Without `baseline_ref`, the workflow falls back to snapshot mode and cannot
 separate intentional local divergence from template evolution.
 
-Use `comparison_exclude_paths` when a derived repository intentionally owns a
-path differently enough that template updates would only add noise. The value is
-a comma-separated list of repo-relative files or folder prefixes.
+Use `comparison_exclude_paths` only when a derived repository has a truly
+local-only surface that should never be compared. The value is a
+comma-separated list of repo-relative files or folder prefixes.
 
 The default comparison scope includes these repo-local template surfaces:
 
