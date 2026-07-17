@@ -60,6 +60,7 @@ jobs:
       template_ref: ${{ steps.config.outputs.template_ref }}
       baseline_ref: ${{ steps.config.outputs.baseline_ref }}
       has_pr_candidates: ${{ steps.compare.outputs.has_pr_candidates }}
+      new_files_json: ${{ steps.compare.outputs.new_files_json }}
       safe_adopt_files_json: ${{ steps.compare.outputs.safe_adopt_files_json }}
       auto_merge_files_json: ${{ steps.compare.outputs.auto_merge_files_json }}
 
@@ -446,9 +447,11 @@ jobs:
           } > "${REPORT_FILE}"
 
           echo "report_file=${REPORT_FILE}" >> "${GITHUB_OUTPUT}"
+          new_files_json="$(printf '%s\n' "${NEW_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
           safe_adopt_json="$(printf '%s\n' "${SAFE_ADOPT_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
           auto_merge_json="$(printf '%s\n' "${AUTO_MERGE_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
           conflict_json="$(printf '%s\n' "${CONFLICT_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
+          echo "new_files_json=${new_files_json}" >> "${GITHUB_OUTPUT}"
           echo "safe_adopt_files_json=${safe_adopt_json}" >> "${GITHUB_OUTPUT}"
           echo "auto_merge_files_json=${auto_merge_json}" >> "${GITHUB_OUTPUT}"
           echo "conflict_files_json=${conflict_json}" >> "${GITHUB_OUTPUT}"
@@ -457,7 +460,7 @@ jobs:
           else
             echo "has_conflicts=false" >> "${GITHUB_OUTPUT}"
           fi
-          if [ $(( ${#SAFE_ADOPT_FILES[@]} + ${#AUTO_MERGE_FILES[@]} )) -gt 0 ]; then
+          if [ $(( ${#NEW_FILES[@]} + ${#SAFE_ADOPT_FILES[@]} + ${#AUTO_MERGE_FILES[@]} )) -gt 0 ]; then
             echo "has_pr_candidates=true" >> "${GITHUB_OUTPUT}"
           else
             echo "has_pr_candidates=false" >> "${GITHUB_OUTPUT}"
@@ -718,6 +721,7 @@ jobs:
         id: prepare_sync_patch
         env:
           BASELINE_REF: ${{ needs.check-template-updates.outputs.baseline_ref }}
+          NEW_FILES_JSON: ${{ needs.check-template-updates.outputs.new_files_json }}
           SAFE_ADOPT_FILES_JSON: ${{ needs.check-template-updates.outputs.safe_adopt_files_json }}
           AUTO_MERGE_FILES_JSON: ${{ needs.check-template-updates.outputs.auto_merge_files_json }}
         run: |
@@ -735,6 +739,7 @@ jobs:
           import subprocess
 
           base_ref = os.environ.get('BASELINE_REF', '').strip()
+          new_files = json.loads(os.environ.get('NEW_FILES_JSON', '[]'))
           safe_files = json.loads(os.environ.get('SAFE_ADOPT_FILES_JSON', '[]'))
           auto_files = json.loads(os.environ.get('AUTO_MERGE_FILES_JSON', '[]'))
 
@@ -749,7 +754,16 @@ jobs:
             result = run(['git', '-C', str(template_root), 'show', f'{base_ref}:{path}'])
             return result.stdout
 
-          applied = {'safe': [], 'auto': []}
+          applied = {'new': [], 'safe': [], 'auto': []}
+
+          for rel in new_files:
+            src = template_root / rel
+            dst = current_root / rel
+            if not src.exists() or not src.is_file():
+              continue
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_bytes(src.read_bytes())
+            applied['new'].append(rel)
 
           for rel in safe_files:
             src = template_root / rel
@@ -801,12 +815,19 @@ jobs:
             '',
             'This draft PR includes only low-risk categories from check-template-updates:',
             '',
+            f'- New template files applied: {len(applied["new"])}',
             f'- Safe adopt candidates applied: {len(applied["safe"])}',
             f'- Auto-merge candidates applied: {len(applied["auto"])}',
             '',
             '### Applied Files',
             '',
           ]
+
+          if applied['new']:
+            summary_lines.append('#### New Template Files')
+            for item in applied['new']:
+              summary_lines.append(f'- `{item}`')
+            summary_lines.append('')
 
           if applied['safe']:
             summary_lines.append('#### Safe Adopt')
