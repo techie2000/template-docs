@@ -1,5 +1,7 @@
 autofetch
 Claude
+elif
+esac
 frontmatter
 github
 GitHub
@@ -8,12 +10,16 @@ GitLab
 gitlabce
 ilograph
 Ilograph
+mktemp
 mojibake
+pathlib
 pgsql
+pipefail
 precommit
 prepush
 pycache
 readback
+returncode
 setext
 sslmode
 toplevel

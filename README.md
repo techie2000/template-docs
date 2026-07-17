@@ -12,6 +12,8 @@ and operational references for the software or service being documented.
 | [docs/](docs/) | Documentation index for the docs area and subfolders |
 | [docs/internal/](docs/internal/) | Internal notes, ADRs, runbooks, and operational references |
 | [docs/vendor/](docs/vendor/) | Vendor documentation and third-party references |
+| [.gitattributes](.gitattributes) | Git attributes that should stay aligned with template defaults |
+| [.gitignore](.gitignore) | Repository ignore rules that affect generated-template parity |
 | [images/](images/) | Supporting screenshots and diagrams |
 | [logs/](logs/) | Tracked log guidance and anchor files; generated runtime logs remain ignored |
 | [scripts/](scripts/) | Helper scripts for bootstrap, linting, hook installation, and workspace normalization |
@@ -26,6 +28,7 @@ and operational references for the software or service being documented.
 | [.github/](.github/) | GitHub configuration, Copilot policy, issue templates, and workflows |
 | [.github/dependabot.yml](.github/dependabot.yml) | Dependabot configuration for automated dependency updates |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
+| [.github/template-sync.yml](.github/template-sync.yml) | Baseline metadata for template drift classification and sync automation |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | markdownlint-cli2 configuration aligned with repository linting behavior |
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by hooks and CI |
@@ -75,6 +78,67 @@ make settings-profile-check-generic
 Pre-commit enforces that `.vscode/settings.json` matches the selected profile
 (`WORK_TEMPLATE_SETTINGS_PROFILE`, default `generic`) and fails when out of
 sync.
+
+## Template Sync Workflow
+
+Use [.github/workflows/check-template-updates.yml](.github/workflows/check-template-updates.yml)
+to detect and triage drift between a derived repository and this template.
+
+### Configure baseline metadata
+
+Set a baseline commit in
+[.github/template-sync.yml](.github/template-sync.yml) inside the derived
+repository:
+
+```yaml
+template_repo: "techie2000/work-template-docs"
+template_ref: "main"
+baseline_ref: "<template_commit_sha_used_for_generation_or_rebaseline>"
+comparison_exclude_paths: ""
+```
+
+Without `baseline_ref`, the workflow falls back to snapshot mode and cannot
+separate intentional local divergence from template evolution.
+
+Use `comparison_exclude_paths` only when a derived repository has a truly
+local-only surface that should never be compared. The value is a
+comma-separated list of repo-relative files or folder prefixes.
+
+The default comparison scope includes these repo-local template surfaces:
+
+- `.gitattributes`
+- `.gitignore`
+- `.github/copilot-instructions.md`
+- `.github/dependabot.yml`
+- `.github/instructions/`
+- `.github/ISSUE_TEMPLATE/`
+- `.github/pull_request_template.md`
+- `.github/workflows/`
+- `.githooks/`
+- `.markdownlint-cli2.yaml`
+- `.markdownlint.yaml`
+- `.markdownlintignore`
+- `.vscode/`
+- `AGENTS.md`
+- `Makefile`
+- `docs/internal/`
+- `scripts/`
+
+### Trigger options
+
+- `workflow_dispatch` for on-demand runs
+- Weekly scheduled run (Monday 09:00 UTC)
+
+### Optional automation inputs
+
+- `generate_ai_suggestions: true`
+   Generates advisory-only merge guidance for files classified as manual
+   conflicts. It never auto-applies changes.
+- `create_sync_pr: true`
+   Creates or updates a draft PR containing only low-risk categories:
+   safe-adopt and clean auto-merge candidates.
+
+Manual-conflict files remain excluded and require maintainer review.
 
 ## Automatic Branch Deletion for Template-Based Repositories
 
