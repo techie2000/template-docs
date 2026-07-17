@@ -649,7 +649,7 @@ jobs:
 
       - name: Create or update draft sync PR
         if: steps.compare.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true && steps.prepare_sync_patch.outputs.has_sync_patch == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
         with:
           path: current
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -657,7 +657,7 @@ jobs:
           delete-branch: true
           title: 'chore(template-sync): apply safe and auto-merge template updates'
           commit-message: 'chore(template-sync): apply safe and auto-merge template updates'
-          body-path: .tmp/template-sync-pr-summary.md
+          body-path: current/.tmp/template-sync-pr-summary.md
           draft: true
           labels: |
             template-sync
