@@ -257,6 +257,14 @@ resources:
                     name: powershell-lint.yml
                     subtitle: PowerShell Lint CI
                     description: Runs PSScriptAnalyzer on all .ps1 files.
+                  - id: workflow_check_template_updates
+                    name: check-template-updates.yml
+                    subtitle: Check Template Updates
+                    description: >-
+                      On-demand or weekly scheduled check that compares
+                      infrastructure paths against the upstream template and
+                      creates or updates a template-sync tracking issue when
+                      differences are found.
                   - id: workflow_sync_issue_status
                     name: sync-issue-status-from-pr.yml
                     subtitle: Sync Issue Status From PR
@@ -441,6 +449,9 @@ perspectives:
       - from: workflow_ps_lint
         to: scripts
         label: lints .ps1 files
+      - from: workflow_check_template_updates
+        to: github
+        label: compares against template
       - from: workflow_sync_issue_status
         to: workflow_check_issue_link
         label: complements

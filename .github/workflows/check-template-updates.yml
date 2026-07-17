@@ -1,0 +1,223 @@
+name: Check Template Updates
+
+on:
+  workflow_dispatch:
+    inputs:
+      template_repo:
+        description: 'Source template repository (owner/repo)'
+        default: 'techie2000/work-template-docs'
+        required: false
+        type: string
+      template_ref:
+        description: 'Template branch or tag to compare against'
+        default: 'main'
+        required: false
+        type: string
+      create_issue:
+        description: 'Create or update a tracking issue with findings'
+        default: true
+        required: false
+        type: boolean
+  schedule:
+    # Every Monday at 09:00 UTC.
+    - cron: '0 9 * * 1'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-template-updates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          path: current
+
+      - name: Checkout template repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.template_repo || 'techie2000/work-template-docs' }}
+          ref: ${{ inputs.template_ref || 'main' }}
+          path: template
+
+      - name: Compare with template and generate report
+        id: compare
+        run: |
+          set -euo pipefail
+
+          TEMPLATE_DIR="template"
+          CURRENT_DIR="current"
+          REPORT_FILE="${RUNNER_TEMP}/template-drift-report.md"
+
+          # Infrastructure paths that consuming repos should keep in sync with
+          # the template. Content paths (docs/, README.md, package.json, etc.)
+          # are intentionally excluded — they are customised per project.
+          SYNC_PATHS=(
+            ".github/copilot-instructions.md"
+            ".github/dependabot.yml"
+            ".github/instructions"
+            ".github/ISSUE_TEMPLATE"
+            ".github/pull_request_template.md"
+            ".github/workflows"
+            ".githooks"
+            ".markdownlint-cli2.yaml"
+            ".markdownlint.yaml"
+            "AGENTS.md"
+            "Makefile"
+            "scripts"
+          )
+
+          NEW_FILES=()
+          CHANGED_FILES=()
+
+          for sync_path in "${SYNC_PATHS[@]}"; do
+            template_target="${TEMPLATE_DIR}/${sync_path}"
+            if [ -d "${template_target}" ]; then
+              while IFS= read -r -d '' template_file; do
+                relative="${template_file#${TEMPLATE_DIR}/}"
+                current_file="${CURRENT_DIR}/${relative}"
+                if [ ! -f "${current_file}" ]; then
+                  NEW_FILES+=("${relative}")
+                elif ! diff -q "${current_file}" "${template_file}" > /dev/null 2>&1; then
+                  CHANGED_FILES+=("${relative}")
+                fi
+              done < <(find "${template_target}" -type f -print0 | sort -z)
+            elif [ -f "${template_target}" ]; then
+              current_file="${CURRENT_DIR}/${sync_path}"
+              if [ ! -f "${current_file}" ]; then
+                NEW_FILES+=("${sync_path}")
+              elif ! diff -q "${current_file}" "${template_target}" > /dev/null 2>&1; then
+                CHANGED_FILES+=("${sync_path}")
+              fi
+            fi
+          done
+
+          if [ "${#NEW_FILES[@]}" -eq 0 ] && [ "${#CHANGED_FILES[@]}" -eq 0 ]; then
+            echo "has_changes=false" >> "${GITHUB_OUTPUT}"
+            echo "No differences found. This repository is up-to-date with the template."
+            exit 0
+          fi
+
+          echo "has_changes=true" >> "${GITHUB_OUTPUT}"
+
+          TEMPLATE_REPO="${{ inputs.template_repo || 'techie2000/work-template-docs' }}"
+          TEMPLATE_REF="${{ inputs.template_ref || 'main' }}"
+          CHECK_DATE="$(date -u '+%Y-%m-%d')"
+
+          {
+            echo "## Template Drift Report — ${CHECK_DATE}"
+            echo ""
+            echo "Compared against: [\`${TEMPLATE_REPO}\`](https://github.com/${TEMPLATE_REPO}/tree/${TEMPLATE_REF}) @ \`${TEMPLATE_REF}\`"
+            echo ""
+            echo "> [!NOTE]"
+            echo "> This report is **advisory only**. Review each difference and decide"
+            echo "> whether to incorporate the change. Do **not** blindly copy files from"
+            echo "> the template without understanding the impact on this repository."
+            echo ""
+
+            if [ "${#NEW_FILES[@]}" -gt 0 ]; then
+              echo "### New Files in Template"
+              echo ""
+              echo "These files exist in the template but not in this repository:"
+              echo ""
+              for f in "${NEW_FILES[@]}"; do
+                echo "- \`${f}\`"
+              done
+              echo ""
+            fi
+
+            if [ "${#CHANGED_FILES[@]}" -gt 0 ]; then
+              echo "### Changed Files"
+              echo ""
+              echo "These files differ from the template version:"
+              echo ""
+              for f in "${CHANGED_FILES[@]}"; do
+                echo "- \`${f}\`"
+              done
+              echo ""
+            fi
+
+            TOTAL=$(( ${#NEW_FILES[@]} + ${#CHANGED_FILES[@]} ))
+            echo "---"
+            echo ""
+            echo "**Summary**: ${TOTAL} difference(s) found \
+(${#NEW_FILES[@]} new, ${#CHANGED_FILES[@]} changed)."
+          } > "${REPORT_FILE}"
+
+          echo "report_file=${REPORT_FILE}" >> "${GITHUB_OUTPUT}"
+          cat "${REPORT_FILE}"
+
+      - name: Ensure template-sync label exists
+        if: steps.compare.outputs.has_changes == 'true' && inputs.create_issue != false
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const labelDef = {
+              name: 'template-sync',
+              color: '0075ca',
+              description: 'Template drift detected - review upstream changes',
+            }
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: labelDef.name,
+              })
+            } catch (e) {
+              if (e.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ...labelDef,
+                })
+                core.info(`Created label: ${labelDef.name}`)
+              } else {
+                throw e
+              }
+            }
+
+      - name: Create or update tracking issue
+        if: steps.compare.outputs.has_changes == 'true' && inputs.create_issue != false
+        uses: actions/github-script@v9
+        env:
+          REPORT_FILE: ${{ steps.compare.outputs.report_file }}
+        with:
+          script: |
+            const fs = require('fs')
+            const reportFile = process.env.REPORT_FILE
+            const report = fs.readFileSync(reportFile, 'utf8')
+
+            const title = 'chore: template drift detected - review upstream template changes'
+
+            // Find any existing open template-sync tracking issue.
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'template-sync',
+              per_page: 5,
+            })
+
+            const openIssue = existing.find(i => !i.pull_request)
+
+            if (openIssue) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: openIssue.number,
+                body: report,
+              })
+              core.info(`Updated existing issue #${openIssue.number} with new drift report`)
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body: report,
+                labels: ['template-sync'],
+              })
+              core.info(`Created new tracking issue #${created.number}: ${created.html_url}`)
+            }
