@@ -65,7 +65,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: current
 
@@ -74,7 +74,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          DEFAULT_TEMPLATE_REPO="techie2000/work-template-docs"
+          DEFAULT_TEMPLATE_REPO="techie2000/template-docs"
           DEFAULT_TEMPLATE_REF="main"
           INPUT_TEMPLATE_REPO="${{ inputs.template_repo || '' }}"
           INPUT_TEMPLATE_REF="${{ inputs.template_ref || '' }}"
@@ -143,12 +143,15 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Checkout template repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        env:
+          TEMPLATE_SYNC_TOKEN: ${{ secrets.TEMPLATE_SYNC_TOKEN }}
         with:
           repository: ${{ steps.config.outputs.template_repo }}
           ref: ${{ steps.config.outputs.template_ref }}
           fetch-depth: 0
           path: template
+          token: ${{ env.TEMPLATE_SYNC_TOKEN != '' && env.TEMPLATE_SYNC_TOKEN || github.token }}
 
       - name: Compare with template and generate report
         id: compare
@@ -693,17 +696,20 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: current
 
       - name: Checkout template repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        env:
+          TEMPLATE_SYNC_TOKEN: ${{ secrets.TEMPLATE_SYNC_TOKEN }}
         with:
           repository: ${{ needs.check-template-updates.outputs.template_repo }}
           ref: ${{ needs.check-template-updates.outputs.template_ref }}
           fetch-depth: 0
           path: template
+          token: ${{ env.TEMPLATE_SYNC_TOKEN != '' && env.TEMPLATE_SYNC_TOKEN || github.token }}
 
       - name: Prepare sync candidate patch
         id: prepare_sync_patch

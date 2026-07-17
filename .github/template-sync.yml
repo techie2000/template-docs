@@ -10,7 +10,7 @@
 # comparison_exclude_paths should be a comma-separated list of repo-relative
 # files/folders to skip when a derived repository has a truly local-only
 # surface that should never be compared.
-template_repo: "techie2000/work-template-docs"
+template_repo: "techie2000/template-docs"
 template_ref: "main"
 baseline_ref: ""
 comparison_exclude_paths: ""
