@@ -889,7 +889,7 @@ jobs:
         if: always() && needs.check-template-updates.outputs.has_manual_review_items == 'true'
         uses: actions/github-script@v9
         env:
-          PR_BRANCH: chore/template-sync-auto-adopt
+          PR_BRANCH: ${{ steps.create_sync_pr.outputs['pull-request-branch'] || 'chore/template-sync-auto-adopt' }}
           CONFLICT_FILES_JSON: ${{ needs.check-template-updates.outputs.conflict_files_json }}
           BASELINE_GAP_FILES_JSON: ${{ needs.check-template-updates.outputs.baseline_gap_files_json }}
         with:
@@ -947,7 +947,7 @@ jobs:
             lines.push('Action: review these paths before merge and decide whether to follow up in this PR or a separate PR.')
             const body = lines.join('\n')
 
-            const { data: comments } = await github.rest.issues.listComments({
+            const comments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
