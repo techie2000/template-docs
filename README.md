@@ -26,6 +26,7 @@ and operational references for the software or service being documented.
 | [.github/](.github/) | GitHub configuration, Copilot policy, issue templates, and workflows |
 | [.github/dependabot.yml](.github/dependabot.yml) | Dependabot configuration for automated dependency updates |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
+| [.github/template-sync.yml](.github/template-sync.yml) | Baseline metadata for template drift classification and sync automation |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | markdownlint-cli2 configuration aligned with repository linting behavior |
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by hooks and CI |
@@ -75,6 +76,42 @@ make settings-profile-check-generic
 Pre-commit enforces that `.vscode/settings.json` matches the selected profile
 (`WORK_TEMPLATE_SETTINGS_PROFILE`, default `generic`) and fails when out of
 sync.
+
+## Template Sync Workflow
+
+Use [.github/workflows/check-template-updates.yml](.github/workflows/check-template-updates.yml)
+to detect and triage drift between a derived repository and this template.
+
+### Configure baseline metadata
+
+Set a baseline commit in
+[.github/template-sync.yml](.github/template-sync.yml) inside the derived
+repository:
+
+```yaml
+template_repo: "techie2000/work-template-docs"
+template_ref: "main"
+baseline_ref: "<template_commit_sha_used_for_generation_or_rebaseline>"
+```
+
+Without `baseline_ref`, the workflow falls back to snapshot mode and cannot
+separate intentional local divergence from template evolution.
+
+### Trigger options
+
+- `workflow_dispatch` for on-demand runs
+- Weekly scheduled run (Monday 09:00 UTC)
+
+### Optional automation inputs
+
+- `generate_ai_suggestions: true`
+   Generates advisory-only merge guidance for files classified as manual
+   conflicts. It never auto-applies changes.
+- `create_sync_pr: true`
+   Creates or updates a draft PR containing only low-risk categories:
+   safe-adopt and clean auto-merge candidates.
+
+Manual-conflict files remain excluded and require maintainer review.
 
 ## Automatic Branch Deletion for Template-Based Repositories
 

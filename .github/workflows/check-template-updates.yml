@@ -28,6 +28,11 @@ on:
         default: 'gpt-4.1-mini'
         required: false
         type: string
+      create_sync_pr:
+        description: 'Create or update a draft PR for safe-adopt and auto-merge candidates'
+        default: false
+        required: false
+        type: boolean
       create_issue:
         description: 'Create or update a tracking issue with findings'
         default: true
@@ -38,9 +43,10 @@ on:
     - cron: '0 9 * * 1'
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   models: read
+  pull-requests: write
 
 jobs:
   check-template-updates:
@@ -351,12 +357,21 @@ jobs:
           } > "${REPORT_FILE}"
 
           echo "report_file=${REPORT_FILE}" >> "${GITHUB_OUTPUT}"
+          safe_adopt_json="$(printf '%s\n' "${SAFE_ADOPT_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
+          auto_merge_json="$(printf '%s\n' "${AUTO_MERGE_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
           conflict_json="$(printf '%s\n' "${CONFLICT_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
+          echo "safe_adopt_files_json=${safe_adopt_json}" >> "${GITHUB_OUTPUT}"
+          echo "auto_merge_files_json=${auto_merge_json}" >> "${GITHUB_OUTPUT}"
           echo "conflict_files_json=${conflict_json}" >> "${GITHUB_OUTPUT}"
           if [ "${#CONFLICT_FILES[@]}" -gt 0 ]; then
             echo "has_conflicts=true" >> "${GITHUB_OUTPUT}"
           else
             echo "has_conflicts=false" >> "${GITHUB_OUTPUT}"
+          fi
+          if [ $(( ${#SAFE_ADOPT_FILES[@]} + ${#AUTO_MERGE_FILES[@]} )) -gt 0 ]; then
+            echo "has_pr_candidates=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "has_pr_candidates=false" >> "${GITHUB_OUTPUT}"
           fi
 
           cat "${REPORT_FILE}"
@@ -507,6 +522,137 @@ jobs:
 
             fs.appendFileSync(reportFile, appendix)
             core.info(`Appended AI suggestions to ${reportFile}`)
+
+      - name: Prepare sync candidate patch
+        if: steps.compare.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true
+        env:
+          BASELINE_REF: ${{ steps.config.outputs.baseline_ref }}
+          SAFE_ADOPT_FILES_JSON: ${{ steps.compare.outputs.safe_adopt_files_json }}
+          AUTO_MERGE_FILES_JSON: ${{ steps.compare.outputs.auto_merge_files_json }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${BASELINE_REF}" ]; then
+            echo "No baseline_ref configured. Cannot prepare auto-merge candidates."
+            exit 0
+          fi
+
+          python3 - <<'PY'
+          import json
+          import os
+          import pathlib
+          import subprocess
+
+          base_ref = os.environ.get('BASELINE_REF', '').strip()
+          safe_files = json.loads(os.environ.get('SAFE_ADOPT_FILES_JSON', '[]'))
+          auto_files = json.loads(os.environ.get('AUTO_MERGE_FILES_JSON', '[]'))
+
+          root = pathlib.Path.cwd()
+          current_root = root / 'current'
+          template_root = root / 'template'
+
+          def run(cmd, cwd=None, check=True):
+            return subprocess.run(cmd, cwd=cwd, check=check, text=True, capture_output=True)
+
+          def read_base(path):
+            result = run(['git', '-C', str(template_root), 'show', f'{base_ref}:{path}'])
+            return result.stdout
+
+          applied = {'safe': [], 'auto': []}
+
+          for rel in safe_files:
+            src = template_root / rel
+            dst = current_root / rel
+            if not src.exists() or not src.is_file():
+              continue
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_bytes(src.read_bytes())
+            applied['safe'].append(rel)
+
+          for rel in auto_files:
+            local = current_root / rel
+            upstream = template_root / rel
+            if not local.exists() or not upstream.exists():
+              continue
+
+            base_content = read_base(rel)
+            merge_dir = pathlib.Path(subprocess.run(['mktemp', '-d'], check=True, text=True, capture_output=True).stdout.strip())
+            try:
+              base_file = merge_dir / 'base'
+              local_file = merge_dir / 'local'
+              upstream_file = merge_dir / 'upstream'
+              merged_file = merge_dir / 'merged'
+
+              base_file.write_text(base_content, encoding='utf-8')
+              local_file.write_bytes(local.read_bytes())
+              upstream_file.write_bytes(upstream.read_bytes())
+
+              merge = subprocess.run(
+                ['git', 'merge-file', '-p', str(local_file), str(base_file), str(upstream_file)],
+                check=False,
+                text=True,
+                capture_output=True,
+              )
+
+              if merge.returncode != 0:
+                continue
+
+              merged_file.write_text(merge.stdout, encoding='utf-8')
+              local.write_bytes(merged_file.read_bytes())
+              applied['auto'].append(rel)
+            finally:
+              subprocess.run(['rm', '-rf', str(merge_dir)], check=False)
+
+          summary_path = current_root / '.tmp' / 'template-sync-pr-summary.md'
+          summary_path.parent.mkdir(parents=True, exist_ok=True)
+          summary_lines = [
+            '## Automated Template Sync Proposal',
+            '',
+            'This draft PR includes only low-risk categories from check-template-updates:',
+            '',
+            f'- Safe adopt candidates applied: {len(applied["safe"])}',
+            f'- Auto-merge candidates applied: {len(applied["auto"])}',
+            '',
+            '### Applied Files',
+            '',
+          ]
+
+          if applied['safe']:
+            summary_lines.append('#### Safe Adopt')
+            for item in applied['safe']:
+              summary_lines.append(f'- `{item}`')
+            summary_lines.append('')
+
+          if applied['auto']:
+            summary_lines.append('#### Auto-Merge')
+            for item in applied['auto']:
+              summary_lines.append(f'- `{item}`')
+            summary_lines.append('')
+
+          summary_lines.extend([
+            '> [!IMPORTANT]',
+            '> Review all changes before merge. Manual-conflict files are intentionally excluded.',
+            '',
+          ])
+
+          summary_path.write_text('\n'.join(summary_lines), encoding='utf-8')
+          print(f'Wrote summary to {summary_path}')
+          PY
+
+      - name: Create or update draft sync PR
+        if: steps.compare.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true
+        uses: peter-evans/create-pull-request@v7
+        with:
+          path: current
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/template-sync-auto-adopt
+          delete-branch: true
+          title: 'chore(template-sync): apply safe and auto-merge template updates'
+          commit-message: 'chore(template-sync): apply safe and auto-merge template updates'
+          body-path: .tmp/template-sync-pr-summary.md
+          draft: true
+          labels: |
+            template-sync
 
       - name: Ensure template-sync label exists
         if: steps.compare.outputs.has_changes == 'true' && inputs.create_issue != false
