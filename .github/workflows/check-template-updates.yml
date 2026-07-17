@@ -886,7 +886,7 @@ jobs:
             template-sync
 
       - name: Post manual review guidance comment
-        if: needs.check-template-updates.outputs.has_manual_review_items == 'true'
+        if: always() && needs.check-template-updates.outputs.has_manual_review_items == 'true'
         uses: actions/github-script@v9
         env:
           PR_BRANCH: chore/template-sync-auto-adopt
