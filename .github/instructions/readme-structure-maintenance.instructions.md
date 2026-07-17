@@ -3,7 +3,7 @@ description: >
   Formalizes when and how to keep README.md synchronized with repository structure changes.
   README.md must serve as the primary human entrypoint for the repository and accurately reflect
   stable top-level folders and critical root-level workflow files.
-applyTo: '**'
+applyTo: 'README.md,docs/**/README.md,.github/**,scripts/**,src/**,test/**,Makefile,package.json,AGENTS.md'
 ---
 
 # README Structure Maintenance

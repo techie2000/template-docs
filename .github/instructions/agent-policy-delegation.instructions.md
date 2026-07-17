@@ -2,7 +2,7 @@
 description: >
   Enforces a single canonical AI policy source in this repository while allowing
   lightweight discovery stubs and scoped instruction files.
-applyTo: '**'
+applyTo: 'AGENTS.md,.github/copilot-instructions.md,.github/instructions/**/*.instructions.md,CLAUDE.md,CURSOR.md,GEMINI.md'
 ---
 
 # Canonical Agent Policy Delegation
