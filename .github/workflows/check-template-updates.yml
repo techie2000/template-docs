@@ -525,6 +525,7 @@ jobs:
 
       - name: Prepare sync candidate patch
         if: steps.compare.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true
+        id: prepare_sync_patch
         env:
           BASELINE_REF: ${{ steps.config.outputs.baseline_ref }}
           SAFE_ADOPT_FILES_JSON: ${{ steps.compare.outputs.safe_adopt_files_json }}
@@ -639,8 +640,15 @@ jobs:
           print(f'Wrote summary to {summary_path}')
           PY
 
+          if git -C current diff --quiet; then
+            echo "has_sync_patch=false" >> "${GITHUB_OUTPUT}"
+            echo "No file changes produced by sync candidate preparation; skipping draft PR creation."
+          else
+            echo "has_sync_patch=true" >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: Create or update draft sync PR
-        if: steps.compare.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true
+        if: steps.compare.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true && steps.prepare_sync_patch.outputs.has_sync_patch == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           path: current
