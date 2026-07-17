@@ -519,7 +519,9 @@ jobs:
 
                 const localText = fs.existsSync(localPath) ? fs.readFileSync(localPath, 'utf8') : ''
                 const upstreamText = fs.existsSync(upstreamPath) ? fs.readFileSync(upstreamPath, 'utf8') : ''
-                const baseText = cp.execSync(`git -C template show ${baselineRef}:${relPath}`, { encoding: 'utf8' })
+                const baseText = cp.execFileSync('git', ['-C', 'template', 'show', `${baselineRef}:${relPath}`], {
+                  encoding: 'utf8',
+                })
 
                 const prompt = [
                   'You are helping maintain a repository derived from a template.',
@@ -657,7 +659,7 @@ jobs:
               repo: context.repo.repo,
               state: 'open',
               labels: 'template-sync',
-              per_page: 5,
+              per_page: 100,
             })
 
             const openIssue = existing.find(i => !i.pull_request)
