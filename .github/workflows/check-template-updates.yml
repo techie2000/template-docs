@@ -5,12 +5,12 @@ on:
     inputs:
       template_repo:
         description: 'Source template repository (owner/repo)'
-        default: 'techie2000/work-template-docs'
+        default: ''
         required: false
         type: string
       template_ref:
         description: 'Template branch or tag to compare against'
-        default: 'main'
+        default: ''
         required: false
         type: string
       baseline_ref:
@@ -48,14 +48,20 @@ on:
     - cron: '0 9 * * 1'
 
 permissions:
-  contents: write
+  contents: read
   issues: write
   models: read
-  pull-requests: write
 
 jobs:
   check-template-updates:
     runs-on: ubuntu-latest
+    outputs:
+      template_repo: ${{ steps.config.outputs.template_repo }}
+      template_ref: ${{ steps.config.outputs.template_ref }}
+      baseline_ref: ${{ steps.config.outputs.baseline_ref }}
+      has_pr_candidates: ${{ steps.compare.outputs.has_pr_candidates }}
+      safe_adopt_files_json: ${{ steps.compare.outputs.safe_adopt_files_json }}
+      auto_merge_files_json: ${{ steps.compare.outputs.auto_merge_files_json }}
 
     steps:
       - name: Checkout this repository
@@ -75,8 +81,16 @@ jobs:
           INPUT_BASELINE_REF="${{ inputs.baseline_ref || '' }}"
           INPUT_COMPARISON_EXCLUDE_PATHS="${{ inputs.comparison_exclude_paths || '' }}"
 
-          TEMPLATE_REPO="${INPUT_TEMPLATE_REPO:-$DEFAULT_TEMPLATE_REPO}"
-          TEMPLATE_REF="${INPUT_TEMPLATE_REF:-$DEFAULT_TEMPLATE_REF}"
+          TEMPLATE_REPO="${DEFAULT_TEMPLATE_REPO}"
+          TEMPLATE_REF="${DEFAULT_TEMPLATE_REF}"
+
+          if [ -n "${INPUT_TEMPLATE_REPO}" ]; then
+            TEMPLATE_REPO="${INPUT_TEMPLATE_REPO}"
+          fi
+
+          if [ -n "${INPUT_TEMPLATE_REF}" ]; then
+            TEMPLATE_REF="${INPUT_TEMPLATE_REF}"
+          fi
 
           BASELINE_REF=""
           BASELINE_SOURCE="none"
@@ -91,15 +105,29 @@ jobs:
           if [ -f "${METADATA_FILE}" ]; then
             # Parse minimal key/value YAML (single-line scalar values only).
             if [ -z "${BASELINE_REF}" ]; then
-              METADATA_BASELINE_REF="$(sed -nE 's/^baseline_ref:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
+              METADATA_BASELINE_REF="$(sed -nE 's/^[[:space:]]*baseline_ref:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
               if [ -n "${METADATA_BASELINE_REF}" ]; then
                 BASELINE_REF="${METADATA_BASELINE_REF}"
                 BASELINE_SOURCE="metadata_file"
               fi
             fi
 
+            if [ -z "${INPUT_TEMPLATE_REPO}" ]; then
+              METADATA_TEMPLATE_REPO="$(sed -nE 's/^[[:space:]]*template_repo:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
+              if [ -n "${METADATA_TEMPLATE_REPO}" ]; then
+                TEMPLATE_REPO="${METADATA_TEMPLATE_REPO}"
+              fi
+            fi
+
+            if [ -z "${INPUT_TEMPLATE_REF}" ]; then
+              METADATA_TEMPLATE_REF="$(sed -nE 's/^[[:space:]]*template_ref:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
+              if [ -n "${METADATA_TEMPLATE_REF}" ]; then
+                TEMPLATE_REF="${METADATA_TEMPLATE_REF}"
+              fi
+            fi
+
             if [ -z "${COMPARISON_EXCLUDE_PATHS}" ]; then
-              METADATA_EXCLUDE_PATHS="$(sed -nE 's/^comparison_exclude_paths:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
+              METADATA_EXCLUDE_PATHS="$(sed -nE 's/^[[:space:]]*comparison_exclude_paths:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
               if [ -n "${METADATA_EXCLUDE_PATHS}" ]; then
                 COMPARISON_EXCLUDE_PATHS="${METADATA_EXCLUDE_PATHS}"
               fi
@@ -581,13 +609,106 @@ jobs:
             fs.appendFileSync(reportFile, appendix)
             core.info(`Appended AI suggestions to ${reportFile}`)
 
+      - name: Ensure template-sync label exists
+        if: steps.compare.outputs.has_changes == 'true' && inputs.create_issue != false
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const labelDef = {
+              name: 'template-sync',
+              color: '0075ca',
+              description: 'Template drift detected - review upstream changes',
+            }
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: labelDef.name,
+              })
+            } catch (e) {
+              if (e.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ...labelDef,
+                })
+                core.info(`Created label: ${labelDef.name}`)
+              } else {
+                throw e
+              }
+            }
+
+      - name: Create or update tracking issue
+        if: steps.compare.outputs.has_changes == 'true' && inputs.create_issue != false
+        uses: actions/github-script@v9
+        env:
+          REPORT_FILE: ${{ steps.compare.outputs.report_file }}
+        with:
+          script: |
+            const fs = require('fs')
+            const reportFile = process.env.REPORT_FILE
+            const report = fs.readFileSync(reportFile, 'utf8')
+
+            const title = 'chore: template drift detected - review upstream template changes'
+
+            // Find any existing open template-sync tracking issue.
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'template-sync',
+              per_page: 5,
+            })
+
+            const openIssue = existing.find(i => !i.pull_request)
+
+            if (openIssue) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: openIssue.number,
+                body: report,
+              })
+              core.info(`Updated existing issue #${openIssue.number} with new drift report`)
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body: report,
+                labels: ['template-sync'],
+              })
+              core.info(`Created new tracking issue #${created.number}: ${created.html_url}`)
+            }
+
+  create-sync-pr:
+    needs: check-template-updates
+    if: needs.check-template-updates.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          path: current
+
+      - name: Checkout template repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ needs.check-template-updates.outputs.template_repo }}
+          ref: ${{ needs.check-template-updates.outputs.template_ref }}
+          fetch-depth: 0
+          path: template
+
       - name: Prepare sync candidate patch
-        if: steps.compare.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true
         id: prepare_sync_patch
         env:
-          BASELINE_REF: ${{ steps.config.outputs.baseline_ref }}
-          SAFE_ADOPT_FILES_JSON: ${{ steps.compare.outputs.safe_adopt_files_json }}
-          AUTO_MERGE_FILES_JSON: ${{ steps.compare.outputs.auto_merge_files_json }}
+          BASELINE_REF: ${{ needs.check-template-updates.outputs.baseline_ref }}
+          SAFE_ADOPT_FILES_JSON: ${{ needs.check-template-updates.outputs.safe_adopt_files_json }}
+          AUTO_MERGE_FILES_JSON: ${{ needs.check-template-updates.outputs.auto_merge_files_json }}
         run: |
           set -euo pipefail
 
@@ -706,7 +827,7 @@ jobs:
           fi
 
       - name: Create or update draft sync PR
-        if: steps.compare.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true && steps.prepare_sync_patch.outputs.has_sync_patch == 'true'
+        if: steps.prepare_sync_patch.outputs.has_sync_patch == 'true'
         uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
         with:
           path: current
@@ -719,75 +840,3 @@ jobs:
           draft: true
           labels: |
             template-sync
-
-      - name: Ensure template-sync label exists
-        if: steps.compare.outputs.has_changes == 'true' && inputs.create_issue != false
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const labelDef = {
-              name: 'template-sync',
-              color: '0075ca',
-              description: 'Template drift detected - review upstream changes',
-            }
-            try {
-              await github.rest.issues.getLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: labelDef.name,
-              })
-            } catch (e) {
-              if (e.status === 404) {
-                await github.rest.issues.createLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  ...labelDef,
-                })
-                core.info(`Created label: ${labelDef.name}`)
-              } else {
-                throw e
-              }
-            }
-
-      - name: Create or update tracking issue
-        if: steps.compare.outputs.has_changes == 'true' && inputs.create_issue != false
-        uses: actions/github-script@v9
-        env:
-          REPORT_FILE: ${{ steps.compare.outputs.report_file }}
-        with:
-          script: |
-            const fs = require('fs')
-            const reportFile = process.env.REPORT_FILE
-            const report = fs.readFileSync(reportFile, 'utf8')
-
-            const title = 'chore: template drift detected - review upstream template changes'
-
-            // Find any existing open template-sync tracking issue.
-            const { data: existing } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'template-sync',
-              per_page: 5,
-            })
-
-            const openIssue = existing.find(i => !i.pull_request)
-
-            if (openIssue) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: openIssue.number,
-                body: report,
-              })
-              core.info(`Updated existing issue #${openIssue.number} with new drift report`)
-            } else {
-              const { data: created } = await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title,
-                body: report,
-                labels: ['template-sync'],
-              })
-              core.info(`Created new tracking issue #${created.number}: ${created.html_url}`)
-            }

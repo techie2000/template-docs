@@ -255,14 +255,6 @@ resources:
                     description: >-
                       Validates PRs reference a linked issue; prevents
                       Closes/Fixes keywords from targeting PRs instead of issues.
-                  - id: workflow_md_lint
-                    name: markdown-lint-helpers.yml
-                    subtitle: Markdown Lint CI
-                    description: Runs markdownlint on pull requests and pushes.
-                  - id: workflow_ps_lint
-                    name: powershell-lint.yml
-                    subtitle: PowerShell Lint CI
-                    description: Runs PSScriptAnalyzer on all .ps1 files.
                   - id: workflow_check_template_updates
                     name: check-template-updates.yml
                     subtitle: Check Template Updates
@@ -274,6 +266,14 @@ resources:
                       classification, configurable comparison exclusions,
                       optional advisory AI conflict guidance, and optional
                       draft PR creation for safe-update classes.
+                  - id: workflow_md_lint
+                    name: markdown-lint-helpers.yml
+                    subtitle: Markdown Lint CI
+                    description: Runs markdownlint on pull requests and pushes.
+                  - id: workflow_ps_lint
+                    name: powershell-lint.yml
+                    subtitle: PowerShell Lint CI
+                    description: Runs PSScriptAnalyzer on all .ps1 files.
                   - id: workflow_sync_issue_status
                     name: sync-issue-status-from-pr.yml
                     subtitle: Sync Issue Status From PR
@@ -452,18 +452,18 @@ perspectives:
       - from: workflow_check_issue_link
         to: pull_request_template
         label: validates issue linkage from
-      - from: workflow_md_lint
-        to: scripts_lint_docs
-        label: runs via CI
-      - from: workflow_ps_lint
-        to: scripts
-        label: lints .ps1 files
       - from: workflow_check_template_updates
         to: github
         label: compares against template
       - from: workflow_check_template_updates
         to: template_sync_metadata
         label: reads baseline metadata from
+      - from: workflow_md_lint
+        to: scripts_lint_docs
+        label: runs via CI
+      - from: workflow_ps_lint
+        to: scripts
+        label: lints .ps1 files
       - from: workflow_sync_issue_status
         to: workflow_check_issue_link
         label: complements
