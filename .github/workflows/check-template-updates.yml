@@ -686,6 +686,9 @@ jobs:
               core.info(`Created new tracking issue #${created.number}: ${created.html_url}`)
             }
 
+  # PREREQUISITE: Repository must have "Allow GitHub Actions to create and approve pull requests"
+  # enabled in Settings > Actions > General > Workflow permissions, or this job will fail to create PRs.
+  # This setting cannot be automated; it must be enabled manually in each derived repository.
   create-sync-pr:
     needs: check-template-updates
     if: needs.check-template-updates.outputs.has_pr_candidates == 'true' && inputs.create_sync_pr == true

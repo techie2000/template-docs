@@ -1,5 +1,11 @@
 # Template sync metadata for baseline-aware drift analysis.
 #
+# PREREQUISITE for automated PR creation:
+# Ensure your derived repository has enabled:
+#   Settings > Actions > General > Workflow permissions >
+#   "Allow GitHub Actions to create and approve pull requests"
+# (This setting cannot be enabled programmatically; manual setup required.)
+#
 # baseline_ref should be set in each derived repository to the template commit
 # used to create (or last re-baseline) that repository.
 #
