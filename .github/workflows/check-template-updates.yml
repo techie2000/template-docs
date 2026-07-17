@@ -60,9 +60,12 @@ jobs:
       template_ref: ${{ steps.config.outputs.template_ref }}
       baseline_ref: ${{ steps.config.outputs.baseline_ref }}
       has_pr_candidates: ${{ steps.compare.outputs.has_pr_candidates }}
+      has_manual_review_items: ${{ steps.compare.outputs.has_manual_review_items }}
       new_files_json: ${{ steps.compare.outputs.new_files_json }}
       safe_adopt_files_json: ${{ steps.compare.outputs.safe_adopt_files_json }}
       auto_merge_files_json: ${{ steps.compare.outputs.auto_merge_files_json }}
+      conflict_files_json: ${{ steps.compare.outputs.conflict_files_json }}
+      baseline_gap_files_json: ${{ steps.compare.outputs.baseline_gap_files_json }}
 
     steps:
       - name: Checkout this repository
@@ -451,14 +454,21 @@ jobs:
           safe_adopt_json="$(printf '%s\n' "${SAFE_ADOPT_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
           auto_merge_json="$(printf '%s\n' "${AUTO_MERGE_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
           conflict_json="$(printf '%s\n' "${CONFLICT_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
+          baseline_gap_json="$(printf '%s\n' "${NEEDS_REBASELINE_FILES[@]}" | python3 -c 'import json,sys; print(json.dumps([line.strip() for line in sys.stdin if line.strip()]))')"
           echo "new_files_json=${new_files_json}" >> "${GITHUB_OUTPUT}"
           echo "safe_adopt_files_json=${safe_adopt_json}" >> "${GITHUB_OUTPUT}"
           echo "auto_merge_files_json=${auto_merge_json}" >> "${GITHUB_OUTPUT}"
           echo "conflict_files_json=${conflict_json}" >> "${GITHUB_OUTPUT}"
+          echo "baseline_gap_files_json=${baseline_gap_json}" >> "${GITHUB_OUTPUT}"
           if [ "${#CONFLICT_FILES[@]}" -gt 0 ]; then
             echo "has_conflicts=true" >> "${GITHUB_OUTPUT}"
           else
             echo "has_conflicts=false" >> "${GITHUB_OUTPUT}"
+          fi
+          if [ $(( ${#CONFLICT_FILES[@]} + ${#NEEDS_REBASELINE_FILES[@]} )) -gt 0 ]; then
+            echo "has_manual_review_items=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "has_manual_review_items=false" >> "${GITHUB_OUTPUT}"
           fi
           if [ $(( ${#NEW_FILES[@]} + ${#SAFE_ADOPT_FILES[@]} + ${#AUTO_MERGE_FILES[@]} )) -gt 0 ]; then
             echo "has_pr_candidates=true" >> "${GITHUB_OUTPUT}"
@@ -698,6 +708,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
       pull-requests: write
 
     steps:
@@ -859,6 +870,7 @@ jobs:
           fi
 
       - name: Create or update draft sync PR
+        id: create_sync_pr
         if: steps.prepare_sync_patch.outputs.has_sync_patch == 'true'
         uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
         with:
@@ -872,3 +884,91 @@ jobs:
           draft: true
           labels: |
             template-sync
+
+      - name: Post manual review guidance comment
+        if: needs.check-template-updates.outputs.has_manual_review_items == 'true'
+        uses: actions/github-script@v9
+        env:
+          PR_BRANCH: chore/template-sync-auto-adopt
+          CONFLICT_FILES_JSON: ${{ needs.check-template-updates.outputs.conflict_files_json }}
+          BASELINE_GAP_FILES_JSON: ${{ needs.check-template-updates.outputs.baseline_gap_files_json }}
+        with:
+          script: |
+            const marker = '<!-- template-sync-manual-review -->'
+            const conflictFiles = JSON.parse(process.env.CONFLICT_FILES_JSON || '[]')
+            const baselineGapFiles = JSON.parse(process.env.BASELINE_GAP_FILES_JSON || '[]')
+            const branch = process.env.PR_BRANCH
+
+            if (!conflictFiles.length && !baselineGapFiles.length) {
+              core.info('No manual review items to post.')
+              return
+            }
+
+            const { data: pulls } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${context.repo.owner}:${branch}`,
+              per_page: 1,
+            })
+
+            if (!pulls.length) {
+              core.warning(`No open PR found for branch ${branch}; skipping manual review comment.`)
+              return
+            }
+
+            const pr = pulls[0]
+            const lines = [
+              marker,
+              '## Template Sync Manual Review Items',
+              '',
+              'These files are intentionally excluded from auto-adopt and require human review.',
+              '',
+            ]
+
+            if (conflictFiles.length) {
+              lines.push('### Manual Review Conflicts')
+              lines.push('')
+              for (const file of conflictFiles) {
+                lines.push(`- \`${file}\``)
+              }
+              lines.push('')
+            }
+
+            if (baselineGapFiles.length) {
+              lines.push('### Baseline Gap (Needs Rebaseline)')
+              lines.push('')
+              for (const file of baselineGapFiles) {
+                lines.push(`- \`${file}\``)
+              }
+              lines.push('')
+            }
+
+            lines.push('Action: review these paths before merge and decide whether to follow up in this PR or a separate PR.')
+            const body = lines.join('\n')
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              per_page: 100,
+            })
+
+            const existing = comments.find(comment => comment.body && comment.body.includes(marker))
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              })
+              core.info(`Updated existing manual review comment on PR #${pr.number}`)
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body,
+              })
+              core.info(`Posted manual review comment on PR #${pr.number}`)
+            }
