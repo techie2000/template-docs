@@ -234,7 +234,7 @@ jobs:
           read_template_object_to_file() {
             local rel="$1"
             local target="$2"
-            git -C "${TEMPLATE_DIR}" show "${BASELINE_REF}:${rel}" > "${target}"
+            git -C "${TEMPLATE_DIR}" show -- "${BASELINE_REF}:${rel}" > "${target}"
           }
 
           classify_with_baseline() {
@@ -525,7 +525,7 @@ jobs:
 
                 const localText = fs.existsSync(localPath) ? fs.readFileSync(localPath, 'utf8') : ''
                 const upstreamText = fs.existsSync(upstreamPath) ? fs.readFileSync(upstreamPath, 'utf8') : ''
-                const baseText = cp.execFileSync('git', ['-C', 'template', 'show', `${baselineRef}:${relPath}`], {
+                const baseText = cp.execFileSync('git', ['-C', 'template', 'show', '--', `${baselineRef}:${relPath}`], {
                   encoding: 'utf8',
                 })
 
@@ -751,7 +751,7 @@ jobs:
             return subprocess.run(cmd, cwd=cwd, check=check, text=True, capture_output=True)
 
           def read_base(path):
-            result = run(['git', '-C', str(template_root), 'show', f'{base_ref}:{path}'])
+            result = run(['git', '-C', str(template_root), 'show', '--', f'{base_ref}:{path}'])
             return result.stdout
 
           applied = {'new': [], 'safe': [], 'auto': []}
