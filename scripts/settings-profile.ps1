@@ -35,7 +35,7 @@ function ConvertTo-SortedJsonNode {
         foreach ($item in $Node) {
             $items += ,(ConvertTo-SortedJsonNode -Node $item)
         }
-        return ,$items
+        return $items
     }
 
     return $Node
