@@ -220,6 +220,12 @@ resources:
                 name: pull_request_template.md
                 subtitle: PR Template
                 description: Standard pull request template with summary and validation checklist.
+              - id: template_sync_metadata
+                name: template-sync.yml
+                subtitle: Template Sync Baseline Metadata
+                description: >-
+                  Stores template source and baseline_ref used by
+                  check-template-updates for 3-way drift classification.
               - id: workflows
                 name: workflows/
                 subtitle: GitHub Actions
@@ -452,6 +458,9 @@ perspectives:
       - from: workflow_check_template_updates
         to: github
         label: compares against template
+      - from: workflow_check_template_updates
+        to: template_sync_metadata
+        label: reads baseline metadata from
       - from: workflow_sync_issue_status
         to: workflow_check_issue_link
         label: complements
