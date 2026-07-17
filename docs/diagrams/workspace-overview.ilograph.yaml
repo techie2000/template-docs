@@ -271,8 +271,9 @@ resources:
                       infrastructure paths against the upstream template and
                       creates or updates a template-sync tracking issue when
                       differences are found. Supports baseline-aware 3-way
-                      classification, optional advisory AI conflict guidance,
-                      and optional draft PR creation for safe-update classes.
+                      classification, configurable comparison exclusions,
+                      optional advisory AI conflict guidance, and optional
+                      draft PR creation for safe-update classes.
                   - id: workflow_sync_issue_status
                     name: sync-issue-status-from-pr.yml
                     subtitle: Sync Issue Status From PR

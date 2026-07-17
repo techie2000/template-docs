@@ -12,6 +12,8 @@ and operational references for the software or service being documented.
 | [docs/](docs/) | Documentation index for the docs area and subfolders |
 | [docs/internal/](docs/internal/) | Internal notes, ADRs, runbooks, and operational references |
 | [docs/vendor/](docs/vendor/) | Vendor documentation and third-party references |
+| [.gitattributes](.gitattributes) | Git attributes that should stay aligned with template defaults |
+| [.gitignore](.gitignore) | Repository ignore rules that affect generated-template parity |
 | [images/](images/) | Supporting screenshots and diagrams |
 | [logs/](logs/) | Tracked log guidance and anchor files; generated runtime logs remain ignored |
 | [scripts/](scripts/) | Helper scripts for bootstrap, linting, hook installation, and workspace normalization |
@@ -92,10 +94,35 @@ repository:
 template_repo: "techie2000/work-template-docs"
 template_ref: "main"
 baseline_ref: "<template_commit_sha_used_for_generation_or_rebaseline>"
+comparison_exclude_paths: ".vscode,docs/internal"
 ```
 
 Without `baseline_ref`, the workflow falls back to snapshot mode and cannot
 separate intentional local divergence from template evolution.
+
+Use `comparison_exclude_paths` when a derived repository intentionally owns a
+path differently enough that template updates would only add noise. The value is
+a comma-separated list of repo-relative files or folder prefixes.
+
+The default comparison scope includes these repo-local template surfaces:
+
+- `.gitattributes`
+- `.gitignore`
+- `.github/copilot-instructions.md`
+- `.github/dependabot.yml`
+- `.github/instructions/`
+- `.github/ISSUE_TEMPLATE/`
+- `.github/pull_request_template.md`
+- `.github/workflows/`
+- `.githooks/`
+- `.markdownlint-cli2.yaml`
+- `.markdownlint.yaml`
+- `.markdownlintignore`
+- `.vscode/`
+- `AGENTS.md`
+- `Makefile`
+- `docs/internal/`
+- `scripts/`
 
 ### Trigger options
 

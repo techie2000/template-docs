@@ -18,6 +18,11 @@ on:
         default: ''
         required: false
         type: string
+      comparison_exclude_paths:
+        description: 'Comma-separated repo-relative files/folders to skip in comparison'
+        default: ''
+        required: false
+        type: string
       generate_ai_suggestions:
         description: 'Attempt AI suggestions for manual-conflict files (advisory only)'
         default: false
@@ -68,23 +73,36 @@ jobs:
           INPUT_TEMPLATE_REPO="${{ inputs.template_repo || '' }}"
           INPUT_TEMPLATE_REF="${{ inputs.template_ref || '' }}"
           INPUT_BASELINE_REF="${{ inputs.baseline_ref || '' }}"
+          INPUT_COMPARISON_EXCLUDE_PATHS="${{ inputs.comparison_exclude_paths || '' }}"
 
           TEMPLATE_REPO="${INPUT_TEMPLATE_REPO:-$DEFAULT_TEMPLATE_REPO}"
           TEMPLATE_REF="${INPUT_TEMPLATE_REF:-$DEFAULT_TEMPLATE_REF}"
 
           BASELINE_REF=""
           BASELINE_SOURCE="none"
+          COMPARISON_EXCLUDE_PATHS="${INPUT_COMPARISON_EXCLUDE_PATHS}"
           METADATA_FILE="current/.github/template-sync.yml"
 
           if [ -n "${INPUT_BASELINE_REF}" ]; then
             BASELINE_REF="${INPUT_BASELINE_REF}"
             BASELINE_SOURCE="workflow_input"
-          elif [ -f "${METADATA_FILE}" ]; then
+          fi
+
+          if [ -f "${METADATA_FILE}" ]; then
             # Parse minimal key/value YAML (single-line scalar values only).
-            METADATA_BASELINE_REF="$(sed -nE 's/^baseline_ref:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
-            if [ -n "${METADATA_BASELINE_REF}" ]; then
-              BASELINE_REF="${METADATA_BASELINE_REF}"
-              BASELINE_SOURCE="metadata_file"
+            if [ -z "${BASELINE_REF}" ]; then
+              METADATA_BASELINE_REF="$(sed -nE 's/^baseline_ref:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
+              if [ -n "${METADATA_BASELINE_REF}" ]; then
+                BASELINE_REF="${METADATA_BASELINE_REF}"
+                BASELINE_SOURCE="metadata_file"
+              fi
+            fi
+
+            if [ -z "${COMPARISON_EXCLUDE_PATHS}" ]; then
+              METADATA_EXCLUDE_PATHS="$(sed -nE 's/^comparison_exclude_paths:[[:space:]]*"?([^"#]+)"?.*$/\1/p' "${METADATA_FILE}" | head -n 1 | xargs || true)"
+              if [ -n "${METADATA_EXCLUDE_PATHS}" ]; then
+                COMPARISON_EXCLUDE_PATHS="${METADATA_EXCLUDE_PATHS}"
+              fi
             fi
           fi
 
@@ -93,6 +111,7 @@ jobs:
             echo "template_ref=${TEMPLATE_REF}"
             echo "baseline_ref=${BASELINE_REF}"
             echo "baseline_source=${BASELINE_SOURCE}"
+            echo "comparison_exclude_paths=${COMPARISON_EXCLUDE_PATHS}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Checkout template repository
@@ -115,10 +134,11 @@ jobs:
           TEMPLATE_REF="${{ steps.config.outputs.template_ref }}"
           BASELINE_REF="${{ steps.config.outputs.baseline_ref }}"
           BASELINE_SOURCE="${{ steps.config.outputs.baseline_source }}"
+          COMPARISON_EXCLUDE_PATHS="${{ steps.config.outputs.comparison_exclude_paths }}"
 
           # Infrastructure paths that consuming repos should keep in sync with
-          # the template. Content paths (docs/, README.md, package.json, etc.)
-          # are intentionally excluded - they are customized per project.
+          # the template. Content paths such as docs/, README.md, package.json,
+          # and product-specific files remain intentionally excluded.
           SYNC_PATHS=(
             ".github/copilot-instructions.md"
             ".github/dependabot.yml"
@@ -127,10 +147,15 @@ jobs:
             ".github/pull_request_template.md"
             ".github/workflows"
             ".githooks"
+            ".gitignore"
+            ".gitattributes"
             ".markdownlint-cli2.yaml"
             ".markdownlint.yaml"
+            ".markdownlintignore"
             "AGENTS.md"
             "Makefile"
+            ".vscode"
+            "docs/internal"
             "scripts"
           )
 
@@ -141,6 +166,33 @@ jobs:
           CONFLICT_FILES=()
           LOCAL_DIVERGENCE_FILES=()
           NEEDS_REBASELINE_FILES=()
+
+          is_excluded_path() {
+            local rel="$1"
+            local exclude_list="$2"
+            local normalized_rel="$rel"
+
+            normalized_rel="${normalized_rel#/}"
+
+            IFS=',' read -r -a EXCLUDED_PATHS <<< "${exclude_list}"
+            for exclude_path in "${EXCLUDED_PATHS[@]}"; do
+              exclude_path="$(printf '%s' "${exclude_path}" | xargs || true)"
+              exclude_path="${exclude_path#/}"
+              exclude_path="${exclude_path%/}"
+
+              if [ -z "${exclude_path}" ]; then
+                continue
+              fi
+
+              case "${normalized_rel}" in
+                "${exclude_path}"|"${exclude_path}"/*)
+                  return 0
+                  ;;
+              esac
+            done
+
+            return 1
+          }
 
           has_template_object_ref() {
             local rel="$1"
@@ -212,6 +264,9 @@ jobs:
             if [ -d "${template_target}" ]; then
               while IFS= read -r -d '' template_file; do
                 relative="${template_file#${TEMPLATE_DIR}/}"
+                if is_excluded_path "${relative}" "${COMPARISON_EXCLUDE_PATHS}"; then
+                  continue
+                fi
                 current_file="${CURRENT_DIR}/${relative}"
                 if [ ! -f "${current_file}" ]; then
                   NEW_FILES+=("${relative}")
@@ -221,6 +276,9 @@ jobs:
               done < <(find "${template_target}" -type f -print0 | sort -z)
             elif [ -f "${template_target}" ]; then
               current_file="${CURRENT_DIR}/${sync_path}"
+              if is_excluded_path "${sync_path}" "${COMPARISON_EXCLUDE_PATHS}"; then
+                continue
+              fi
               if [ ! -f "${current_file}" ]; then
                 NEW_FILES+=("${sync_path}")
               elif ! diff -q "${current_file}" "${template_target}" > /dev/null 2>&1; then

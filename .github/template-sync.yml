@@ -7,6 +7,9 @@
 #   baseline_ref: "a1b2c3d4e5f6..."
 #
 # If baseline_ref is blank, check-template-updates falls back to snapshot mode.
+# comparison_exclude_paths should be a comma-separated list of repo-relative
+# files/folders to skip (for example: ".vscode,docs/internal").
 template_repo: "techie2000/work-template-docs"
 template_ref: "main"
 baseline_ref: ""
+comparison_exclude_paths: ""
