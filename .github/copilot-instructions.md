@@ -105,6 +105,9 @@ This instruction file also defines a required PR/issue body encoding guard: use
 `.tmp/` body files for multiline content and verify posted content to avoid
 escaping or encoding corruption.
 
+When resolving Copilot PR conversation threads, do not automatically re-request
+Copilot review after fixes unless the user explicitly asks.
+
 ### PR Template Usage (REQUIRED)
 
 When creating a new pull request, always base the PR description on

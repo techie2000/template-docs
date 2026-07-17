@@ -58,6 +58,8 @@ next action.
 - Before posting or editing in-thread replies, sanitize body text to printable characters
   (plus normal newline/tab) and remove control characters such as form feed (`\f`).
   If a bad character is discovered after posting, patch the comment body immediately.
+- Do not automatically request a new Copilot review after resolving Copilot thread
+  feedback. Only request re-review when explicitly asked by the user.
 
 ## PR/Issue Body Encoding Guard (Required)
 
