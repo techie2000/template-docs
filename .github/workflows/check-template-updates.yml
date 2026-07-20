@@ -66,7 +66,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: current
 
@@ -144,7 +144,7 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Checkout template repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         env:
           TEMPLATE_SYNC_TOKEN: ${{ secrets.TEMPLATE_SYNC_TOKEN }}
         with:
@@ -702,12 +702,12 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: current
 
       - name: Checkout template repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         env:
           TEMPLATE_SYNC_TOKEN: ${{ secrets.TEMPLATE_SYNC_TOKEN }}
         with:
