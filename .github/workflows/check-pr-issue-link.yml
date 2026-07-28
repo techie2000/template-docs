@@ -12,13 +12,12 @@ on:
       - unlabeled
 
 permissions:
-  actions: read
   contents: read
   issues: write
   pull-requests: read
 
 env:
-  ISSUE_LINK_ENFORCEMENT_MODE: advisory
+  ISSUE_LINK_ENFORCEMENT_MODE: ${{ vars.ISSUE_LINK_ENFORCEMENT_MODE || 'advisory' }}
 
 jobs:
   check-issue-link:
@@ -43,26 +42,7 @@ jobs:
               return
             }
 
-            let enforcementMode = (process.env.ISSUE_LINK_ENFORCEMENT_MODE || 'advisory').toLowerCase()
-            try {
-              const { data: variable } = await github.request(
-                'GET /repos/{owner}/{repo}/actions/variables/{name}',
-                {
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: 'ISSUE_LINK_ENFORCEMENT_MODE',
-                }
-              )
-
-              const configuredMode = String(variable?.value || '').trim().toLowerCase()
-              if (configuredMode === 'required' || configuredMode === 'advisory') {
-                enforcementMode = configuredMode
-              }
-            } catch (error) {
-              if (error?.status !== 404) {
-                core.warning(`Unable to read ISSUE_LINK_ENFORCEMENT_MODE variable; using '${enforcementMode}'.`)
-              }
-            }
+            const enforcementMode = (process.env.ISSUE_LINK_ENFORCEMENT_MODE || 'advisory').toLowerCase()
 
             // Bot-authored PRs are exempt.
             if (actor.endsWith('[bot]') || actor === 'dependabot') {
