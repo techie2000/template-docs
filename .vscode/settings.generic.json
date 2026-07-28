@@ -39,6 +39,11 @@
     "shellscript": false,
     "yaml": true
   },
+  "cSpell.ignorePaths": [
+    "**/backups/**",
+    "**/worktrees/**",
+    "**/node_modules/**"
+  ],
   "cSpell.ignoreRegExpList": [],
   "cSpell.language": "en,en-GB",
   "files.exclude": {
