@@ -45,6 +45,8 @@
     "**/backups/**": true,
     "**/worktrees/**": true
   },
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
   "files.watcherExclude": {
     "**/backups/**": true,
     "**/worktrees/**": true
