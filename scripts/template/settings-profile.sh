@@ -7,4 +7,4 @@ if ! command -v pwsh >/dev/null 2>&1; then
 fi
 
 # Delegate to the canonical profile implementation.
-pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/settings-profile.ps1 "$@"
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/template/settings-profile.ps1 "$@"

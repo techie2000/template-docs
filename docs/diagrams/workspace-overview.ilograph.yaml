@@ -55,48 +55,63 @@ resources:
 
       - id: scripts
         name: scripts/
-        subtitle: Utility Scripts
+        subtitle: Scripts Root
         color: "#F0AD4E"
         description: >
-          Utility scripts invoked by Makefile targets and Git hooks.
-          Each script has both a Bash (.sh) and PowerShell (.ps1) counterpart.
+          Root scripts directory. Template-provided tooling lives in scripts/template/.
+          Repo-specific scripts should be added in purpose-named subfolders
+          (e.g. scripts/runtime/).
         children:
           - id: scripts_readme
             name: scripts/README.md
             subtitle: Scripts Index
-            description: Script usage and conventions for contributors.
-          - id: scripts_bootstrap
-            name: bootstrap-package-name
-            subtitle: Package Bootstrap
             description: >
-              Updates package.json name and description from template defaults
-              to repository-derived values.
-          - id: scripts_install_hooks
-            name: install-hooks
-            subtitle: Hook Installer
-            description: Configures Git to use .githooks/ as the hooks directory.
-          - id: scripts_lint_docs
-            name: lint-docs
-            subtitle: Docs Linter
-            description: Runs markdownlint-cli2 against all markdown files.
-          - id: scripts_settings_sort
-            name: settings-sort
-            subtitle: Settings Sorter
+              Landing page describing the scripts/ layout and guidance for
+              adding repo-specific scripts in subfolders.
+          - id: scripts_template
+            name: scripts/template/
+            subtitle: Template Tooling
             description: >
-              Delegates to sort-vscode-settings and sort-vscode-extensions
-              to normalize VS Code workspace files.
-          - id: scripts_sort_extensions
-            name: sort-vscode-extensions
-            subtitle: Extensions Sorter
-            description: Alphabetically sorts .vscode/extensions.json recommendations.
-          - id: scripts_sort_settings
-            name: sort-vscode-settings
-            subtitle: Settings Sorter (Canonical)
-            description: Alphabetically sorts keys in .vscode/settings.json.
-          - id: scripts_sort_word_list
-            name: sort-word-list
-            subtitle: Word List Sorter
-            description: Sorts the cSpell custom word list in .vscode/.
+              Template-provided utility scripts invoked by Makefile targets and
+              Git hooks. Each script has both a Bash (.sh) and PowerShell (.ps1)
+              counterpart.
+            children:
+              - id: scripts_template_readme
+                name: scripts/template/README.md
+                subtitle: Template Scripts Index
+                description: Script usage and conventions for template contributors.
+              - id: scripts_bootstrap
+                name: bootstrap-package-name
+                subtitle: Package Bootstrap
+                description: >
+                  Updates package.json name and description from template defaults
+                  to repository-derived values.
+              - id: scripts_install_hooks
+                name: install-hooks
+                subtitle: Hook Installer
+                description: Configures Git to use .githooks/ as the hooks directory.
+              - id: scripts_lint_docs
+                name: lint-docs
+                subtitle: Docs Linter
+                description: Runs markdownlint-cli2 against all markdown files.
+              - id: scripts_settings_sort
+                name: settings-sort
+                subtitle: Settings Sorter
+                description: >
+                  Delegates to sort-vscode-settings and sort-vscode-extensions
+                  to normalize VS Code workspace files.
+              - id: scripts_sort_extensions
+                name: sort-vscode-extensions
+                subtitle: Extensions Sorter
+                description: Alphabetically sorts .vscode/extensions.json recommendations.
+              - id: scripts_sort_settings
+                name: sort-vscode-settings
+                subtitle: Settings Sorter (Canonical)
+                description: Alphabetically sorts keys in .vscode/settings.json.
+              - id: scripts_sort_word_list
+                name: sort-word-list
+                subtitle: Word List Sorter
+                description: Sorts the cSpell custom word list in .vscode/.
 
       - id: logs
         name: logs/
@@ -215,7 +230,7 @@ resources:
                     subtitle: Shell Parity Rules
                     description: >
                       Requires Bash and PowerShell counterparts for every script
-                      in scripts/ unless explicitly documented as platform-specific.
+                      in scripts/template/ unless explicitly documented as platform-specific.
               - id: pull_request_template
                 name: pull_request_template.md
                 subtitle: PR Template
@@ -380,6 +395,9 @@ perspectives:
       - from: scripts
         to: scripts_readme
         label: documents
+      - from: scripts
+        to: scripts_template
+        label: contains
       - from: config
         to: agents_md
         label: defines
@@ -462,7 +480,7 @@ perspectives:
         to: scripts_lint_docs
         label: runs via CI
       - from: workflow_ps_lint
-        to: scripts
+        to: scripts_template
         label: lints .ps1 files
       - from: workflow_sync_issue_status
         to: workflow_check_issue_link

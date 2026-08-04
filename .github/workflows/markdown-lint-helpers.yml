@@ -10,10 +10,10 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'Makefile'
-      - 'scripts/lint-docs.ps1'
-      - 'scripts/lint-docs.sh'
-      - 'scripts/bootstrap-package-name.ps1'
-      - 'scripts/bootstrap-package-name.sh'
+      - 'scripts/template/lint-docs.ps1'
+      - 'scripts/template/lint-docs.sh'
+      - 'scripts/template/bootstrap-package-name.ps1'
+      - 'scripts/template/bootstrap-package-name.sh'
       - '.github/workflows/markdown-lint-helpers.yml'
   push:
     branches:
@@ -26,10 +26,10 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'Makefile'
-      - 'scripts/lint-docs.ps1'
-      - 'scripts/lint-docs.sh'
-      - 'scripts/bootstrap-package-name.ps1'
-      - 'scripts/bootstrap-package-name.sh'
+      - 'scripts/template/lint-docs.ps1'
+      - 'scripts/template/lint-docs.sh'
+      - 'scripts/template/bootstrap-package-name.ps1'
+      - 'scripts/template/bootstrap-package-name.sh'
       - '.github/workflows/markdown-lint-helpers.yml'
 
 permissions:
@@ -53,8 +53,8 @@ jobs:
         run: npm ci
 
       - name: Validate Bash markdown lint helper
-        run: bash ./scripts/lint-docs.sh
+        run: bash ./scripts/template/lint-docs.sh
 
       - name: Validate PowerShell markdown lint helper
         shell: pwsh
-        run: pwsh ./scripts/lint-docs.ps1
+        run: pwsh ./scripts/template/lint-docs.ps1

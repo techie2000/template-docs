@@ -16,7 +16,7 @@ and operational references for the software or service being documented.
 | [.gitignore](.gitignore) | Repository ignore rules that affect generated-template parity |
 | [images/](images/) | Supporting screenshots and diagrams |
 | [logs/](logs/) | Tracked log guidance and anchor files; generated runtime logs remain ignored |
-| [scripts/](scripts/) | Helper scripts for bootstrap, linting, hook installation, and workspace normalization |
+| [scripts/](scripts/) | Scripts directory; `scripts/template/` holds template-provided tooling; add repo-specific scripts in purpose-named subfolders (e.g. `scripts/runtime/`) |
 | [src/](src/) | Placeholder for application or service source code |
 | [test/](test/) | Placeholder for automated tests covering `src/` |
 
@@ -245,7 +245,7 @@ When adding or editing PowerShell in repositories created from this template:
  for new or edited PowerShell code.
 - Review `.github/instructions/powershell-approved-verbs.instructions.md`
  for the repository instruction used by Copilot.
-- The repository includes `scripts/PSScriptAnalyzerSettings.psd1` and
+- The repository includes `scripts/template/PSScriptAnalyzerSettings.psd1` and
  `.github/workflows/powershell-lint.yml` to validate PowerShell scripts in
  GitHub Actions.
 
@@ -259,5 +259,5 @@ When adding or editing PowerShell in repositories created from this template:
    [.vscode/](.vscode/) and add any extra domain terms it cannot infer.
 6. If you add additional word lists, register each under `cSpell.customDictionaries` in [.vscode/settings.json](.vscode/settings.json).
 7. If you add PowerShell automation, keep
- `scripts/PSScriptAnalyzerSettings.psd1` aligned with your linting policy and
+ `scripts/template/PSScriptAnalyzerSettings.psd1` aligned with your linting policy and
  ensure the GitHub Actions workflow still covers your PowerShell files.

@@ -78,7 +78,7 @@ foreach ($path in $existing) {
 }
 
 if ($CheckOnly -and $changedPaths.Count -gt 0) {
-    Write-Error "Word lists are not sorted. Run: pwsh ./scripts/sort-word-list.ps1"
+    Write-Error "Word lists are not sorted. Run: pwsh ./scripts/template/sort-word-list.ps1"
     exit 1
 }
 

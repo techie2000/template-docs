@@ -5,7 +5,7 @@ on:
     paths:
       - '**/*.ps1'
       - '**/*.psm1'
-      - 'scripts/PSScriptAnalyzerSettings.psd1'
+      - 'scripts/template/PSScriptAnalyzerSettings.psd1'
       - '.github/workflows/powershell-lint.yml'
   push:
     branches:
@@ -13,7 +13,7 @@ on:
     paths:
       - '**/*.ps1'
       - '**/*.psm1'
-      - 'scripts/PSScriptAnalyzerSettings.psd1'
+      - 'scripts/template/PSScriptAnalyzerSettings.psd1'
       - '.github/workflows/powershell-lint.yml'
 
 permissions:
@@ -36,7 +36,7 @@ jobs:
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
-          $settingsPath = Join-Path $PWD 'scripts/PSScriptAnalyzerSettings.psd1'
+          $settingsPath = Join-Path $PWD 'scripts/template/PSScriptAnalyzerSettings.psd1'
           $issues = Invoke-ScriptAnalyzer -Path '.' -Recurse -Settings $settingsPath
 
           if (-not $issues) {

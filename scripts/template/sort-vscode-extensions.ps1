@@ -65,7 +65,7 @@ if ($normalizedOriginal -ceq $formatted) {
 }
 
 if ($CheckOnly) {
-    Write-Error "extensions.json is not sorted. Run: pwsh ./scripts/sort-vscode-extensions.ps1"
+    Write-Error "extensions.json is not sorted. Run: pwsh ./scripts/template/sort-vscode-extensions.ps1"
     exit 1
 }
 

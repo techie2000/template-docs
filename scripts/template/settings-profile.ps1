@@ -7,7 +7,7 @@ param(
     [string]$SettingsPath = ".vscode/settings.json",
     [string]$GenericSettingsPath = ".vscode/settings.generic.json",
     [string]$OpinionatedSettingsPath = ".vscode/settings.opinionated.json",
-    [string]$PolicyPath = "scripts/settings-policy.json",
+    [string]$PolicyPath = "scripts/template/settings-policy.json",
     [ValidateSet("error", "generic", "opinionated")]
     [string]$UnknownKeyScope = "error"
 )
@@ -225,7 +225,7 @@ switch ($Action) {
             exit 0
         }
 
-        Write-Error "${SettingsPath} does not match the generated '$SettingsProfile' profile. Run: pwsh ./scripts/settings-profile.ps1 -Action apply -Profile $SettingsProfile"
+        Write-Error "${SettingsPath} does not match the generated '$SettingsProfile' profile. Run: pwsh ./scripts/template/settings-profile.ps1 -Action apply -Profile $SettingsProfile"
         exit 1
     }
     "distribute" {
