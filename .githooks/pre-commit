@@ -5,7 +5,7 @@
 if [ -f ".vscode/settings.json" ] || [ -f ".vscode/settings.generic.json" ] || [ -f ".vscode/settings.opinionated.json" ] || [ -f ".vscode/extensions.json" ] || ls .vscode/*-words.txt >/dev/null 2>&1; then
     if command -v pwsh > /dev/null 2>&1; then
         echo "Sorting VS Code workspace files..."
-        if ! pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/settings-sort.ps1; then
+        if ! pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/template/settings-sort.ps1; then
             echo "Failed to sort VS Code workspace files"
             exit 1
         fi
@@ -26,9 +26,9 @@ if [ -f ".vscode/settings.json" ] || [ -f ".vscode/settings.generic.json" ] || [
                 ;;
         esac
         echo "Checking VS Code settings profile: $settings_profile"
-        if ! pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/settings-profile.ps1 -Action check -Profile "$settings_profile"; then
+        if ! pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/template/settings-profile.ps1 -Action check -Profile "$settings_profile"; then
             echo "settings.json does not match profile '$settings_profile'"
-            echo "Run: pwsh ./scripts/settings-profile.ps1 -Action apply -Profile $settings_profile"
+            echo "Run: pwsh ./scripts/template/settings-profile.ps1 -Action apply -Profile $settings_profile"
             exit 1
         fi
     else
@@ -88,11 +88,11 @@ fi
 echo "Linting PowerShell files:"
 echo "$STAGED_PS_FILES"
 
-if echo "$STAGED_PS_FILES" | xargs -I {} pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-powershell.ps1 -Files {} >/dev/null 2>&1; then
+if echo "$STAGED_PS_FILES" | xargs -I {} pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/template/lint-powershell.ps1 -Files {} >/dev/null 2>&1; then
     true  # All files passed
 else
     # Re-run with output for error display
-    echo "$STAGED_PS_FILES" | xargs -I {} pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/lint-powershell.ps1 -Files {}
+    echo "$STAGED_PS_FILES" | xargs -I {} pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/template/lint-powershell.ps1 -Files {}
     echo ""
     echo "PowerShell linting failed"
     echo ""

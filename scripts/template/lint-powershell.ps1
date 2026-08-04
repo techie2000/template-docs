@@ -35,7 +35,7 @@ Set-StrictMode -Version 3.0
 $ErrorActionPreference = 'Stop'
 
 $RepoRoot = git rev-parse --show-toplevel
-$ScriptsDir = Join-Path $RepoRoot 'scripts'
+$ScriptsDir = Join-Path $RepoRoot 'scripts/template'
 $SettingsFile = Join-Path $ScriptsDir 'PSScriptAnalyzerSettings.psd1'
 
 # Verify PSScriptAnalyzer is installed

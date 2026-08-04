@@ -7,4 +7,4 @@ if ! command -v pwsh >/dev/null 2>&1; then
 fi
 
 # Delegate to the canonical sorter implementation.
-pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/sort-word-list.ps1 "$@"
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/template/sort-word-list.ps1 "$@"

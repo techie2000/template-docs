@@ -14,7 +14,7 @@
 set -euo pipefail
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
-SCRIPTS_DIR="$REPO_ROOT/scripts"
+SCRIPTS_DIR="$REPO_ROOT/scripts/template"
 SETTINGS_FILE="$SCRIPTS_DIR/PSScriptAnalyzerSettings.psd1"
 
 # Check if pwsh is available
