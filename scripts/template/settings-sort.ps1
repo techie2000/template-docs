@@ -17,6 +17,26 @@ $settingsSorterScript = Join-Path $PSScriptRoot "sort-vscode-settings.ps1"
 $extensionsSorterScript = Join-Path $PSScriptRoot "sort-vscode-extensions.ps1"
 $wordListSorterScript = Join-Path $PSScriptRoot "sort-word-list.ps1"
 
+$hadFailures = $false
+
+function Invoke-SorterScript {
+    param(
+        [string]$ScriptPath,
+        [hashtable]$Parameters
+    )
+
+    & $ScriptPath @Parameters
+
+    $exitCode = 0
+    if ($null -ne $LASTEXITCODE) {
+        $exitCode = [int]$LASTEXITCODE
+    }
+
+    if ($exitCode -ne 0) {
+        $script:hadFailures = $true
+    }
+}
+
 $commonParams = @{}
 if ($CheckOnly) {
     $commonParams.CheckOnly = $true
@@ -27,14 +47,26 @@ $resolvedSettingsPaths = @($resolvedSettingsPaths | Where-Object { -not [string]
 
 foreach ($path in $resolvedSettingsPaths) {
     if (Test-Path -LiteralPath $path) {
-        & $settingsSorterScript -SettingsPath $path @commonParams
+        $params = @{
+            SettingsPath = $path
+        }
+        foreach ($key in $commonParams.Keys) {
+            $params[$key] = $commonParams[$key]
+        }
+        Invoke-SorterScript -ScriptPath $settingsSorterScript -Parameters $params
     } else {
         Write-Host "Skipping missing settings file: $path"
     }
 }
 
 if (Test-Path -LiteralPath $ExtensionsPath) {
-    & $extensionsSorterScript -ExtensionsPath $ExtensionsPath @commonParams
+    $params = @{
+        ExtensionsPath = $ExtensionsPath
+    }
+    foreach ($key in $commonParams.Keys) {
+        $params[$key] = $commonParams[$key]
+    }
+    Invoke-SorterScript -ScriptPath $extensionsSorterScript -Parameters $params
 } else {
     Write-Host "Skipping missing extensions file: $ExtensionsPath"
 }
@@ -47,5 +79,16 @@ if ($resolvedWordListPaths.Count -eq 0) {
     )
 }
 
-& $wordListSorterScript -WordListPaths $resolvedWordListPaths @commonParams
-exit $LASTEXITCODE
+$params = @{
+    WordListPaths = $resolvedWordListPaths
+}
+foreach ($key in $commonParams.Keys) {
+    $params[$key] = $commonParams[$key]
+}
+Invoke-SorterScript -ScriptPath $wordListSorterScript -Parameters $params
+
+if ($hadFailures) {
+    exit 1
+}
+
+exit 0
