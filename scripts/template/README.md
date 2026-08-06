@@ -12,13 +12,19 @@ This folder contains helper scripts for local repository tooling.
 | `install-hooks.sh` | Bash | Configures `core.hooksPath` to `.githooks` and applies executable bits when available. |
 | `lint-docs.ps1` | PowerShell | Runs markdownlint-cli2 using `.markdownlint-cli2.yaml`; supports optional fix mode. |
 | `lint-docs.sh` | Bash | Runs markdownlint-cli2 using `.markdownlint-cli2.yaml`; supports optional fix mode. |
+| `lint-powershell.ps1` | PowerShell | Runs PSScriptAnalyzer using `scripts/template/PSScriptAnalyzerSettings.psd1`. |
+| `lint-powershell.sh` | Bash | Wrapper that delegates to `lint-powershell.ps1` via `pwsh`. |
 | `PSScriptAnalyzerSettings.psd1` | PowerShell | Shared PSScriptAnalyzer settings used to enforce approved PowerShell verbs. |
-| `settings-sort.ps1` | PowerShell | Wrapper for `sort-vscode-settings.ps1`; supports `-CheckOnly`. |
+| `settings-sort.ps1` | PowerShell | Wrapper that sorts settings, extensions, and cSpell word lists; supports `-CheckOnly`. |
 | `settings-profile.ps1` | PowerShell | Applies/checks/distributes split VS Code settings profiles (`generic`, `opinionated`) using `scripts/template/settings-policy.json`. |
-| `settings-sort.sh` | Bash | Wrapper that delegates to `sort-vscode-settings.ps1` via `pwsh`. |
+| `settings-sort.sh` | Bash | Wrapper that delegates to `settings-sort.ps1` via `pwsh` for cross-platform parity. |
 | `settings-profile.sh` | Bash | Wrapper that delegates to `settings-profile.ps1` via `pwsh`. |
 | `settings-policy.json` | JSON | Key classification rules that route settings into generic or opinionated profiles. |
+| `sort-vscode-extensions.ps1` | PowerShell | Sorts and normalizes extension recommendation lists in `.vscode/extensions.json`. |
+| `sort-vscode-extensions.sh` | Bash | Wrapper that delegates to `sort-vscode-extensions.ps1` via `pwsh`. |
 | `sort-vscode-settings.ps1` | PowerShell | Canonical JSON key sorter for `.vscode/settings.json`; used by git hooks. |
+| `sort-word-list.ps1` | PowerShell | Sorts cSpell word lists while preserving deterministic formatting. |
+| `sort-word-list.sh` | Bash | Wrapper that delegates to `sort-word-list.ps1` via `pwsh`. |
 
 ## Common Usage
 

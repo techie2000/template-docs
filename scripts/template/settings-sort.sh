@@ -6,5 +6,5 @@ if ! command -v pwsh >/dev/null 2>&1; then
   exit 1
 fi
 
-# Delegate to the canonical sorter implementation.
-pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/template/sort-vscode-settings.ps1 "$@"
+# Delegate to the canonical wrapper that sorts settings, extensions, and cSpell word lists.
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/template/settings-sort.ps1 "$@"
