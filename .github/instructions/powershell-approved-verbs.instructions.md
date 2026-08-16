@@ -1,4 +1,7 @@
 ---
+description: >
+  Requires PowerShell functions and cmdlets to use approved verb-noun naming
+  and treats PSUseApprovedVerbs as blocking for edited PowerShell code.
 applyTo: '**/*.ps1,**/*.psm1'
 ---
 

@@ -2,6 +2,9 @@
 
 REPLACE_WITH_SUMMARY <!-- Replace with one or two sentences describing what this PR does and why. -->
 
+<!-- Recommendation: keep this PR in Draft while follow-up commits are expected,
+then mark Ready for review when stable. -->
+
 ## Linked Work
 
 - Issue(s): <!-- Refs #N (preferred) | Closes/Fixes #N (ISSUES ONLY, never PRs) -->
@@ -28,3 +31,4 @@ REPLACE_WITH_SUMMARY <!-- Replace with one or two sentences describing what this
 - [ ] `docs/diagrams/workspace-overview.ilograph.yaml` updated if structure changed
 - [ ] Validation completed for any markdown or docs changes
 - [ ] PR description populated from this template and placeholders removed
+- [ ] Marked Ready for review only when major follow-up commits are not expected

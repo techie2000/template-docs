@@ -2,7 +2,7 @@
 description: >
   Ensures Dependabot configuration stays synchronized as package managers,
   ecosystems, and directory structures change in the repository.
-applyTo: '**'
+applyTo: '.github/dependabot.yml,**/package.json,**/requirements.txt,**/Pipfile,**/pyproject.toml,**/Gemfile,**/go.mod,**/pom.xml,**/build.gradle,**/Dockerfile'
 ---
 
 # Dependabot Configuration Sync

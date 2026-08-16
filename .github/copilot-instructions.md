@@ -105,12 +105,32 @@ This instruction file also defines a required PR/issue body encoding guard: use
 `.tmp/` body files for multiline content and verify posted content to avoid
 escaping or encoding corruption.
 
+When resolving Copilot PR conversation threads, do not automatically re-request
+Copilot review after fixes unless the user explicitly asks.
+
 ### PR Template Usage (REQUIRED)
 
 When creating a new pull request, always base the PR description on
 `.github/pull_request_template.md`. Populate all sections; do not leave the
 template placeholders as-is. The checklist gates in the template mirror the
 required gates in these instructions.
+
+### Draft PR Default For Iterative Work (REQUIRED)
+
+When creating PRs for in-progress implementation from chat or agent sessions,
+create them as **Draft** by default.
+
+Rules:
+
+- Default to draft PRs while additional commits are likely.
+- Convert to "Ready for review" only when the change set is stable enough for
+  focused review.
+- If the user explicitly asks for a non-draft PR, follow the user request.
+
+Why:
+
+- Avoids repeated bot review churn while work is still actively changing.
+- Keeps reviewer attention focused on near-final diffs.
 
 ### Conventional Commits (REQUIRED)
 

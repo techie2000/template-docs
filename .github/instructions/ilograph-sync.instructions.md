@@ -2,7 +2,7 @@
 description: >
   Prevents diagram drift by requiring Ilograph YAML sources in docs/diagrams/
   to be updated whenever repository structure or runtime flow changes.
-applyTo: '**'
+applyTo: 'docs/diagrams/*.ilograph.yaml,README.md,docs/**/README.md,src/**,scripts/**,test/**,Makefile,package.json,.github/workflows/**'
 ---
 
 # Ilograph Diagram Sync
