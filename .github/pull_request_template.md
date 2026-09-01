@@ -9,6 +9,8 @@ REPLACE_WITH_SUMMARY <!-- Replace with one or two sentences describing what this
 ### Issue Closure Intent
 
 - Close on merge: <!-- Closes #N / Fixes #N for each issue that should auto-close -->
+<!-- Multiple issues? Repeat the keyword per issue: "Fixes #1, Fixes #2" not "Fixes #1, #2". -->
+<!-- GitHub only closes the issue immediately after the keyword, not the rest of a list. -->
 - [ ] Keep linked issue(s) open - reason: <!-- Explain why linked issue(s) should remain open after merge -->
 
 <!-- No backing issue? Check the box and type a brief reason directly after "reason:" -->

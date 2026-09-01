@@ -32,6 +32,17 @@ jobs:
               return
             }
 
+            // Bot-authored PR bodies (Dependabot changelogs, release notes, commit lists)
+            // are full of `#N` references to issues in upstream repos, not this one. The
+            // generic reference scan below can't tell those apart from real issue links,
+            // so skip status sync entirely for bots rather than risk mislabeling — or, once
+            // merged, auto-closing — an unrelated issue that happens to share a number.
+            const actor = pr.user.login
+            if (actor.endsWith('[bot]') || actor === 'dependabot') {
+              core.info('Bot PR — skipping issue status label sync.')
+              return
+            }
+
             const statusLabels = [
               {
                 name: 'status: triage',
@@ -183,6 +194,7 @@ jobs:
 
                 linkedIssueByNumber.set(data.number, {
                   number: data.number,
+                  state: data.state,
                   labels: (data.labels || []).map((label) => ({
                     name: typeof label === 'string' ? label : label.name,
                   })),
@@ -218,6 +230,7 @@ jobs:
 
                 linkedIssueByNumber.set(data.number, {
                   number: data.number,
+                  state: data.state,
                   labels: (data.labels || []).map((label) => ({
                     name: typeof label === 'string' ? label : label.name,
                   })),
@@ -257,37 +270,62 @@ jobs:
                 (name) => name !== effectiveDesiredStatus
               )
 
-              if (
+              const labelsAlreadyCorrect =
                 conflictingStatusNames.length === 0 &&
                 currentStatusNames.includes(effectiveDesiredStatus)
-              ) {
-                core.info(`Issue #${issue.number} already has expected labels.`)
-                continue
-              }
 
-              for (const labelName of conflictingStatusNames) {
-                try {
-                  await github.rest.issues.removeLabel({
+              if (labelsAlreadyCorrect) {
+                core.info(`Issue #${issue.number} already has expected labels.`)
+              } else {
+                for (const labelName of conflictingStatusNames) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      name: labelName,
+                    })
+                  } catch (error) {
+                    if (error.status !== 404) {
+                      throw error
+                    }
+                  }
+                }
+
+                if (!currentStatusNames.includes(effectiveDesiredStatus)) {
+                  await github.rest.issues.addLabels({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: issue.number,
-                    name: labelName,
+                    labels: [effectiveDesiredStatus],
                   })
+                }
+
+                core.info(`Issue #${issue.number} set to ${effectiveDesiredStatus}`)
+              }
+
+              // Keep label and lifecycle state in sync: a PR reference is enough to mark
+              // an issue "done" above, so it must also be enough to close it. Otherwise an
+              // issue can end up labeled done while staying open forever (e.g. when a PR
+              // body lists multiple issues after a single closing keyword — GitHub only
+              // auto-closes the first one in that list, not the rest).
+              if (effectiveDesiredStatus === 'status: done' && String(issue.state).toLowerCase() === 'open') {
+                try {
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    body: `Closing automatically: linked PR #${prNumber} merged.`,
+                  })
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    state: 'closed',
+                  })
+                  core.info(`Issue #${issue.number} closed (linked PR #${prNumber} merged)`)
                 } catch (error) {
-                  if (error.status !== 404) {
-                    throw error
-                  }
+                  core.warning(`Failed to close issue #${issue.number}: ${error.message}`)
                 }
               }
-
-              if (!currentStatusNames.includes(effectiveDesiredStatus)) {
-                await github.rest.issues.addLabels({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  labels: [effectiveDesiredStatus],
-                })
-              }
-
-              core.info(`Issue #${issue.number} set to ${effectiveDesiredStatus}`)
             }

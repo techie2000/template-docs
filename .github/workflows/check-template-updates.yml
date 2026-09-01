@@ -177,6 +177,7 @@ jobs:
             ".github/instructions"
             ".github/ISSUE_TEMPLATE"
             ".github/pull_request_template.md"
+            ".github/skills"
             ".github/workflows"
             ".githooks"
             ".gitignore"

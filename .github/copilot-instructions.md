@@ -11,10 +11,26 @@ The configuration has been tailored specifically for this repository.
 ├── copilot-instructions.md   # Canonical repo-wide Copilot policy
 ├── instructions/             # Scoped workflow and language rules
 ├── pull_request_template.md  # Standard PR description and checklist
+├── skills/                   # Invokable runbooks (create PR, address feedback, issues)
 └── workflows/                # GitHub Actions for automation
 ```
 
 ## Special Instructions
+
+### Skills (Invokable Runbooks)
+
+`.github/skills/` holds step-by-step runbooks for actions triggered by an explicit request
+rather than a passive file-pattern match — e.g. "open a PR", "address the review
+feedback", "file a bug". Unlike the files in `.github/instructions/`, these are not tied
+to any one tool's native skill-discovery convention: check this directory for a matching
+runbook whenever the user's request looks like one of these actions, regardless of what
+tooling you're running under.
+
+Available skills:
+
+- `.github/skills/create-pull-request/SKILL.md`
+- `.github/skills/address-pr-comments/SKILL.md`
+- `.github/skills/github-issues/SKILL.md`
 
 ### README Structure Maintenance (REQUIRED)
 
@@ -64,6 +80,9 @@ When asked to create, close, or otherwise manage GitHub issues, follow:
 This covers the required workflow for avoiding duplicate issue creation and for
 closing duplicate issues with a clear pointer back to the canonical issue.
 
+For the broader issue-creation/update workflow (title conventions, body templates,
+status-label lifecycle), see `.github/skills/github-issues/SKILL.md`.
+
 ### PR/Issue Linkage Guardrails (REQUIRED)
 
 Template repositories include workflow guardrails for PR-to-issue linkage and issue lifecycle labels.
@@ -80,9 +99,16 @@ Behavior:
 - Allows approved override via the PR template checkbox:
   `- [x] No linked issue - reason: ...`
 - Ensures `Closes/Fixes/Resolves` targets issues only (never PR numbers).
+- Fails a PR that applies a closing keyword to a comma-separated issue list (for example
+  `Fixes #1, #2`), because GitHub only closes the first issue in that list. Repeat the
+  keyword per issue instead (`Fixes #1, Fixes #2`).
 - Applies `no-issue-needed` label for bots or checked override.
 - Syncs linked issue status labels across PR lifecycle (`status: triage`, `status: in progress`,
-  `status: done`).
+  `status: done`), and closes the issue (with an explanatory comment) whenever it reaches
+  `status: done` while still open, so the label and lifecycle state cannot drift apart.
+- Skips status sync entirely for bot-authored PRs, since their bodies (Dependabot changelogs,
+  release notes) are full of `#N` references to issues in other repos that the generic scan
+  cannot distinguish from real links.
 
 Enforcement mode:
 
@@ -92,6 +118,9 @@ Enforcement mode:
 - For strict enforcement, also configure branch protection to require the
   `Check PR Issue Link` status check.
 
+When asked to open a PR, see `.github/skills/create-pull-request/SKILL.md` for the full
+runbook (issue-linking, verification checklist, confirming the automated labels above).
+
 ### PR Conversation Handling (REQUIRED)
 
 When asked to process PR conversations/review threads end-to-end, follow:
@@ -100,6 +129,9 @@ When asked to process PR conversations/review threads end-to-end, follow:
 
 This covers the required flow to review each thread, apply fixes, commit with traceability,
 reply in-thread with commit references, and resolve each conversation.
+
+For triaging a batch of feedback and posting a categorized summary once threads are
+resolved, see `.github/skills/address-pr-comments/SKILL.md`.
 
 This instruction file also defines a required PR/issue body encoding guard: use
 `.tmp/` body files for multiline content and verify posted content to avoid
