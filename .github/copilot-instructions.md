@@ -31,6 +31,7 @@ Available skills:
 - `.github/skills/create-pull-request/SKILL.md`
 - `.github/skills/address-pr-comments/SKILL.md`
 - `.github/skills/github-issues/SKILL.md`
+- `.github/skills/check-template-updates/SKILL.md`
 
 ### README Structure Maintenance (REQUIRED)
 
@@ -136,6 +137,20 @@ resolved, see `.github/skills/address-pr-comments/SKILL.md`.
 This instruction file also defines a required PR/issue body encoding guard: use
 `.tmp/` body files for multiline content and verify posted content to avoid
 escaping or encoding corruption.
+
+### Template Drift / Sync Check
+
+`.github/workflows/check-template-updates.yml` compares this repo's infra
+files (workflows, instructions, skills, `AGENTS.md`, `CLAUDE.md`, `scripts`,
+etc.) against the upstream template repo configured in
+`.github/template-sync.yml`, runs weekly (Monday 09:00 UTC), and can also be
+triggered on demand.
+
+When asked to check for template drift/updates or to act on an existing
+`template-sync` tracking issue or draft PR, see
+`.github/skills/check-template-updates/SKILL.md` for the full runbook
+(triggering the workflow, reading the classified report, and re-baselining
+after adopting changes).
 
 ### PR Template Usage (REQUIRED)
 

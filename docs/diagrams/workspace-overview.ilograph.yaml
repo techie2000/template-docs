@@ -268,6 +268,13 @@ resources:
                     description: >-
                       Triage and resolve open review feedback, then post a
                       categorized summary and mirror updates to linked issues.
+                  - id: skill_check_template_updates
+                    name: check-template-updates/
+                    subtitle: Check Template Updates
+                    description: >-
+                      Runbook for triggering the template drift check, reading
+                      the classified report, and re-baselining after adopting
+                      changes.
                   - id: skill_create_pull_request
                     name: create-pull-request/
                     subtitle: Create Pull Request
