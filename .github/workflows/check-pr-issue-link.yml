@@ -42,7 +42,17 @@ jobs:
               return
             }
 
-            const enforcementMode = (process.env.ISSUE_LINK_ENFORCEMENT_MODE || 'advisory').toLowerCase()
+            const validEnforcementModes = new Set(['required', 'advisory'])
+            const rawEnforcementMode = process.env.ISSUE_LINK_ENFORCEMENT_MODE || 'advisory'
+            const normalizedEnforcementMode = rawEnforcementMode.trim().toLowerCase()
+            let enforcementMode = 'advisory'
+            if (validEnforcementModes.has(normalizedEnforcementMode)) {
+              enforcementMode = normalizedEnforcementMode
+            } else {
+              core.warning(
+                `Invalid ISSUE_LINK_ENFORCEMENT_MODE '${rawEnforcementMode}'; expected 'required' or 'advisory'. Falling back to 'advisory'.`
+              )
+            }
 
             // Bot-authored PRs are exempt.
             if (actor.endsWith('[bot]') || actor === 'dependabot') {
