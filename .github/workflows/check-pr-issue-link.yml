@@ -29,7 +29,7 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request
-            const actor = pr.user.login
+            const actor = pr.user?.login || ''
 
             function isIntegrationPermissionError(error) {
               return (

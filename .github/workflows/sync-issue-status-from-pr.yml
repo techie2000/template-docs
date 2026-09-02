@@ -37,7 +37,7 @@ jobs:
             // generic reference scan below can't tell those apart from real issue links,
             // so skip status sync entirely for bots rather than risk mislabeling — or, once
             // merged, auto-closing — an unrelated issue that happens to share a number.
-            const actor = pr.user.login
+            const actor = pr.user?.login || ''
             if (actor.endsWith('[bot]') || actor === 'dependabot') {
               core.info('Bot PR — skipping issue status label sync.')
               return
