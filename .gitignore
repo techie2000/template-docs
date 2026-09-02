@@ -9,6 +9,9 @@ Thumbs.db
 *.swo
 **/node_modules/
 
+# Claude Code personal/machine-local overrides (never share across a template)
+.claude/settings.local.json
+
 # Temporary files
 *.tmp
 *.bak
