@@ -172,11 +172,13 @@ jobs:
           # the template. Content paths such as docs/, README.md, package.json,
           # and product-specific files remain intentionally excluded.
           SYNC_PATHS=(
+            ".claude"
             ".github/copilot-instructions.md"
             ".github/dependabot.yml"
             ".github/instructions"
             ".github/ISSUE_TEMPLATE"
             ".github/pull_request_template.md"
+            ".github/skills"
             ".github/workflows"
             ".githooks"
             ".gitignore"

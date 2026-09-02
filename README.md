@@ -24,10 +24,12 @@ and operational references for the software or service being documented.
 
 | File/Folder | Purpose |
 | ----------- | ------- |
+| [.claude/skills/](.claude/skills/) | Thin stubs so Claude Code auto-discovers skills; delegate to canonical content in `.github/skills/` |
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
 | [.github/](.github/) | GitHub configuration, Copilot policy, issue templates, and workflows |
 | [.github/dependabot.yml](.github/dependabot.yml) | Dependabot configuration for automated dependency updates |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
+| [.github/skills/](.github/skills/) | Invokable runbooks (create PR, address review feedback, manage issues) for any agent |
 | [.github/template-sync.yml](.github/template-sync.yml) | Baseline metadata for template drift classification and sync automation |
 | [.github/workflows/](.github/workflows/) | GitHub Actions workflows used for automated repository validation |
 | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | markdownlint-cli2 configuration aligned with repository linting behavior |
@@ -129,6 +131,7 @@ The default comparison scope includes these repo-local template surfaces:
 - `.github/instructions/`
 - `.github/ISSUE_TEMPLATE/`
 - `.github/pull_request_template.md`
+- `.github/skills/`
 - `.github/workflows/`
 - `.githooks/`
 - `.markdownlint-cli2.yaml`

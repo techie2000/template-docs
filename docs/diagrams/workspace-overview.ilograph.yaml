@@ -173,6 +173,19 @@ resources:
         subtitle: Policies and Local IDE Config
         description: Automation and policy folders that support contribution workflows.
         children:
+          - id: claude
+            name: .claude/
+            subtitle: Claude Code Configuration
+            description: >
+              Claude Code configuration; skills/ holds thin stubs delegating
+              to canonical content in .github/skills/.
+            children:
+              - id: claude_skills
+                name: skills/
+                subtitle: Claude Code Skill Discovery Stubs
+                description: >
+                  Thin SKILL.md stubs auto-discovered by Claude Code that
+                  delegate to canonical content in .github/skills/.
           - id: github
             name: .github/
             subtitle: GitHub Configuration
@@ -235,6 +248,32 @@ resources:
                 name: pull_request_template.md
                 subtitle: PR Template
                 description: Standard pull request template with summary and validation checklist.
+              - id: skills
+                name: skills/
+                subtitle: Agent Skills
+                description: >
+                  Invokable runbooks for PR creation, review-feedback triage, and
+                  issue management, usable by any agent regardless of native
+                  skill-discovery support.
+                children:
+                  - id: skill_address_pr_comments
+                    name: address-pr-comments/
+                    subtitle: Address PR Comments
+                    description: >-
+                      Triage and resolve open review feedback, then post a
+                      categorized summary and mirror updates to linked issues.
+                  - id: skill_create_pull_request
+                    name: create-pull-request/
+                    subtitle: Create Pull Request
+                    description: >-
+                      Runbook for opening a PR with correct issue linkage and a
+                      verification checklist.
+                  - id: skill_github_issues
+                    name: github-issues/
+                    subtitle: GitHub Issues
+                    description: >-
+                      Runbook for creating/updating issues: duplicate checks,
+                      title/body conventions, and the status-label lifecycle.
               - id: template_sync_metadata
                 name: template-sync.yml
                 subtitle: Template Sync Baseline Metadata
@@ -413,6 +452,15 @@ perspectives:
       - from: config
         to: package_json
         label: defines
+      - from: tooling
+        to: claude
+        label: supports
+      - from: claude
+        to: claude_skills
+        label: includes
+      - from: claude_skills
+        to: skills
+        label: delegates content to
       - from: tooling
         to: github
         label: supports
