@@ -166,6 +166,13 @@ jobs:
 
             referencedIssueNumbers.delete(prNumber)
 
+            // Only issues the PR text (or GitHub's own closingIssuesReferences) actually
+            // names are eligible for auto-close below. Child/sub-issues discovered
+            // indirectly - via a linked issue's own task list or "children:" line - still
+            // get their status label synced, but must never be closed just because a
+            // parent issue happened to list them; the PR never referenced them itself.
+            const explicitlyReferencedIssueNumbers = new Set(referencedIssueNumbers)
+
             const linkedIssueByNumber = new Map()
 
             function extractChildIssueNumbers(bodyText) {
@@ -214,6 +221,7 @@ jobs:
                   labels: (data.labels || []).map((label) => ({
                     name: typeof label === 'string' ? label : label.name,
                   })),
+                  explicitlyLinked: explicitlyReferencedIssueNumbers.has(data.number),
                 })
 
                 for (const childNumber of extractChildIssueNumbers(data.body || '')) {
@@ -250,6 +258,7 @@ jobs:
                   labels: (data.labels || []).map((label) => ({
                     name: typeof label === 'string' ? label : label.name,
                   })),
+                  explicitlyLinked: explicitlyReferencedIssueNumbers.has(data.number),
                 })
               } catch (error) {
                 if (error.status !== 404) {
@@ -326,8 +335,13 @@ jobs:
               // body lists multiple issues after a single closing keyword — GitHub only
               // auto-closes the first one in that list, not the rest). A maintainer can
               // still opt out via the template's "Keep linked issue(s) open" checkbox.
+              // Never auto-close an issue that was only discovered indirectly (via a
+              // linked issue's own task list / "children:" line) - the PR itself never
+              // referenced it, so closing it would be an unintended side effect.
               if (effectiveDesiredStatus === 'status: done' && String(issue.state).toLowerCase() === 'open') {
-                if (keepIssuesOpenChecked) {
+                if (!issue.explicitlyLinked) {
+                  core.info(`Issue #${issue.number} left open: discovered indirectly, not explicitly referenced by PR #${prNumber}.`)
+                } else if (keepIssuesOpenChecked) {
                   core.info(`Issue #${issue.number} left open: "Keep linked issue(s) open" checked on PR #${prNumber}.`)
                 } else {
                   // The explanatory comment is best-effort: if it fails (permissions,
