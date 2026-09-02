@@ -24,9 +24,11 @@ and operational references for the software or service being documented.
 
 | File/Folder | Purpose |
 | ----------- | ------- |
+| [.claude/agents/](.claude/agents/) | Thin stubs so Claude Code auto-discovers agents; delegate to canonical content in `.github/agents/` |
 | [.claude/skills/](.claude/skills/) | Thin stubs so Claude Code auto-discovers skills; delegate to canonical content in `.github/skills/` |
 | [.githooks/](.githooks/) | Git hook scripts used for pre-commit and pre-push validation |
 | [.github/](.github/) | GitHub configuration, Copilot policy, issue templates, and workflows |
+| [.github/agents/](.github/agents/) | Custom agents for contextual/advisory guidance (diagram authoring, documentation artifact triggers) |
 | [.github/dependabot.yml](.github/dependabot.yml) | Dependabot configuration for automated dependency updates |
 | [.github/instructions/](.github/instructions/) | Repository instructions used by Copilot and other tooling |
 | [.github/skills/](.github/skills/) | Invokable runbooks (create PR, address review feedback, manage issues) for any agent |

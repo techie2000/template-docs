@@ -8,6 +8,7 @@ The configuration has been tailored specifically for this repository.
 ```text
 .github/
 ├── ISSUE_TEMPLATE/           # Standardized issue forms and templates
+├── agents/                   # Custom agents for contextual/advisory guidance
 ├── copilot-instructions.md   # Canonical repo-wide Copilot policy
 ├── instructions/             # Scoped workflow and language rules
 ├── pull_request_template.md  # Standard PR description and checklist
@@ -32,6 +33,20 @@ Available skills:
 - `.github/skills/address-pr-comments/SKILL.md`
 - `.github/skills/github-issues/SKILL.md`
 - `.github/skills/check-template-updates/SKILL.md`
+
+### Custom Agents (Contextual/Advisory Guidance)
+
+`.github/agents/*.agent.md` holds guidance that is contextual or stylistic
+rather than an unconditional gate: it only matters when that specific kind
+of work is already happening, so a missed automatic invocation is a missed
+style suggestion, not a broken policy. Unconditional REQUIRED rules stay in
+this file instead, since automatic agent invocation is heuristic and cannot
+guarantee the "always applied" behavior those rules depend on.
+
+Available agents:
+
+- `.github/agents/diagrams.agent.md` - Mermaid/Ilograph diagram authoring standards
+- `.github/agents/docs-architect.agent.md` - ADR/runbook/changelog/log-file creation triggers
 
 ### README Structure Maintenance (REQUIRED)
 
@@ -326,190 +341,19 @@ Workflow requirement for markdown edits:
 5. Run `make lint-docs`.
 6. Resolve any remaining markdownlint issues before commit.
 
-### Diagram Standards (REQUIRED)
+### Diagram Standards
 
-**Prescribe both Mermaid and Ilograph where they each fit best.**
-
-- **Mermaid for inline docs**: Keep diagrams embedded in markdown so they render
-  directly in GitHub and VS Code without extra tooling.
-- **Ilograph for deep-dive architecture**: Use `docs/diagrams/*.ilograph.yaml`
-  when interactive exploration and richer multi-perspective views improve
-  understanding.
-- **Keep both in sync** when a markdown Mermaid view and an Ilograph view describe
-  the same structure or runtime behavior.
-
-- **Format**: Mermaid markdown code blocks
-- **Location**: Embedded in README.md, ADRs, or separate `.md` files in `docs/diagrams/`
-- **Types**: Use appropriate Mermaid diagram types:
-  - `flowchart` - Process flows, decision trees
-  - `sequenceDiagram` - API interactions, component communication
-  - `classDiagram` - Object models, data structures
-  - `erDiagram` - Database schemas, entity relationships
-  - `stateDiagram` - State machines, lifecycle flows
-  - `gitGraph` - Branching strategies
-  - `gantt` - Project timelines
-
-#### Mermaid Best Practices
-
-##### Mermaid Label Line Break Rule (REQUIRED)
-
-When writing multi-line Mermaid node labels:
-
-- Use `<br/>` inside quoted labels.
-- Do **not** use escaped newline tokens like `\n` in labels.
-
-Required pre-check before finalizing diagram markdown:
-
-1. Search changed diagram markdown for literal `\n` text.
-2. Replace any `\n` label content with `<br/>`.
-
-This prevents visible `\n` artifacts in rendered diagrams in GitHub and VS Code previews.
-
-```markdown
-## Example Architecture Diagram
-
-\`\`\`mermaid
-flowchart LR
-    A[Input] --> B{Decision}
-    B -->|Yes| C[Process]
-    B -->|No| D[Skip]
-    C --> E[Output]
-
-    style A fill:#e1f5ff
-    style E fill:#d4edda
-    style D fill:#fff3cd
-\`\`\`
-
-## Example Sequence Diagram
-
-\`\`\`mermaid
-sequenceDiagram
-    participant Client
-    participant API
-    participant DB
-
-    Client->>API: POST /users
-    API->>DB: INSERT user
-    DB-->>API: Success
-    API-->>Client: 201 Created
-\`\`\`
-
-## Example State Diagram
-
-\`\`\`mermaid
-stateDiagram-v2
-    [*] --> New
-    New --> Processing: Submit
-    Processing --> Completed: Success
-    Processing --> Failed: Error
-    Failed --> Processing: Retry
-    Completed --> [*]
-\`\`\`
-```
-
-#### Why Mermaid?
-
-- ✅ **Version Control**: Text-based diagrams tracked in Git
-- ✅ **Collaboration**: Easy to review and update in PRs
-- ✅ **Rendering**: Works in GitHub, VS Code, and most documentation tools
-- ✅ **No Binary Files**: Avoid binary image files that cause merge conflicts
-- ✅ **Consistency**: Standardized syntax across all diagrams
-- ✅ **Maintainability**: Update diagrams as code changes
-
-**DO NOT** use:
-
-- ❌ Binary image files (PNG, JPG) for architecture diagrams
-- ❌ External diagram tools (draw.io, Visio) unless absolutely necessary
-- ❌ ASCII art (hard to read and maintain)
-- ❌ External hosting (links break, requires external accounts)
-
-#### Color Scheme for Dark Mode
-
-Use medium-saturation colors that work in both light and dark modes:
-
-```yaml
-services/components: "#2C5F8D" (medium blue) with white text
-processing/intermediate: "#17A2B8" (teal) with white text
-success/output: "#28A745" (medium green) with white text
-errors/validation: "#D9534F" (medium red) with white text
-warnings/DLQ: "#F0AD4E" (medium orange) with dark text
-backgrounds: "#555" (dark gray) with white text
-```
+Mermaid/Ilograph diagram authoring standards (format choice, Mermaid syntax
+conventions, label line-break rule, color scheme for dark mode) now live in
+`.github/agents/diagrams.agent.md`. The structural gate that requires
+`docs/diagrams/*.ilograph.yaml` to stay in sync with repository changes
+remains above under "Ilograph Diagram Sync (REQUIRED)".
 
 ## Documentation Artifact Guidance
 
-This section provides **trigger-based** guidance on when to create durable
-documentation artifacts. Only create artifacts when they serve a clear purpose;
-avoid over-prescribing documentation.
-
-### ADR (Architecture Decision Record)
-
-**Trigger**: A change introduces a durable architectural, tooling, governance,
-or workflow decision.
-
-**When to create**:
-
-- Alternatives were evaluated and a choice was made
-- The decision affects multiple areas or future contributors
-- The decision is unlikely to change in the near term
-- Future maintainers would benefit from understanding the "why," not just
-  the "what"
-
-**Why**: Durable decisions deserve justification and historical context. ADRs
-prevent rehashing decisions and document the trade-offs considered.
-
-### Runbooks and Checklists
-
-**Trigger**: A process is repeatable, operational, and easy to get wrong.
-
-**When to create**:
-
-- Setup flows or onboarding procedures
-- Incident response or troubleshooting workflows
-- Maintenance tasks that happen periodically
-- Complex workflows with many manual steps or decision points
-
-**Why**: Step-by-step guidance reduces operational errors and onboarding
-friction. Checklists ensure nothing is missed in high-stress situations.
-
-### Changelog or Release Notes
-
-**Trigger**: Only for versioned releases or externally visible behavior changes.
-
-**When to create**:
-
-- New version is being released to users or customers
-- A breaking change or significant feature is introduced
-- Users or external teams need to know about the change
-
-**When NOT to create**:
-
-- Internal refactoring with no user-visible impact
-- Every internal documentation edit
-- Temporary fixes or experiments
-
-**Why**: Avoid changelog noise. Focus on signal for end users; changelogs are not development journals.
-
-### Log Files (log.md)
-
-**Trigger**: Only for bounded chronological records with a clear owner and
-retention purpose.
-
-**When to create**:
-
-- Migration logs (tracking progress and decisions during a migration)
-- Meeting notes or decision journals (with dates, attendees, outcomes)
-- Incident timelines (when and how issues were discovered and resolved)
-- Ongoing records with a clear owner and maintenance commitment
-
-**When NOT to create**:
-
-- Generic "log.md" files scattered across the repo without purpose
-- Logs with no clear retention policy or owner
-- Transient debug output or build artifacts (use `.tmp/` for these)
-
-**Why**: Focused, purposeful logs aid troubleshooting and knowledge transfer.
-Unfocused or orphaned logs create clutter and confusion.
+Trigger-based guidance on when to create durable documentation artifacts
+(ADRs, runbooks/checklists, changelogs, log files) now lives in
+`.github/agents/docs-architect.agent.md`.
 
 ## Documentation Conventions
 
@@ -547,6 +391,10 @@ All agent and automation policy is maintained in one place:
 
 - `.github/copilot-instructions.md` is the canonical source for all repo-wide policies
 - `.github/instructions/` contains scoped rules (language-specific, workflow-specific)
+- `.github/agents/` is the canonical source for contextual/advisory guidance
+  (see "Custom Agents" above); `.claude/agents/` holds thin stubs that
+  delegate to it, the same bridging pattern used for `.github/skills/` and
+  `.claude/skills/`
 - Cross-tool agent files (e.g., AGENTS.md, CLAUDE.md, CURSOR.md) must
   **delegate** to these canonical sources instead of duplicating rules
 
