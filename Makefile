@@ -47,7 +47,7 @@ settings-sort:
 >bash ./scripts/template/settings-sort.sh
 
 settings-sort-claude:
->pwsh ./scripts/template/sort-vscode-settings.ps1 -SettingsPath .claude/settings.json
+>bash ./scripts/template/settings-sort-claude.sh
 
 bootstrap-package:
 >bash ./scripts/template/bootstrap-package-name.sh
