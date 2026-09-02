@@ -187,6 +187,7 @@ jobs:
             ".markdownlint.yaml"
             ".markdownlintignore"
             "AGENTS.md"
+            "CLAUDE.md"
             "Makefile"
             ".vscode"
             "docs/internal"

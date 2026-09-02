@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(pwsh ./scripts/template/lint-docs.ps1 -Fix)"
+      "PowerShell(pwsh ./scripts/template/lint-docs.ps1 -Fix)",
+      "Bash(echo \"actionlint exit: $?\")",
+      "Bash(pwsh ./scripts/template/lint-docs.ps1)"
     ]
   }
 }

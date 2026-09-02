@@ -37,6 +37,7 @@ and operational references for the software or service being documented.
 | [.markdownlintignore](.markdownlintignore) | Ignore rules for transient markdown artifacts such as .tmp/ output |
 | [.vscode/](.vscode/) | Workspace settings, extension recommendations, MCP config, and cSpell dictionaries |
 | [AGENTS.md](AGENTS.md) | Thin cross-agent entrypoint delegating to the canonical Copilot instructions |
+| [CLAUDE.md](CLAUDE.md) | Thin Claude Code entrypoint that `@`-imports `AGENTS.md` instead of forking a separate policy copy |
 | [Makefile](Makefile) | Optional shortcuts for hook setup, sorting, and docs linting |
 | [package.json](package.json) | Generic Node metadata and markdownlint-cli2 development dependency |
 
@@ -124,6 +125,7 @@ comma-separated list of repo-relative files or folder prefixes.
 
 The default comparison scope includes these repo-local template surfaces:
 
+- `.claude/`
 - `.gitattributes`
 - `.gitignore`
 - `.github/copilot-instructions.md`
@@ -139,6 +141,7 @@ The default comparison scope includes these repo-local template surfaces:
 - `.markdownlintignore`
 - `.vscode/`
 - `AGENTS.md`
+- `CLAUDE.md`
 - `Makefile`
 - `docs/internal/`
 - `scripts/`
