@@ -12,13 +12,12 @@ on:
       - unlabeled
 
 permissions:
-  actions: read
   contents: read
   issues: write
   pull-requests: read
 
 env:
-  ISSUE_LINK_ENFORCEMENT_MODE: advisory
+  ISSUE_LINK_ENFORCEMENT_MODE: ${{ vars.ISSUE_LINK_ENFORCEMENT_MODE || 'advisory' }}
 
 jobs:
   check-issue-link:
@@ -43,25 +42,16 @@ jobs:
               return
             }
 
-            let enforcementMode = (process.env.ISSUE_LINK_ENFORCEMENT_MODE || 'advisory').toLowerCase()
-            try {
-              const { data: variable } = await github.request(
-                'GET /repos/{owner}/{repo}/actions/variables/{name}',
-                {
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: 'ISSUE_LINK_ENFORCEMENT_MODE',
-                }
+            const validEnforcementModes = new Set(['required', 'advisory'])
+            const rawEnforcementMode = process.env.ISSUE_LINK_ENFORCEMENT_MODE || 'advisory'
+            const normalizedEnforcementMode = rawEnforcementMode.trim().toLowerCase()
+            let enforcementMode = 'advisory'
+            if (validEnforcementModes.has(normalizedEnforcementMode)) {
+              enforcementMode = normalizedEnforcementMode
+            } else {
+              core.warning(
+                `Invalid ISSUE_LINK_ENFORCEMENT_MODE '${rawEnforcementMode}'; expected 'required' or 'advisory'. Falling back to 'advisory'.`
               )
-
-              const configuredMode = String(variable?.value || '').trim().toLowerCase()
-              if (configuredMode === 'required' || configuredMode === 'advisory') {
-                enforcementMode = configuredMode
-              }
-            } catch (error) {
-              if (error?.status !== 404) {
-                core.warning(`Unable to read ISSUE_LINK_ENFORCEMENT_MODE variable; using '${enforcementMode}'.`)
-              }
             }
 
             // Bot-authored PRs are exempt.
