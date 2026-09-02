@@ -134,13 +134,18 @@ jobs:
             // mistaken for real issue references and get labeled/auto-closed.
             const prText = `${prTitle}\n${prBodyWithoutHtmlComments}`
 
+            // Referenced (for status-label sync): any of closes/fixes/resolves/refs/relates.
+            // Being merely mentioned via Refs/Relates is enough to track status, but must
+            // NOT be enough to auto-close - see closingKeywordListRegex below.
             const explicitRefRegex = /\b(?:closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#(\d+)\b/gi
             // A bare `#N` scan would treat casual mentions like "see #123" as a linked
             // issue, which is unsafe now that linked issues can be auto-closed on merge.
             // Narrow the fallback to just the pattern it exists to compensate for: the
-            // trailing members of a comma-separated closing-keyword list (e.g.
-            // "Fixes #1, #2"), which explicitRefRegex's singular capture misses.
-            const closingKeywordListRegex = /\b(?:closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#\d+(?:\s*,\s*#\d+)+/gi
+            // trailing members of a comma-separated *closing*-keyword list (e.g.
+            // "Fixes #1, #2"), which GitHub's own closingIssuesReferences and
+            // explicitRefRegex's singular capture both miss. Deliberately excludes
+            // refs/relates - those never carry closing intent, even in a list.
+            const closingKeywordListRegex = /\b(?:closes?|fixes?|resolves?)(?:\s+|:\s*)#\d+(?:\s*,\s*#\d+)+/gi
 
             const referencedIssueNumbers = new Set(
               closingIssues
@@ -155,23 +160,30 @@ jobs:
               }
             }
 
+            // Closing-eligible (for auto-close): only issues GitHub itself treats as
+            // closing targets (closingIssuesReferences), plus the trailing members of a
+            // closing-keyword comma list that GitHub doesn't recognize. A plain Refs/
+            // Relates mention - or any issue discovered only indirectly via another
+            // issue's task list / "children:" line - is deliberately excluded, since the
+            // PR never expressed closing intent for it.
+            const closingEligibleIssueNumbers = new Set(
+              closingIssues
+                .map((issue) => issue.number)
+                .filter((n) => Number.isInteger(n))
+            )
+
             for (const listMatch of prText.matchAll(closingKeywordListRegex)) {
               for (const numberMatch of listMatch[0].matchAll(/#(\d+)/g)) {
                 const number = Number(numberMatch[1])
                 if (Number.isInteger(number)) {
                   referencedIssueNumbers.add(number)
+                  closingEligibleIssueNumbers.add(number)
                 }
               }
             }
 
             referencedIssueNumbers.delete(prNumber)
-
-            // Only issues the PR text (or GitHub's own closingIssuesReferences) actually
-            // names are eligible for auto-close below. Child/sub-issues discovered
-            // indirectly - via a linked issue's own task list or "children:" line - still
-            // get their status label synced, but must never be closed just because a
-            // parent issue happened to list them; the PR never referenced them itself.
-            const explicitlyReferencedIssueNumbers = new Set(referencedIssueNumbers)
+            closingEligibleIssueNumbers.delete(prNumber)
 
             const linkedIssueByNumber = new Map()
 
@@ -221,7 +233,7 @@ jobs:
                   labels: (data.labels || []).map((label) => ({
                     name: typeof label === 'string' ? label : label.name,
                   })),
-                  explicitlyLinked: explicitlyReferencedIssueNumbers.has(data.number),
+                  closingEligible: closingEligibleIssueNumbers.has(data.number),
                 })
 
                 for (const childNumber of extractChildIssueNumbers(data.body || '')) {
@@ -258,7 +270,7 @@ jobs:
                   labels: (data.labels || []).map((label) => ({
                     name: typeof label === 'string' ? label : label.name,
                   })),
-                  explicitlyLinked: explicitlyReferencedIssueNumbers.has(data.number),
+                  closingEligible: closingEligibleIssueNumbers.has(data.number),
                 })
               } catch (error) {
                 if (error.status !== 404) {
@@ -335,12 +347,14 @@ jobs:
               // body lists multiple issues after a single closing keyword — GitHub only
               // auto-closes the first one in that list, not the rest). A maintainer can
               // still opt out via the template's "Keep linked issue(s) open" checkbox.
-              // Never auto-close an issue that was only discovered indirectly (via a
-              // linked issue's own task list / "children:" line) - the PR itself never
-              // referenced it, so closing it would be an unintended side effect.
+              // Never auto-close an issue unless the PR actually expressed closing intent
+              // for it (a real GitHub closing target, or a trailing item in a closing-
+              // keyword comma list). A plain Refs/Relates mention, or an issue discovered
+              // only indirectly via another issue's task list / "children:" line, is not
+              // enough - closing it would be an unintended side effect.
               if (effectiveDesiredStatus === 'status: done' && String(issue.state).toLowerCase() === 'open') {
-                if (!issue.explicitlyLinked) {
-                  core.info(`Issue #${issue.number} left open: discovered indirectly, not explicitly referenced by PR #${prNumber}.`)
+                if (!issue.closingEligible) {
+                  core.info(`Issue #${issue.number} left open: no closing intent expressed for it on PR #${prNumber}.`)
                 } else if (keepIssuesOpenChecked) {
                   core.info(`Issue #${issue.number} left open: "Keep linked issue(s) open" checked on PR #${prNumber}.`)
                 } else {
