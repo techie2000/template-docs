@@ -10,7 +10,10 @@
       "Bash(make lint-docs *)",
       "Bash(python -c \"import yaml,sys; yaml.safe_load\\(open\\('docs/diagrams/workspace-overview.ilograph.yaml', encoding='utf-8'\\)\\); print\\('OK'\\)\")",
       "Bash(pwsh -NoProfile -Command \"python -c \\\\\"import yaml\\\\\"\")",
-      "Bash(python -c \"import yaml,sys; yaml.safe_load\\(sys.stdin\\); print\\('OK'\\)\")"
+      "Bash(python -c \"import yaml,sys; yaml.safe_load\\(sys.stdin\\); print\\('OK'\\)\")",
+      "Bash(mkdir -p .tmp)",
+      "Bash(cat)",
+      "Bash(git commit *)"
     ]
   }
 }
