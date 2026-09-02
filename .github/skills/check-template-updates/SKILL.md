@@ -110,6 +110,8 @@ Once changes are merged/reconciled, update `baseline_ref` in
 next run's 3-way diff starts clean:
 
 ```bash
+git ls-remote upstream <template_ref>
+# Fall back to the URL form only if no "upstream" remote points at the template repo yet:
 git ls-remote https://github.com/<template_repo>.git <template_ref>
 ```
 
