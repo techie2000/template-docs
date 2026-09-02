@@ -146,6 +146,12 @@ resources:
             description: >
               Root discovery file for AI tools. Delegates repository-wide policy
               to .github/copilot-instructions.md.
+          - id: claude_md
+            name: CLAUDE.md
+            subtitle: Claude Code Entrypoint
+            description: >
+              Thin Claude Code discovery stub: @-imports AGENTS.md rather than
+              forking a separate policy copy.
           - id: makefile
             name: Makefile
             subtitle: Task Runner
