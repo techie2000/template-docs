@@ -129,7 +129,10 @@ jobs:
 
             const pullRequest = result.repository.pullRequest
             const closingIssues = pullRequest.closingIssuesReferences.nodes || []
-            const prText = `${prTitle}\n${prBody}`
+            // Scan the comment-stripped body: the template's own guidance text contains
+            // literal issue numbers (e.g. "Fixes #1, #2") that would otherwise be
+            // mistaken for real issue references and get labeled/auto-closed.
+            const prText = `${prTitle}\n${prBodyWithoutHtmlComments}`
 
             const explicitRefRegex = /\b(?:closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#(\d+)\b/gi
             const anyIssueRefRegex = /(^|[^\w])#(\d+)\b/gm
