@@ -98,6 +98,12 @@ jobs:
 
             const prTitle = prDetails?.title || pr?.title || ''
             const prBody = prDetails?.body || pr?.body || ''
+            // Strip HTML comments before scanning for the "keep open" override so the
+            // template's own guidance text can't be mistaken for a real checkbox.
+            const prBodyWithoutHtmlComments = prBody.replace(/<!--[\s\S]*?-->/g, ' ')
+            const keepIssuesOpenChecked = /- \[x\] keep linked issue\(s\) open\s*-\s*reason\s*:\s*\S+/i.test(
+              prBodyWithoutHtmlComments
+            )
 
             const query = `
               query($owner: String!, $repo: String!, $number: Int!) {
@@ -308,24 +314,29 @@ jobs:
               // an issue "done" above, so it must also be enough to close it. Otherwise an
               // issue can end up labeled done while staying open forever (e.g. when a PR
               // body lists multiple issues after a single closing keyword — GitHub only
-              // auto-closes the first one in that list, not the rest).
+              // auto-closes the first one in that list, not the rest). A maintainer can
+              // still opt out via the template's "Keep linked issue(s) open" checkbox.
               if (effectiveDesiredStatus === 'status: done' && String(issue.state).toLowerCase() === 'open') {
-                try {
-                  await github.rest.issues.createComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: issue.number,
-                    body: `Closing automatically: linked PR #${prNumber} merged.`,
-                  })
-                  await github.rest.issues.update({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: issue.number,
-                    state: 'closed',
-                  })
-                  core.info(`Issue #${issue.number} closed (linked PR #${prNumber} merged)`)
-                } catch (error) {
-                  core.warning(`Failed to close issue #${issue.number}: ${error.message}`)
+                if (keepIssuesOpenChecked) {
+                  core.info(`Issue #${issue.number} left open: "Keep linked issue(s) open" checked on PR #${prNumber}.`)
+                } else {
+                  try {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      body: `Closing automatically: linked PR #${prNumber} merged.`,
+                    })
+                    await github.rest.issues.update({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      state: 'closed',
+                    })
+                    core.info(`Issue #${issue.number} closed (linked PR #${prNumber} merged)`)
+                  } catch (error) {
+                    core.warning(`Failed to close issue #${issue.number}: ${error.message}`)
+                  }
                 }
               }
             }
