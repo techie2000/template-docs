@@ -135,7 +135,12 @@ jobs:
             const prText = `${prTitle}\n${prBodyWithoutHtmlComments}`
 
             const explicitRefRegex = /\b(?:closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#(\d+)\b/gi
-            const anyIssueRefRegex = /(^|[^\w])#(\d+)\b/gm
+            // A bare `#N` scan would treat casual mentions like "see #123" as a linked
+            // issue, which is unsafe now that linked issues can be auto-closed on merge.
+            // Narrow the fallback to just the pattern it exists to compensate for: the
+            // trailing members of a comma-separated closing-keyword list (e.g.
+            // "Fixes #1, #2"), which explicitRefRegex's singular capture misses.
+            const closingKeywordListRegex = /\b(?:closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#\d+(?:\s*,\s*#\d+)+/gi
 
             const referencedIssueNumbers = new Set(
               closingIssues
@@ -150,10 +155,12 @@ jobs:
               }
             }
 
-            for (const match of prText.matchAll(anyIssueRefRegex)) {
-              const number = Number(match[2])
-              if (Number.isInteger(number)) {
-                referencedIssueNumbers.add(number)
+            for (const listMatch of prText.matchAll(closingKeywordListRegex)) {
+              for (const numberMatch of listMatch[0].matchAll(/#(\d+)/g)) {
+                const number = Number(numberMatch[1])
+                if (Number.isInteger(number)) {
+                  referencedIssueNumbers.add(number)
+                }
               }
             }
 
