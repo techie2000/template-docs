@@ -101,7 +101,12 @@ jobs:
             // Strip HTML comments before scanning for the "keep open" override so the
             // template's own guidance text can't be mistaken for a real checkbox.
             const prBodyWithoutHtmlComments = prBody.replace(/<!--[\s\S]*?-->/g, ' ')
-            const keepIssuesOpenChecked = /- \[x\] keep linked issue\(s\) open\s*-\s*reason\s*:\s*\S+/i.test(
+            // Deliberately does not require reason text after the checkbox: the PR
+            // template's reason placeholder is itself an HTML comment, so a checked
+            // box left with the placeholder untouched would otherwise read as an
+            // empty reason and fail to match - silently allowing an issue to be
+            // auto-closed despite the author's explicit intent to keep it open.
+            const keepIssuesOpenChecked = /- \[x\] keep linked issue\(s\) open\b/i.test(
               prBodyWithoutHtmlComments
             )
 
@@ -352,7 +357,7 @@ jobs:
               // keyword comma list). A plain Refs/Relates mention, or an issue discovered
               // only indirectly via another issue's task list / "children:" line, is not
               // enough - closing it would be an unintended side effect.
-              if (effectiveDesiredStatus === 'status: done' && String(issue.state).toLowerCase() === 'open') {
+              if (desiredStatus === 'status: done' && String(issue.state).toLowerCase() === 'open') {
                 if (!issue.closingEligible) {
                   core.info(`Issue #${issue.number} left open: no closing intent expressed for it on PR #${prNumber}.`)
                 } else if (keepIssuesOpenChecked) {
