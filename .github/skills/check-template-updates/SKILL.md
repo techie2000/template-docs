@@ -27,9 +27,11 @@ for following up on either the scheduled or manual run's output.
   (default `techie2000/template-docs@main`), configured via
   `workflow_dispatch` inputs or `.github/template-sync.yml`. Inputs override
   the committed file; leave them blank to use the repo's own configuration.
-- Only compares the infra allow-list baked into the workflow (`.claude`,
-  `.github/workflows`, `.github/instructions`, `.github/skills`, `AGENTS.md`,
-  `CLAUDE.md`, `scripts`, etc.) — not docs/README/product code.
+- Only compares the `SYNC_PATHS` allow-list baked into the workflow —
+  `.claude`, `.github/workflows`, `.github/instructions`, `.github/skills`,
+  `.github/pull_request_template.md`, `AGENTS.md`, `CLAUDE.md`, `scripts`,
+  `docs/internal`, etc. — not `README.md`, top-level `docs/`, or
+  product/application code.
 - Real 3-way classification (safe-adopt / auto-merge / conflict / local
   divergence) requires `baseline_ref` in `.github/template-sync.yml`.
   Without it, every difference shows up as "changed" in snapshot mode with
