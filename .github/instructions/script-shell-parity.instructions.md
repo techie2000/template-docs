@@ -26,13 +26,13 @@ break `make` targets that try to detect the available shell.
 
 ## Known intentional exceptions
 
-The following scripts are **intentionally PowerShell-only** because the project's
-`.githooks` explicitly require `pwsh` and document this requirement.  No bash
-counterpart is expected:
+The following scripts are **intentionally single-shell only**; no counterpart in
+the other shell flavour is expected:
 
 | Script | Reason |
 | ------ | ------ |
-| `scripts/template/sort-vscode-settings.ps1` | Git hook utility - hook mandates `pwsh` |
+| `scripts/template/sort-vscode-settings.ps1` | PowerShell-only - the project's `.githooks` call it directly and mandate `pwsh`. No bash counterpart. |
+| `scripts/template/settings-sort-claude.sh` | Bash-only - bridges bash environments to the PowerShell-only `sort-vscode-settings.ps1` above by checking for `pwsh` before invoking it. The Windows branch of `make settings-sort-claude` calls `sort-vscode-settings.ps1` directly (not this script); a `.ps1` counterpart to this bash wrapper would just duplicate that same call with no functional difference. No PowerShell counterpart. |
 
 If you add a new script that is intentionally platform-specific, add a row to the
 table above with a clear justification and get it reviewed in the PR.

@@ -93,7 +93,11 @@ jobs:
 
             const hasIssueReferenceKeyword = /\b(closes?|fixes?|resolves?|refs?|relates?\s+to)(?:\s+|:\s*)#\d+/i.test(bodyWithoutHtmlComments)
             const hasCloseOnMergeKeyword = /\b(closes?|fixes?|resolves?)(?:\s+|:\s*)#\d+/i.test(bodyWithoutHtmlComments)
-            const keepOpenChecked = /- \[x\] keep linked issue\(s\) open\s*-\s*reason\s*:\s*\S+/i.test(bodyWithoutHtmlComments)
+            // Deliberately does not require reason text after the checkbox: the PR
+            // template's reason placeholder is itself an HTML comment, so a checked
+            // box left with the placeholder untouched would otherwise read as an
+            // empty reason and silently fail to match.
+            const keepOpenChecked = /- \[x\] keep linked issue\(s\) open\b/i.test(bodyWithoutHtmlComments)
 
             // Guardrail: closing keywords must target issues, not pull requests.
             const closingKeywordMatches = [...bodyWithoutHtmlComments.matchAll(/\b(closes?|fixes?|resolves?)(?:\s+|:\s*)#(\d+)\b/gi)]

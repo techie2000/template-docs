@@ -3,7 +3,9 @@
     "allow": [
       "PowerShell(pwsh ./scripts/template/lint-docs.ps1 -Fix)",
       "Bash(echo \"actionlint exit: $?\")",
-      "Bash(pwsh ./scripts/template/lint-docs.ps1)"
+      "Bash(pwsh ./scripts/template/lint-docs.ps1)",
+      "Bash(git ls-remote origin *)",
+      "Bash(git ls-remote upstream *)"
     ]
   }
 }
