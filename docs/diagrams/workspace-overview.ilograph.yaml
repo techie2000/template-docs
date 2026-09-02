@@ -173,6 +173,19 @@ resources:
         subtitle: Policies and Local IDE Config
         description: Automation and policy folders that support contribution workflows.
         children:
+          - id: claude
+            name: .claude/
+            subtitle: Claude Code Configuration
+            description: >
+              Claude Code configuration; skills/ holds thin stubs delegating
+              to canonical content in .github/skills/.
+            children:
+              - id: claude_skills
+                name: skills/
+                subtitle: Claude Code Skill Discovery Stubs
+                description: >
+                  Thin SKILL.md stubs auto-discovered by Claude Code that
+                  delegate to canonical content in .github/skills/.
           - id: github
             name: .github/
             subtitle: GitHub Configuration
@@ -439,6 +452,15 @@ perspectives:
       - from: config
         to: package_json
         label: defines
+      - from: tooling
+        to: claude
+        label: supports
+      - from: claude
+        to: claude_skills
+        label: includes
+      - from: claude_skills
+        to: skills
+        label: delegates content to
       - from: tooling
         to: github
         label: supports

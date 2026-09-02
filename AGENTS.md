@@ -16,3 +16,7 @@ If you are an AI agent or automation tool starting from the repository root:
 - Do not maintain separate full-policy copies in `CLAUDE.md`, `CURSOR.md`,
   `GEMINI.md`, or similar files. If a tool requires a repo-root discovery
   file, keep it as a thin stub that delegates to the canonical policy.
+- Claude Code auto-discovers skills under `.claude/skills/<name>/SKILL.md`.
+  Those files are thin stubs that delegate to the canonical, tool-neutral
+  content in `.github/skills/<name>/SKILL.md`; do not fork full skill
+  content into `.claude/skills/`.
