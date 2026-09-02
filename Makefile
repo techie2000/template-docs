@@ -1,6 +1,6 @@
 .RECIPEPREFIX := >
 
-.PHONY: init install-hooks settings-sort bootstrap-package settings-profile-generic settings-profile-opinionated settings-profile-check-generic settings-profile-check-opinionated settings-distribute lint-docs lint-docs-fix
+.PHONY: init install-hooks settings-sort settings-sort-claude bootstrap-package settings-profile-generic settings-profile-opinionated settings-profile-check-generic settings-profile-check-opinionated settings-distribute lint-docs lint-docs-fix
 
 ifeq ($(OS),Windows_NT)
 init: install-hooks settings-sort bootstrap-package
@@ -10,6 +10,9 @@ install-hooks:
 
 settings-sort:
 >pwsh ./scripts/template/settings-sort.ps1
+
+settings-sort-claude:
+>pwsh ./scripts/template/sort-vscode-settings.ps1 -SettingsPath .claude/settings.json
 
 bootstrap-package:
 >pwsh ./scripts/template/bootstrap-package-name.ps1
@@ -42,6 +45,9 @@ install-hooks:
 
 settings-sort:
 >bash ./scripts/template/settings-sort.sh
+
+settings-sort-claude:
+>pwsh ./scripts/template/sort-vscode-settings.ps1 -SettingsPath .claude/settings.json
 
 bootstrap-package:
 >bash ./scripts/template/bootstrap-package-name.sh

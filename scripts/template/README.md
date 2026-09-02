@@ -22,7 +22,7 @@ This folder contains helper scripts for local repository tooling.
 | `settings-policy.json` | JSON | Key classification rules that route settings into generic or opinionated profiles. |
 | `sort-vscode-extensions.ps1` | PowerShell | Sorts and normalizes extension recommendation lists in `.vscode/extensions.json`. |
 | `sort-vscode-extensions.sh` | Bash | Wrapper that delegates to `sort-vscode-extensions.ps1` via `pwsh`. |
-| `sort-vscode-settings.ps1` | PowerShell | Canonical JSON key sorter for `.vscode/settings.json`; used by git hooks. |
+| `sort-vscode-settings.ps1` | PowerShell | Canonical JSON key sorter for `.vscode/settings.json`; used by git hooks. Also usable ad hoc against `.claude/settings.json` via `-SettingsPath` (`make settings-sort-claude`); not wired into hooks since that file isn't part of the VS Code settings/extensions/word-list pipeline. |
 | `sort-word-list.ps1` | PowerShell | Sorts cSpell word lists while preserving deterministic formatting. |
 | `sort-word-list.sh` | Bash | Wrapper that delegates to `sort-word-list.ps1` via `pwsh`. |
 
@@ -41,6 +41,7 @@ pwsh ./scripts/template/settings-profile.ps1 -Action distribute -Profile generic
 pwsh ./scripts/template/bootstrap-package-name.ps1
 pwsh ./scripts/template/lint-docs.ps1
 pwsh ./scripts/template/lint-docs.ps1 -Fix
+pwsh ./scripts/template/sort-vscode-settings.ps1 -SettingsPath .claude/settings.json  # or: make settings-sort-claude
 ```
 
 Bash:
