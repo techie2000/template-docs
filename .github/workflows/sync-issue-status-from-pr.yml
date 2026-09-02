@@ -323,6 +323,9 @@ jobs:
                 if (keepIssuesOpenChecked) {
                   core.info(`Issue #${issue.number} left open: "Keep linked issue(s) open" checked on PR #${prNumber}.`)
                 } else {
+                  // The explanatory comment is best-effort: if it fails (permissions,
+                  // rate limiting, locked issue), still attempt the close so the issue
+                  // doesn't stay open just because the comment couldn't be posted.
                   try {
                     await github.rest.issues.createComment({
                       owner: context.repo.owner,
@@ -330,6 +333,11 @@ jobs:
                       issue_number: issue.number,
                       body: `Closing automatically: linked PR #${prNumber} merged.`,
                     })
+                  } catch (error) {
+                    core.warning(`Failed to comment on issue #${issue.number}: ${error.message}`)
+                  }
+
+                  try {
                     await github.rest.issues.update({
                       owner: context.repo.owner,
                       repo: context.repo.repo,
