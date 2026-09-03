@@ -15,6 +15,7 @@ $package = Get-Content -Raw "package.json" | ConvertFrom-Json -AsHashtable
 $currentName = if ($package.ContainsKey("name")) { [string]$package["name"] } else { "" }
 $currentPrivate = if ($package.ContainsKey("private")) { [string]$package["private"] } else { "" }
 $currentDescription = if ($package.ContainsKey("description")) { [string]$package["description"] } else { "" }
+$currentDescription = ($currentDescription -replace '\s+', ' ').Trim()
 
 $repoName = Split-Path -Leaf (Get-Location)
 $projectName = [regex]::Replace($repoName, "^(?i)work-", "")
