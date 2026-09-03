@@ -55,12 +55,12 @@ if (-not $formatted.EndsWith("`n")) {
 $normalizedOriginal = $original -replace "`r`n", "`n"
 
 if ($normalizedOriginal -ceq $formatted) {
-    Write-Host "settings.json is already sorted."
+    Write-Host "$SettingsPath is already sorted."
     exit 0
 }
 
 if ($CheckOnly) {
-    Write-Error "settings.json is not sorted. Run: pwsh ./scripts/sort-vscode-settings.ps1"
+    Write-Error "$SettingsPath is not sorted. Run: pwsh ./scripts/template/sort-vscode-settings.ps1 -SettingsPath `"$SettingsPath`""
     exit 1
 }
 
