@@ -186,6 +186,12 @@ resources:
               Claude Code configuration; skills/ holds thin stubs delegating
               to canonical content in .github/skills/.
             children:
+              - id: claude_agents
+                name: agents/
+                subtitle: Claude Code Agent Discovery Stubs
+                description: >
+                  Thin stubs auto-discovered by Claude Code that delegate to
+                  canonical content in .github/agents/.
               - id: claude_skills
                 name: skills/
                 subtitle: Claude Code Skill Discovery Stubs
@@ -202,12 +208,31 @@ resources:
                 name: ISSUE_TEMPLATE/
                 subtitle: Issue Forms
                 description: Standardized issue templates for structured request intake.
+              - id: agents
+                name: agents/
+                subtitle: Custom Agents
+                description: >
+                  Contextual/advisory custom agents (not unconditional gates)
+                  extracted from copilot-instructions.md.
+                children:
+                  - id: agent_diagrams
+                    name: diagrams.agent.md
+                    subtitle: Diagram Standards Agent
+                    description: >-
+                      Mermaid/Ilograph diagram authoring standards: format
+                      choice, syntax conventions, and dark-mode color scheme.
+                  - id: agent_docs_architect
+                    name: docs-architect.agent.md
+                    subtitle: Documentation Artifact Agent
+                    description: >-
+                      Trigger-based guidance for when to create an ADR,
+                      runbook/checklist, changelog entry, or log file.
               - id: copilot_instructions
                 name: copilot-instructions.md
                 subtitle: Copilot Root Instructions
                 description: >
                   Global Copilot custom instructions: markdown compliance gate,
-                  diagram standards, commit recovery, and temp file placement rules.
+                  commit recovery, and temp file placement rules.
               - id: instructions
                 name: instructions/
                 subtitle: Instruction Files
@@ -468,6 +493,12 @@ perspectives:
       - from: tooling
         to: claude
         label: supports
+      - from: claude
+        to: claude_agents
+        label: includes
+      - from: claude_agents
+        to: agents
+        label: delegates content to
       - from: claude
         to: claude_skills
         label: includes
