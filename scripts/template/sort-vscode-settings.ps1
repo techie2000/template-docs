@@ -60,7 +60,7 @@ if ($normalizedOriginal -ceq $formatted) {
 }
 
 if ($CheckOnly) {
-    Write-Error "$SettingsPath is not sorted. Run: pwsh ./scripts/template/sort-vscode-settings.ps1 -SettingsPath $SettingsPath"
+    Write-Error "$SettingsPath is not sorted. Run: pwsh ./scripts/template/sort-vscode-settings.ps1 -SettingsPath `"$SettingsPath`""
     exit 1
 }
 
