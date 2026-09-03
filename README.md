@@ -9,11 +9,11 @@ and operational references for the software or service being documented.
 
 | Folder | Purpose |
 | ------ | ------- |
+| [.gitattributes](.gitattributes) | Git attributes that should stay aligned with template defaults |
+| [.gitignore](.gitignore) | Repository ignore rules that affect generated-template parity |
 | [docs/](docs/) | Documentation index for the docs area and subfolders |
 | [docs/internal/](docs/internal/) | Internal notes, ADRs, runbooks, and operational references |
 | [docs/vendor/](docs/vendor/) | Vendor documentation and third-party references |
-| [.gitattributes](.gitattributes) | Git attributes that should stay aligned with template defaults |
-| [.gitignore](.gitignore) | Repository ignore rules that affect generated-template parity |
 | [images/](images/) | Supporting screenshots and diagrams |
 | [logs/](logs/) | Tracked log guidance and anchor files; generated runtime logs remain ignored |
 | [scripts/](scripts/) | Scripts directory; `scripts/template/` holds template-provided tooling; add repo-specific scripts in purpose-named subfolders (e.g. `scripts/runtime/`) |
