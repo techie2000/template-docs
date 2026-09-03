@@ -14,7 +14,7 @@ Runs three checks on every commit attempt:
 
 #### 1. VS Code settings sort (`pwsh` required for pre-push)
 
-If `.vscode/settings.json` exists, the hook runs `scripts/template/sort-vscode-settings.ps1` to keep
+If `.vscode/settings.json` exists, the hook runs `scripts/template/settings-sort.ps1` to keep
 the JSON keys alphabetically sorted. If the sorter modifies the file it is automatically staged
 so the sorted version is part of the commit.
 
@@ -57,10 +57,10 @@ run these checks from a machine where `pwsh` is available before pushing.
 
 - Runs `scripts/template/lint-powershell.ps1` against every tracked `.ps1` file and blocks the
   push on violations.
-- Runs `scripts/template/sort-vscode-settings.ps1 -CheckOnly` and blocks the push if the file is
+- Runs `scripts/template/settings-sort.ps1 -CheckOnly` and blocks the push if the file is
   unsorted.
 
-To fix a blocked push, run `pwsh ./scripts/template/sort-vscode-settings.ps1`, then commit the
+To fix a blocked push, run `pwsh ./scripts/template/settings-sort.ps1`, then commit the
 results before pushing again.
 
 ## Installation
@@ -159,7 +159,7 @@ If the pre-commit hook fails on markdown linting:
 If the pre-push hook blocks your push because `.vscode/settings.json` is unsorted:
 
 ```bash
-pwsh ./scripts/template/sort-vscode-settings.ps1
+pwsh ./scripts/template/settings-sort.ps1
 git add .vscode/settings.json
 git commit -m "chore: sort vscode settings"
 git push origin feature/my-branch
