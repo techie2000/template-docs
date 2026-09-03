@@ -10,11 +10,11 @@ Hooks run automatically once installed — no manual steps required per commit.
 
 ### pre-commit
 
-Runs two checks on every commit attempt:
+Runs three checks on every commit attempt:
 
 #### 1. VS Code settings sort (`pwsh` required for pre-push)
 
-If `.vscode/settings.json` exists, the hook runs `scripts/sort-vscode-settings.ps1` to keep
+If `.vscode/settings.json` exists, the hook runs `scripts/template/settings-sort.ps1` to keep
 the JSON keys alphabetically sorted. If the sorter modifies the file it is automatically staged
 so the sorted version is part of the commit.
 
@@ -37,19 +37,31 @@ Runs `npx --no-install markdownlint-cli2` against every staged `.md` file using 
 The hook **fails fast** if `npx` is not available. This is intentional — markdown non-compliance
 is caught before review, not during it.
 
+#### 3. PowerShell linting
+
+Runs `scripts/template/lint-powershell.ps1` against every staged `.ps1` file using
+PSScriptAnalyzer.
+
+If `pwsh` is unavailable, this check is skipped with a warning (commit is not blocked).
+
 ### pre-push
 
-Validates that `.vscode/settings.json` is sorted before code reaches the remote.
+Lints tracked PowerShell files and validates that `.vscode/settings.json` is sorted before code
+reaches the remote.
 
-If `pwsh` is not available the push is **blocked** — install PowerShell 7+ or sort the file
-from a machine where `pwsh` is available before pushing.
+If `pwsh` is not available, PowerShell linting is skipped with a warning (push is not blocked),
+but the `.vscode/settings.json` sort check still **blocks** the push — install PowerShell 7+ or
+run these checks from a machine where `pwsh` is available before pushing.
 
 **What it checks:**
 
-- Runs `scripts/sort-vscode-settings.ps1 -CheckOnly` and blocks the push if the file is unsorted.
+- Runs `scripts/template/lint-powershell.ps1` against every tracked `.ps1` file and blocks the
+  push on violations.
+- Runs `scripts/template/settings-sort.ps1 -CheckOnly` and blocks the push if the file is
+  unsorted.
 
-To fix a blocked push, run `pwsh ./scripts/sort-vscode-settings.ps1`, then commit the results
-before pushing again.
+To fix a blocked push, run `pwsh ./scripts/template/settings-sort.ps1`, then commit the
+results before pushing again.
 
 ## Installation
 
@@ -72,15 +84,15 @@ git config core.hooksPath .githooks
 If you prefer named helper commands instead of typing raw git/npx/pwsh commands:
 
 ```powershell
-pwsh ./scripts/install-hooks.ps1
-pwsh ./scripts/settings-sort.ps1
-pwsh ./scripts/lint-docs.ps1
+pwsh ./scripts/template/install-hooks.ps1
+pwsh ./scripts/template/settings-sort.ps1
+pwsh ./scripts/template/lint-docs.ps1
 ```
 
 ```bash
-bash ./scripts/install-hooks.sh
-bash ./scripts/settings-sort.sh
-bash ./scripts/lint-docs.sh
+bash ./scripts/template/install-hooks.sh
+bash ./scripts/template/settings-sort.sh
+bash ./scripts/template/lint-docs.sh
 ```
 
 Use `bash` explicitly for `.sh` helpers so the commands still work in checkouts
@@ -127,13 +139,13 @@ If the pre-commit hook fails on markdown linting:
 1. **Auto-fix (where possible):**
 
    ```bash
-   npx --no-install markdownlint-cli2 --config .markdownlint.yaml --fix <file>.md
+   npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml --fix <file>.md
    ```
 
 2. **Check manually:**
 
    ```bash
-   npx --no-install markdownlint-cli2 --config .markdownlint.yaml <file>.md
+   npx --no-install markdownlint-cli2 --config .markdownlint-cli2.yaml <file>.md
    ```
 
 3. **Common manual fixes:**
@@ -147,7 +159,7 @@ If the pre-commit hook fails on markdown linting:
 If the pre-push hook blocks your push because `.vscode/settings.json` is unsorted:
 
 ```bash
-pwsh ./scripts/sort-vscode-settings.ps1
+pwsh ./scripts/template/settings-sort.ps1
 git add .vscode/settings.json
 git commit -m "chore: sort vscode settings"
 git push origin feature/my-branch
@@ -164,4 +176,4 @@ git config --unset core.hooksPath
 | Tool | Purpose | Install |
 | ---- | ------- | ------- |
 | `npx` with `markdownlint-cli2` | Markdown linting (pre-commit) | Install Node.js/npm and run `npx --no-install markdownlint-cli2 --version` |
-| `pwsh` (PowerShell 7+) | VS Code settings sorting (pre-commit, pre-push) | [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) |
+| `pwsh` (PowerShell 7+) | VS Code settings sorting and PowerShell linting (pre-commit, pre-push) | [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) |
