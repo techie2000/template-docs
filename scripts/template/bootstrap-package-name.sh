@@ -21,10 +21,17 @@ if [ "$current_private" = "undefined" ] || [ "$current_private" = "null" ]; then
   current_private=""
 fi
 
-current_description=$(npm pkg get description 2>/dev/null | tr -d '"' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' || true)
-if [ "$current_description" = "undefined" ] || [ "$current_description" = "null" ]; then
-  current_description=""
-fi
+current_description=$(node <<'NODE'
+const fs = require("fs");
+let pkg = {};
+try {
+  pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+} catch (error) {
+  pkg = {};
+}
+process.stdout.write(typeof pkg.description === "string" ? pkg.description : "");
+NODE
+)
 
 repo_name=$(basename "$PWD")
 project_name=$(printf '%s' "$repo_name" | sed -E 's/^[Ww][Oo][Rr][Kk]-//')
