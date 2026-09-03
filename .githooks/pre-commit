@@ -36,6 +36,20 @@ if [ -f ".vscode/settings.json" ] || [ -f ".vscode/settings.generic.json" ] || [
     fi
 fi
 
+if [ -f ".mcp.json" ] || [ -f ".vscode/mcp.json" ]; then
+    if [ -f ".mcp.json" ] && [ -f ".vscode/mcp.json" ]; then
+        if ! cmp -s ".mcp.json" ".vscode/mcp.json"; then
+            echo ".mcp.json and .vscode/mcp.json have drifted out of sync."
+            echo "VS Code reads .vscode/mcp.json; Copilot CLI/Agent Host reads root .mcp.json - both must stay identical."
+            echo "Run: cp .vscode/mcp.json .mcp.json"
+            exit 1
+        fi
+    else
+        echo "Only one of .mcp.json / .vscode/mcp.json exists; both are required to stay in sync."
+        exit 1
+    fi
+fi
+
 echo "Running markdown linting..."
 
 if ! command -v npx > /dev/null 2>&1; then
