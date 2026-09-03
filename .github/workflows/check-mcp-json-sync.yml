@@ -1,0 +1,37 @@
+name: Check MCP Config Sync
+
+on:
+  pull_request:
+    paths:
+      - '.mcp.json'
+      - '.vscode/mcp.json'
+      - '.github/workflows/check-mcp-json-sync.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '.mcp.json'
+      - '.vscode/mcp.json'
+      - '.github/workflows/check-mcp-json-sync.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  check-mcp-json-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Verify .mcp.json matches .vscode/mcp.json
+        run: |
+          if [ -f ".mcp.json" ] && [ -f ".vscode/mcp.json" ]; then
+            cmp -s ".mcp.json" ".vscode/mcp.json" || {
+              echo "::error::.mcp.json and .vscode/mcp.json have drifted. Run: cp .vscode/mcp.json .mcp.json"
+              exit 1
+            }
+          else
+            echo "::error::Both .mcp.json and .vscode/mcp.json must exist."
+            exit 1
+          fi

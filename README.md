@@ -35,6 +35,7 @@ and operational references for the software or service being documented.
 | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | markdownlint-cli2 configuration aligned with repository linting behavior |
 | [.markdownlint.yaml](.markdownlint.yaml) | Shared markdownlint rule configuration used by hooks and CI |
 | [.markdownlintignore](.markdownlintignore) | Ignore rules for transient markdown artifacts such as .tmp/ output |
+| [.mcp.json](.mcp.json) | Copilot CLI/Agent Host-readable copy of `.vscode/mcp.json`'s MCP server config; kept in sync by a pre-commit and CI check (see #57) |
 | [.vscode/](.vscode/) | Workspace settings, extension recommendations, MCP config, and cSpell dictionaries |
 | [AGENTS.md](AGENTS.md) | Thin cross-agent entrypoint delegating to the canonical Copilot instructions |
 | [CLAUDE.md](CLAUDE.md) | Thin Claude Code entrypoint that `@`-imports `AGENTS.md` instead of forking a separate policy copy |

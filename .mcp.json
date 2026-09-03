@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "ilograph": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "ghcr.io/quincymillerdev/ilograph-mcp-server:1.0.3"
+      ]
+    }
+  }
+}
