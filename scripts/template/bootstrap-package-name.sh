@@ -29,7 +29,8 @@ try {
 } catch (error) {
   pkg = {};
 }
-process.stdout.write(typeof pkg.description === "string" ? pkg.description : "");
+const description = typeof pkg.description === "string" ? pkg.description : "";
+process.stdout.write(description.replace(/\r\n|\r|\n/g, " ").trim());
 NODE
 )
 
