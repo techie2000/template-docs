@@ -42,11 +42,11 @@ This prevents duplicate issues from being created in the first place.
 
 When closing an issue as a duplicate:
 
-1. Close the issue with reason `duplicate` via `gh issue close <num> --reason duplicate`.
-2. Add a reference comment immediately pointing to the canonical issue using this format:
+1. **Close the issue** with reason `duplicate` via `gh issue close <num> --reason duplicate`.
+2. **Add a reference comment immediately** pointing to the canonical issue using this format:
    `Duplicate of #<CANONICAL_NUM> - follow that issue for the implementation.`
-3. Do not leave a closed duplicate without a pointer, because users landing on the closed issue
-   need a direct path to the active issue.
+3. **Do not leave a closed duplicate without a pointer**, because users landing on the closed
+   issue need a direct path to the active issue.
 
 Example command:
 
@@ -58,9 +58,9 @@ gh issue comment <DUP_NUM> --body "Duplicate of #<CANONICAL_NUM> - follow that i
 
 Keep duplicate-pointer comments minimal and consistent:
 
-- Format: `Duplicate of #<NUM> - follow that issue for the implementation.`
-- Placement: Post the comment on the closed duplicate immediately after closure.
-- Timing: Post the pointer before moving on to other issue work.
+- **Format**: `Duplicate of #<NUM> - follow that issue for the implementation.`
+- **Placement**: Post the comment on the closed duplicate immediately after closure.
+- **Timing**: Post the pointer before moving on to other issue work.
 
 ## Verification
 
