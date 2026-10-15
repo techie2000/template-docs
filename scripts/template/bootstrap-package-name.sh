@@ -30,7 +30,7 @@ try {
   pkg = {};
 }
 const description = typeof pkg.description === "string" ? pkg.description : "";
-process.stdout.write(description.replace(/\r\n|\r|\n/g, " ").trim());
+process.stdout.write(description.replace(/\s+/g, " ").trim());
 NODE
 )
 
